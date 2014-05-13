@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.TypedQuery;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TableColumn;
 
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.dto.CommonDTO;
@@ -122,6 +123,17 @@ public class RecycleListController extends SimpleListController {
 			@Override
 			public CommonDTOList<? extends CommonDTO> getControllerDTO() throws DTOException {
 				return getDTO();
+			}
+
+			@Override
+			public void onColumnResized(TableColumn column) {
+				
+			}
+
+			@Override
+			public void onColumnAdded(TableColumn column, String filterField,
+					String filterFieldGetter, String filterFieldSetter,
+					Class<?> filterFieldType) {				
 			}
 		};
 	}
