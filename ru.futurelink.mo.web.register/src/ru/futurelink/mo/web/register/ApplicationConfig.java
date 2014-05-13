@@ -1,5 +1,6 @@
 package ru.futurelink.mo.web.register;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.DigestInputStream;
@@ -127,34 +128,35 @@ public class ApplicationConfig implements ApplicationConfiguration {
 					}
 				});
 				properties.put( WebClient.FAVICON, info.favicon );
-			} /*else if (info.faviconStream != null) {
+			} else if (info.faviconStream != null) {
 
 				// Если у фавикона нет имени - надо его сгенерить на основе данных,
 				// чтобы, когда RWT будет генерить на основании него файлики - они не размножались
 				if (info.favicon == null) {
 					try {
+						BufferedInputStream stream = new BufferedInputStream(info.faviconStream);
+						stream.mark(65535);	// Mark for rewind limit is 64kb for favicon
+
+						// Generate MD5 digest of favicon stream
 						MessageDigest md = MessageDigest.getInstance("MD5");
-						new DigestInputStream(info.faviconStream, md);
-						while (info.faviconStream.read() != -1) {}
+						new DigestInputStream(stream, md);
+						while (stream.read() != -1) {}
 						byte[] digest = md.digest();
 						StringBuffer md5 = new StringBuffer();
 						for (int i = 0; i < digest.length; i++) {
 			                md5.append(Integer.toHexString(0xFF & digest[i]));
 			            }
-						info.favicon = "favicon_md5_"+new String(md5);						
+						info.favicon = "favicon_md5_"+new String(md5);
+
+						stream.reset();	// Rewind it
+
+						application.addResource(info.favicon, new StreamResourceLoader(stream));
+						properties.put( WebClient.FAVICON, info.favicon );
 					} catch (IOException | NoSuchAlgorithmException e) {
-						info.favicon = "favicon_rand_"+String.valueOf(Math.round(Math.random()*100000));
+						mLogger.warn("Невозможно загрузить favicon!", e);
 					}
 				}
-
-				application.addResource(info.favicon, new ResourceLoader() {					
-					@Override
-					public InputStream getResourceAsStream(String arg0) throws IOException {
-						return info.faviconStream;
-					}					
-				});
-				properties.put( WebClient.FAVICON, info.favicon );				
-			}*/ else {
+			} else {
 				mLogger.warn("Невозможно загрузить favicon, по всей видимости он не доступен из classpath бандла ru.futurelin.mo.web.register");
 			}
 
@@ -172,6 +174,20 @@ public class ApplicationConfig implements ApplicationConfiguration {
 		String favicon;
 		InputStream faviconStream;
 		EntryPointFactory factory;
+	}
+	
+	class StreamResourceLoader implements ResourceLoader {
+		private InputStream mStream;
+		
+		public StreamResourceLoader(InputStream stream) {
+			mStream = stream;
+		}
+		
+		@Override
+		public InputStream getResourceAsStream(String arg0) throws IOException {
+			return mStream;
+		}
+		
 	}
 	
 }
