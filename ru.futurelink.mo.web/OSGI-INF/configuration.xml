@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component
+	xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.osgi.org/xmlns/scr/v1.1.0/scr.xsd"
+	name="ru.futurelink.mo.web">
+   <implementation class="ru.futurelink.mo.web.app.ApplicationConfig"/>
+   <property name="contextName" type="String" value="mo"/>
+   <service>
+      <provide interface="org.eclipse.rap.rwt.application.ApplicationConfiguration"/>
+   </service>
+</scr:component>
