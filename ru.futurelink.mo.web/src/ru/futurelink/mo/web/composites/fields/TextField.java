@@ -139,7 +139,7 @@ public class TextField extends CommonField {
 				if (FilterDTO.class.isAssignableFrom(getDTO().getClass()))
 					getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, null);
 				else
-					getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, "");
+					getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, getValue());
 			} else {
 				getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, getValue());
 			}

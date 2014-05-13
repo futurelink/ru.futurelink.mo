@@ -87,7 +87,7 @@ public class IntegerField extends TextField {
 	
 	@Override
 	public Object getValue() {
-		if (getText() == null || getText().equals("")) return null;
+		if (getText() == null || getText().equals("")) return (Integer)null;
 		return Integer.valueOf(getText());
 	}
 	
