@@ -1,0 +1,73 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>ru.futurelink.mo</groupId>
+	<artifactId>web.graphics</artifactId>
+	<version>0.0.1.11</version>
+	<name>MO Graphics package</name>
+	<packaging>bundle</packaging>
+	<build>
+		<resources>
+			<resource>
+				<directory>resources</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>      
+		</resources>
+    
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>    	    
+					<manifestLocation>META-INF</manifestLocation>
+					<instructions>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Version>${project.version}</Bundle-Version>
+						<Fragment-Host>ru.futurelink.mo.web</Fragment-Host>
+						<Bundle-ClassPath>.</Bundle-ClassPath>
+						<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+						<Include-Resource>
+							{maven-resources}
+						</Include-Resource>
+						<Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>ru.futurelink.mo</groupId>
+			<artifactId>web</artifactId>
+			<version>0.0.1.11</version>
+		</dependency>
+	</dependencies>
+
+    <distributionManagement>
+	<repository>
+		<id>fluvio-maven-repo</id>
+		<name>Fluvio Maven2 repo</name>
+		<url>scp://fluvio.ru/maven</url>
+	</repository>
+    </distributionManagement>
+
+</project>

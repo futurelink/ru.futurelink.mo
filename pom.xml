@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                          http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ru.futurelink</groupId>
+    <artifactId>fluvio</artifactId>
+    <version>0.0.1.11-SNAPSHOT</version>
+    <name>ru.futurelink.mo build</name>
+    <packaging>pom</packaging>
+
+    <modules>
+	<module>ru.futurelink.mo.orm</module>
+	<module>ru.futurelink.mo.web</module>
+	<module>ru.futurelink.mo.web.graphics</module>
+	<module>ru.futurelink.mo.web.register</module>
+    </modules>
+
+    <distributionManagement>
+	<repository>
+		<id>fluvio-maven-repo</id>
+		<name>Fluvio Maven2 repo</name>
+		<url>scp://fluvio.ru/maven</url>
+	</repository>
+    </distributionManagement>
+
+</project>

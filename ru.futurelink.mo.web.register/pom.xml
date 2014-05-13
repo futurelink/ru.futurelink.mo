@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ru.futurelink.mo</groupId>
-	<artifactId>web</artifactId>
-	<version>0.0.1.11</version>
-	<name>Main web components</name>
+	<artifactId>web.register</artifactId>
+	<name>MO Usecase and entry points register services</name>
+	<version>1.0.0.0</version>
 	<packaging>bundle</packaging>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
@@ -35,17 +35,11 @@
 					<instructions>
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId};singleton:=true</Bundle-SymbolicName>
 						<Bundle-Version>${project.version}</Bundle-Version>
-						<Export-Package>
-							ru.futurelink.mo.web.app,
-							ru.futurelink.mo.web.composites.*,
-							ru.futurelink.mo.web.controller.*,
-							ru.futurelink.mo.web.history,
-							ru.futurelink.mo.web.recycle,
-							ru.futurelink.mo.web.exceptions,
-							ru.futurelink.mo.web.topmenu
-						</Export-Package>
+						<Export-Package>ru.futurelink.mo.web.register.*</Export-Package>
 						<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 						<Bundle-ClassPath>.</Bundle-ClassPath>
+						<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+						<Bundle-Activator>ru.futurelink.mo.web.register.Activator</Bundle-Activator>
 						<Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
 					</instructions>
 				</configuration>
@@ -60,41 +54,6 @@
 
 	<dependencies>
 	<dependency>
-		<groupId>ru.futurelink.mo</groupId>
-		<artifactId>web.register</artifactId>
-		<version>1.0.0.0</version>
-	</dependency>
-	<dependency>
-		<groupId>ru.futurelink.mo</groupId>
-		<artifactId>orm</artifactId>
-		<version>0.0.1.7</version>
-	</dependency>
-	<dependency>
-		<groupId>ru.futurelink.mo</groupId>
-		<artifactId>orm.mongodb</artifactId>
-		<version>0.0.1.5</version>
-	</dependency>
-	<dependency>
-		<groupId>org.slf4j</groupId>
-		<artifactId>slf4j-api</artifactId>
-		<version>1.7.6</version>
-	</dependency>
-	<dependency>
-		<groupId>org.eclipse.rap</groupId>
-		<artifactId>org.eclipse.rap.rwt.osgi</artifactId>
-		<version>2.2.0</version>
-	</dependency>
-	<dependency>
-		<groupId>org.eclipse.rap</groupId>
-		<artifactId>org.eclipse.rap.jface</artifactId>
-		<version>2.2.0</version>
-	</dependency>
-	<dependency>
-		<groupId>ru.futurelink.mo</groupId>
-		<artifactId>jgravatar</artifactId>
-		<version>0.0.1.5</version>
-	</dependency>
-	<dependency>
 		<groupId>equinox</groupId>
 		<artifactId>org.eclipse.osgi.services</artifactId>
 		<version>3.4.0.v20131120-1328</version>
@@ -108,25 +67,35 @@
 		<groupId>equinox</groupId>
 		<artifactId>org.eclipse.osgi</artifactId>
 		<version>3.10.0.v20140305-1523</version>
+	</dependency>	    
+	<dependency>
+		<groupId>org.eclipse.rap</groupId>
+		<artifactId>org.eclipse.rap.rwt.osgi</artifactId>
+		<version>2.1.0</version>
+	</dependency>
+	<dependency>
+		<groupId>org.eclipse.rap</groupId>
+		<artifactId>org.eclipse.rap.jface</artifactId>
+		<version>2.1.0</version>
 	</dependency>
 	<dependency>
 		<groupId>org.eclipse.rap</groupId>
 		<artifactId>org.eclipse.rap.rwt</artifactId>
-		<version>2.2.0</version>
+		<version>2.1.0</version>
 	</dependency>
 	<dependency>
-		<groupId>equinox</groupId>
-		<artifactId>javax.servlet</artifactId>
-		<version>3.0.0.v201112011016</version>
-	</dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-api</artifactId>
+		<version>1.7.6</version>
+	</dependency>  	
 	</dependencies>
 
 	<distributionManagement>
-		<repository>
-			<id>fluvio-maven-repo</id>
-			<name>Fluvio Maven2 repo</name>
-			<url>scp://fluvio.ru/maven</url>
-		</repository>
+	<repository>
+		<id>fluvio-maven-repo</id>
+		<name>Fluvio Maven2 repo</name>
+		<url>scp://fluvio.ru/maven</url>
+	</repository>
 	</distributionManagement>
-
+ 
 </project>
