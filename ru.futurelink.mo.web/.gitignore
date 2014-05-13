@@ -1,0 +1,6 @@
+/bin
+/dist
+/doc
+/target
+*.iml
+/META-INF/MANIFEST.MF
