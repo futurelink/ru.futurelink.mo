@@ -3,7 +3,7 @@
 	<groupId>ru.futurelink.mo</groupId>
 	<artifactId>web</artifactId>
 	<version>0.0.1.11</version>
-	<name>Main web components</name>
+	<name>MO Main web components</name>
 	<packaging>bundle</packaging>
 	<build>
 		<sourceDirectory>src</sourceDirectory>

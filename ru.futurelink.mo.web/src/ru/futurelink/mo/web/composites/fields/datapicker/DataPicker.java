@@ -23,9 +23,12 @@ import org.eclipse.swt.widgets.Text;
 
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.FilterDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonComposite;
+import ru.futurelink.mo.web.composites.CommonItemComposite;
+import ru.futurelink.mo.web.composites.fields.CommonField;
 import ru.futurelink.mo.web.composites.fields.IField;
 import ru.futurelink.mo.web.controller.CommonItemController;
 import ru.futurelink.mo.web.controller.CommonItemControllerListener;
@@ -37,15 +40,12 @@ import ru.futurelink.mo.web.controller.CompositeParams;
  * @author Futurelink
  *
  */
-public class DataPicker extends CommonComposite implements IField {
-
-	private static final long serialVersionUID = 1L;
+public class DataPicker extends CommonField implements IField {
 
 	private Text	mEdit;
 	private Label	mSelectButton;
 	private Label  mClearButton;
 	
-	private CommonDTO				mSelectedData;
 	private ModifyListener 			mModifyListener;
 	private SelectionListener		mDataPickListener;
 	
@@ -58,11 +58,9 @@ public class DataPicker extends CommonComposite implements IField {
 	
 	private String			mDisplayFieldName;
 	private String			mDisplayFieldGetterName;
-	private String			mDisplayFieldSetterName;
 	
 	private Map<String, ArrayList<Object>> mQueryConditions;
 	private String			mOrderBy;	
-	private boolean		mMandatoryFlag;
 	
 	// Свойства используемые для определения 
 	// создания элемента из списка выбора
@@ -71,30 +69,51 @@ public class DataPicker extends CommonComposite implements IField {
 	protected CommonItemControllerListener mParentControllerListener;
 	
 	public DataPicker(ApplicationSession session, 
-			Composite parent, 
+			CommonComposite parent, 
 			int style, 
-			CompositeParams params, 
-			Class<? extends CommonDataPickerController> pickerController) {
-		super(session, parent, style, params);
+			CompositeParams params,
+			CommonDTO dto,
+			Class<? extends CommonDataPickerController> pickerController
+			) {
+		super(session, parent, style, params, dto);
 		
 		mPickerController = pickerController;
 
-		GridLayout l = new GridLayout();
-		l.numColumns = 3;
-		l.marginWidth = 0;
-		l.marginHeight = 0;
-		l.horizontalSpacing = 0;
-		l.verticalSpacing = 0;
-		setLayout(l);
+		createControls(style);
+	}
+	
+	public DataPicker(ApplicationSession session, 
+			CommonComposite parent, 
+			int style, 
+			CompositeParams params, 
+			CommonItemComposite dataComposite,
+			Class<? extends CommonDataPickerController> pickerController) {
+		super(session, parent, style, params, dataComposite);
+		
+		mPickerController = pickerController;
+		
+		createControls(style);
+	}
 
-		mEdit = new Text(this, SWT.BORDER | SWT.READ_ONLY);
+	private void createControls(int style) {
+		mControl = new CommonComposite(mParent.getSession(), mParent, SWT.READ_ONLY, null);
+
+		GridLayout gl = new GridLayout(3, false);
+		gl.marginWidth = 0;
+		gl.marginHeight = 0;
+		gl.horizontalSpacing = 0;
+		gl.verticalSpacing = 0;
+
+		((CommonComposite)mControl).setLayout(gl);
+
+		mEdit = new Text((Composite) mControl, SWT.BORDER | SWT.READ_ONLY);
 		mEdit.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 		mEdit.pack();
 
-		mClearButton = new Label(this, SWT.NONE);
+		mClearButton = new Label((Composite) mControl, SWT.NONE);
 		mClearButton.setLayoutData(new GridData(GridData.FILL_VERTICAL));
 		mClearButton.setData(RWT.CUSTOM_VARIANT, "dataPickerButton");
-		mClearButton.setImage(new Image(getDisplay(), getClass().getResourceAsStream("/images/24/delete.png")));
+		mClearButton.setImage(new Image(mControl.getDisplay(), getClass().getResourceAsStream("/images/24/delete.png")));
 		mClearButton.pack();
 		if ((style & SWT.READ_ONLY) > 0) mClearButton.setEnabled(true);
 		mClearButton.addMouseListener(new MouseListener() {
@@ -108,17 +127,22 @@ public class DataPicker extends CommonComposite implements IField {
 			
 			@Override
 			public void mouseDown(MouseEvent arg0) {
-				setDTO(null);
+				try {
+					setSelectedDTO(null);
+					refresh();
+				} catch (DTOException ex) {
+					// TODO hand;e this error!
+				}
 			}
 			
 			@Override
 			public void mouseDoubleClick(MouseEvent arg0) {}
 		});
 		
-		mSelectButton = new Label(this, SWT.NONE);
+		mSelectButton = new Label((Composite) mControl, SWT.NONE);
 		mSelectButton.setLayoutData(new GridData(GridData.FILL_VERTICAL));
 		mSelectButton.setData(RWT.CUSTOM_VARIANT, "dataPickerButton");
-		mSelectButton.setImage(new Image(getDisplay(), getClass().getResourceAsStream("/images/24/find.png")));
+		mSelectButton.setImage(new Image(mControl.getDisplay(), getClass().getResourceAsStream("/images/24/find.png")));
 		mSelectButton.pack();
 		if ((style & SWT.READ_ONLY) > 0) mSelectButton.setEnabled(true);
 		mSelectButton.addMouseListener(new MouseListener() {
@@ -147,44 +171,63 @@ public class DataPicker extends CommonComposite implements IField {
 			public void mouseDoubleClick(MouseEvent arg0) {}
 		});
 		
-		mQueryConditions = new HashMap<String, ArrayList<Object>>();
+		mQueryConditions = new HashMap<String, ArrayList<Object>>();		
 	}
 
-	@Override
-	public CommonDTO getDTO() {
-		return mSelectedData;
+	/**
+	 * Get current selected item's DTO.
+	 *  
+	 * @return
+	 */
+	public CommonDTO getSelectedDTO() throws DTOException {
+		if (getDTO() != null)
+			return (CommonDTO) getDTO().getDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter);
+		else
+			return null;
 	}
-	
-	@Override
-	public void setDTO(CommonDTO data) {
+
+	/**
+	 * Set current selected item DTO.
+	 * 
+	 * @param data
+	 */
+	public void setSelectedDTO(CommonDTO data) throws DTOException {
 		// Только если реально данные изменились на уровне объекта
-		if (((data != null) && !data.equals(mSelectedData)) || 
+		/*if (((data != null) && !data.equals(mSelectedData)) || 
 			((data == null) && (mSelectedData != null))) {
-			mSelectedData = data;
+			mSelectedData = data;*/
+
+			// Set current selected item with value got from getDTO() method
+			if (getDTO() != null) {
+				// Это касается фильтра
+				if (FilterDTO.class.isAssignableFrom(getDTO().getClass()) && getUseOnlyOneCondition())
+					getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, null);
+
+				getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, data);
+			}
+
 			if (mModifyListener != null) {
 				Event e = new Event();
-				e.widget = this;
-				e.display = getDisplay();
+				e.widget = mControl;
+				e.display = mControl.getDisplay();
 				mModifyListener.modifyText(new ModifyEvent(e)); // Отправляем событие
 			}
-		}
-		refresh();		
+		//}			
 	}
 	
 	@Override
-	public void refresh() {
-		// Показать выбранные в дейтапикере данные, согласно конфигурации этого самого пикера
+	public void refresh() throws DTOException {
+		// Display selected item display field value
 		if (!mDisplayFieldName.isEmpty() && !mDisplayFieldGetterName.isEmpty()) {
-			try {
-				if (getDTO() != null)
-					mEdit.setText(getDTO().getDataField(mDisplayFieldName, mDisplayFieldGetterName, 
-						mDisplayFieldSetterName).toString());
-				else
-					mEdit.setText(getLocaleString("noValue"));
-			} catch (DTOException ex) {
-				mEdit.setText(ex.toString());
-			}
+			if (getSelectedDTO() != null)
+				mEdit.setText(
+					getSelectedDTO().getDataFieldAsString(mDisplayFieldName, mDisplayFieldGetterName, "")
+				);
+			else
+				//mEdit.setText(getLocaleString("noValue"));
+				mEdit.setText("-");
 		}
+
 		handleMandatory();
 	}
 	
@@ -204,10 +247,9 @@ public class DataPicker extends CommonComposite implements IField {
 	 * @param getterName
 	 * @param setterName
 	 */
-	final public void setDisplayField(String fieldName, String getterName, String setterName) {
+	final public void setDisplayField(String fieldName, String getterName) {
 		mDisplayFieldName = fieldName;
 		mDisplayFieldGetterName = getterName;
-		mDisplayFieldSetterName = setterName;
 	}
 	
 	/**
@@ -305,25 +347,8 @@ public class DataPicker extends CommonComposite implements IField {
 	}
 
 	@Override
-	public void setDataField(String dataField, String dataFieldGetter,
-			String dataFieldSetter) {}
-
-	@Override
 	public void setParentControllerListener(CommonItemControllerListener listener) {
 		mParentControllerListener = listener;		
-	}
-
-	@Override
-	public void clear() {}
-
-	@Override
-	public void setMandatory(boolean isMandatory) {
-		mMandatoryFlag = isMandatory;
-	}
-
-	@Override
-	public boolean getMandatory() {
-		return mMandatoryFlag;
 	}
 
 	@Override
@@ -331,7 +356,8 @@ public class DataPicker extends CommonComposite implements IField {
 		return (getDTO() == null);
 	}
 		
-	private void handleMandatory() {
+	@Override
+	public void handleMandatory() {
 		if (getMandatory()&&isEmpty()) {
 			mEdit.setBackground(new Color(mEdit.getDisplay(), 255, 169, 169));
 		} else {
@@ -347,7 +373,7 @@ public class DataPicker extends CommonComposite implements IField {
 	public void setAllowCreate(boolean allowCreate) {
 		mAllowCreate = allowCreate;
 	}
-	
+
 	/**
 	 * Получить можно ли создавать элементы из списка выбора.
 	 * 
@@ -367,14 +393,30 @@ public class DataPicker extends CommonComposite implements IField {
 		mItemControllerClass = clazz;
 	}
 
+	/**
+	 * Get selectable data item controller class. The class is used for items creation function which is
+	 * enabled by setAllowCreate() method.
+	 * 
+	 * @return
+	 */
 	public Class<? extends CommonItemController> getItemControllerClass() {
 		return mItemControllerClass;
 	}
 
+	/**
+	 * Set parameters of item creation dialog widget.
+	 * 
+	 * @param params
+	 */
 	public void setItemDialogParams(CompositeParams params) {
 		mItemDialogParams = params;
 	}
 
+	/**
+	 * Get parameters of item creation dialog widget.
+	 * 
+	 * @return
+	 */
 	public CompositeParams getItemDialogParams() {
 		return mItemDialogParams;
 	}
@@ -387,16 +429,6 @@ public class DataPicker extends CommonComposite implements IField {
 	@Override
 	public Object getValue() {
 		return getDTO();
-	}
-
-	@Override
-	public String getDataFieldGetter() {
-		return null;
-	}
-
-	@Override
-	public String getDataFieldSetter() {
-		return null;
 	}
 	
 }

@@ -148,7 +148,7 @@ public class ComboField extends CommonField {
 	}
 
 	@Override
-	protected void handleMandatory() {
+	public void handleMandatory() {
 		if (getMandatory()&&isEmpty()) {
 			mControl.setBackground(new Color(mControl.getDisplay(), 255, 169, 169));
 		} else {

@@ -69,7 +69,7 @@ abstract public class CommonField implements IField {
 	/**
 	 * Обработать обязательность поля. Показать как-либо маркер, свойственный данному полю.
 	 */
-	abstract protected void handleMandatory();
+	abstract public void handleMandatory();
 	
 	/**
 	 * Получить элемент DTO для поля:
