@@ -202,7 +202,7 @@ public class LimitDayField extends CommonField {
 	}
 
 	@Override
-	protected void handleMandatory() {
+	public void handleMandatory() {
 		
 	}
 

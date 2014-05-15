@@ -81,7 +81,7 @@ public class CommonComposite extends Composite {
 	 * 
 	 * @throws InitException 
 	 */
-	public void init() throws InitException {}
+	public synchronized void init() throws InitException {}
 	
 	/**
 	 * Метод для удобства. Возвращает локаль установленную в сессии пользователя.

@@ -106,7 +106,7 @@ public class DateField extends CommonField {
 	}
 
 	@Override
-	protected void handleMandatory() {
+	public void handleMandatory() {
 		
 	}
 

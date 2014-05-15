@@ -77,7 +77,7 @@ public class CheckBoxField extends CommonField {
 	}
 
 	@Override
-	protected void handleMandatory() {}
+	public void handleMandatory() {}
 
 	@Override
 	public Object getValue() {

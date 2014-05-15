@@ -139,7 +139,7 @@ public class TextField extends CommonField {
 				if (FilterDTO.class.isAssignableFrom(getDTO().getClass()))
 					getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, null);
 				else
-					getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, "");
+					getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, getValue());
 			} else {
 				getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, getValue());
 			}
@@ -246,7 +246,7 @@ public class TextField extends CommonField {
 	}
 
 	@Override
-	protected void handleMandatory() {
+	public void handleMandatory() {
 		if (getMandatory()&&isEmpty()) {
 			mControl.setBackground(new Color(mControl.getDisplay(), 255, 169, 169));
 		} else {

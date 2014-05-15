@@ -465,10 +465,13 @@ public class EditorDTO extends CommonDTO {
 	        // если данные в буфере изменений отличаются от данных в элементе данных,
 	        // то берем в возвращаем их. Разумеется, если в буфере вообще есть данные
 	        // по этому ключу, то есть данные вообще когда либо изменялись.
-        	if (mChangesBuffer.containsKey(fieldName) && 
-        		(mChangesBuffer.get(fieldName)[2] != null) &&
-        		!mChangesBuffer.get(fieldName)[2].equals(a)) {
-        		a = mChangesBuffer.get(fieldName)[2];
+        	if (mChangesBuffer.containsKey(fieldName)) {
+        		if ((mChangesBuffer.get(fieldName)[2] != null) &&
+                	!mChangesBuffer.get(fieldName)[2].equals(a)) {
+            		a = mChangesBuffer.get(fieldName)[2];
+        		} else if (mChangesBuffer.get(fieldName)[2] == null) {
+        			a = null;
+        		}
 	        }
 		} catch (NoSuchMethodException e) {
 			throw new DTOException(e.toString(), e);

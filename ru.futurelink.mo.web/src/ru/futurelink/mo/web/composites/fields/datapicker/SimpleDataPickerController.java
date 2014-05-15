@@ -123,9 +123,6 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 		handleDataQueryExecuted();
 	}
 	
-	/* (non-Javadoc)
-	 * @see ru.futurelink.mo.web.composites.fields.datapicker.CommonDataPickerController#doAfterInit()
-	 */
 	@Override
 	protected void doAfterInit() {
 		try {

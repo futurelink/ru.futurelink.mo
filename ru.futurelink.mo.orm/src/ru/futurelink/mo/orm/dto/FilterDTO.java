@@ -93,19 +93,33 @@ public class FilterDTO extends CommonDTO {
 				for (int n = 0; n < mQueryConditions.get(fieldName).size(); n++) {
 					// Пустые условия мы не учитываем при формировании списка условий
 					// просто их пропускаем.
-					if (mQueryConditions.get(fieldName).get(n) != null && 
-						!mQueryConditions.get(fieldName).get(n).equals("")) {
-						// Обработка диапазона дат "от" и "до" 
-						if (DateRange.class.isAssignableFrom(mQueryConditions.get(fieldName).get(n).getClass())) {
-							cond = cond + "(" + fieldName + " >= :fieldData" + k + n+"min and "+
-								fieldName + " <= :fieldData" + k + n+"max)";
-							mAdditionalValues.put("fieldData" + k + n+"min", 
-									((DateRange)mQueryConditions.get(fieldName).get(n)).getBeginDate());						
-							mAdditionalValues.put("fieldData" + k + n+"max", 
-									((DateRange)mQueryConditions.get(fieldName).get(n)).getEndDate());						
+					if (mQueryConditions.get(fieldName).get(n) != null) {
+						// If condition is a CommonDTO object - use data item specific value processing
+						if (CommonDTO.class.isAssignableFrom(mQueryConditions.get(fieldName).get(n).getClass())) {
+							try {
+								String id = ((CommonDTO)mQueryConditions.get(fieldName).get(n)).getId();
+								cond = cond + fieldName + ".mId = :fieldData" + k + n;
+								mAdditionalValues.put("fieldData" + k + n, id);
+							} catch (DTOException ex) {
+								// TODO handle this error
+								ex.printStackTrace();
+							}
 						} else {
-							cond = cond + fieldName + " = :fieldData" + k + n;
-							mAdditionalValues.put("fieldData" + k + n, mQueryConditions.get(fieldName).get(n));
+							// If condition is a string or any other value - use simple string processing
+							if (!mQueryConditions.get(fieldName).get(n).equals("")) {
+								// Обработка диапазона дат "от" и "до" 
+								if (DateRange.class.isAssignableFrom(mQueryConditions.get(fieldName).get(n).getClass())) {
+									cond = cond + "(" + fieldName + " >= :fieldData" + k + n+"min and "+
+										fieldName + " <= :fieldData" + k + n+"max)";
+									mAdditionalValues.put("fieldData" + k + n+"min", 
+										((DateRange)mQueryConditions.get(fieldName).get(n)).getBeginDate());						
+									mAdditionalValues.put("fieldData" + k + n+"max", 
+										((DateRange)mQueryConditions.get(fieldName).get(n)).getEndDate());						
+								}
+							} else {					
+								cond = cond + fieldName + " = :fieldData" + k + n;
+								mAdditionalValues.put("fieldData" + k + n, mQueryConditions.get(fieldName).get(n));
+							}
 						}
 
 						// Если условий по одному полю несколько, то добавляем "or"
@@ -162,5 +176,13 @@ public class FilterDTO extends CommonDTO {
 	@Override
 	public void refresh() {
 		
+	}
+
+	/**
+	 * @param string
+	 * @return
+	 */
+	public boolean haveCondition(String key) {
+		return mQueryConditions.containsKey(key);
 	}
 }

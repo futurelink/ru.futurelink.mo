@@ -28,6 +28,7 @@ abstract public class ApplicationController extends CompositeController {
 	protected ApplicationController(ApplicationSession session, Shell shell) {
 		super(session, null);
 		mShell = shell;
+		mContainer = shell;
 	}
 
 	@Override
