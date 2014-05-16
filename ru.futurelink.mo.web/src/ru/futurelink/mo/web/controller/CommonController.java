@@ -1,15 +1,12 @@
 package ru.futurelink.mo.web.controller;
 
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.eclipse.swt.widgets.Composite;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
@@ -20,16 +17,14 @@ import org.slf4j.LoggerFactory;
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
-import ru.futurelink.mo.web.composites.CommonComposite;
 import ru.futurelink.mo.web.controller.iface.IBundleDecorator;
 import ru.futurelink.mo.web.controller.iface.IController;
 import ru.futurelink.mo.web.controller.iface.IMailSender;
 import ru.futurelink.mo.web.controller.iface.ISessionDecorator;
 import ru.futurelink.mo.web.exceptions.InitException;
-import ru.futurelink.mo.web.register.UseCaseRegister;
 
 public abstract class CommonController 
-		implements IController, IMailSender, ISessionDecorator, IBundleDecorator 
+		implements IController, ISessionDecorator, IBundleDecorator, IMailSender 
 {
 		protected BundleContext						mBundleContext;
 
@@ -325,157 +320,7 @@ public abstract class CommonController
 			logger().debug("Полчуено сообщение '{}' по OSGI от {}", event.toString(), sender.getClass().getSimpleName());
 		}
 
-		/**
-		 * Метод запускающий юзкейсы. Любой контроллер может запустить из себя юзкейс.
-		 * Вообще юзкейс в даннос случае - это просто способ использования контроллера,
-		 * а также юзкейс - это архитектурный набор из контроллера и композита, ограниченный 
-		 * одним бандлом.
-		 * 
-		 * Заупск юзкейса преставляет собой простой запуск контроллера и
-		 * его инициализацию. При этом композит контроллера будет присобачен в контейнер,
-		 * который указан при создании контроллера.
-		 * 
-		 * Для того, чтобы контроллер работал в режиме юзкейса нужно, чтобы он
-		 * имел соответствующий конструктор (режим субконтроллера).
-		 * 
-		 * @param usecaseBundle название юзкейса, зарегистрированного в реестре юзкейсов
-		 * @param dataClass класс данных, для работы этого юзкейса
-		 * @return объект контроллера запущенного юзкейса в случае удачи, в случае неудачи null.
-		 */
-		public CompositeController handleRunUsecase(String usecaseBundle, Class<?> dataClass) {		
-			logger().debug("Контекст бандла для запуска юзкейса: {}", mBundleContext.toString());			
-			if (mBundleContext == null) {
-				handleError("Невозможно запустить юзкейс "+usecaseBundle+", неизвестен контекст бандла.", null);
-				return null;
-			}
-
-			Class<? extends CompositeController> usecaseController = 
-					getUsecaseControllerClass(usecaseBundle);
-
-			if (usecaseController != null) {
-				// Запустим контроллер юзкейса в работу
-				return handleRunControllerAsUsecase(usecaseController, dataClass, null);
-			}
-			
-			return null;
-		}
-
-		/**
-		 * Запуск любого контроллера композита в виде юзкейса. Вообще, запуск юзкейса это
-		 * создание экземпляра контроллера и его внедрение в качестве субконтроллера, что и
-		 * происходит в данном случае.
-		 * 
-		 * Если необходимо запустить контроллер в указанном контейнере, нужно передать container.
-		 * Если container будет null, то для запуска будет использоваться стандартный контейнер
-		 * этого контроллера. В первом случае, у контроллера, который будет запущен должен быть
-		 * определен конструктор с параметрами (parentController, dataClass, params), а во втором
-		 * (parentController, dataClass, container, params).
-		 *  
-		 * @param controller
-		 * @param dataClass
-		 * @param container
-		 * @return объект контроллера запущенного юзкейса в случае удачи, в случае неудачи null. 
-		 */
-		public CompositeController handleRunControllerAsUsecase(
-				Class<? extends CompositeController> controller,
-				Class<?> dataClass,
-				CommonComposite container) {
-
-			CompositeController c = getUsecaseController(controller, dataClass, container, new CompositeParams());
-
-			// Добавляем субконтроллер для текущего контроллера
-			addSubController(c);
-				
-			return c;			
-		}
-		
-		public final Class<? extends CompositeController> getUsecaseControllerClass(String usecaseBundle) {
-			logger().debug("Контекст бандла для запуска юзкейса: {}", mBundleContext.toString());
-			if (mBundleContext == null) {
-				handleError("Невозможно запустить юзкейс "+usecaseBundle+", неизвестен контекст бандла.", null);
-				return null;
-			}
-
-			// Получим экземпляр сервиса реестра юзкейсов
-			UseCaseRegister register = (UseCaseRegister) mBundleContext.getService(
-					mBundleContext.getServiceReference(UseCaseRegister.class.getName()));
-
-			// Получим контроллен юзкейса
-			@SuppressWarnings("unchecked")
-			Class<? extends CompositeController> usecaseController = 
-					(Class<? extends CompositeController>)register.getController(usecaseBundle);
-
-			return usecaseController;
-		}
-		
-		public final CompositeController getUsecaseController(
-				Class<? extends CompositeController> usecaseController,
-				Class<?> dataClass,
-				Composite container,
-				CompositeParams params) {
-
-			if (usecaseController == null) return null;
-			
-			try {
-				// Возьмем нужный конструктор контроллера, если надо запустить его
-				// в композите по-умолчанию для этого контроллера, то контейнер указывать
-				// не надо, то есть он будет null. Если нужно указать композит для упаковки
-				// юзкейса, то контейнер нужно указать явно.				
-				Constructor<? extends CommonController> constr;
-				if (container == null) {
-					constr = usecaseController.getConstructor(
-						CompositeController.class,
-						Class.class,
-						CompositeParams.class
-						);
-				} else {
-					constr = usecaseController.getConstructor(
-						CompositeController.class,
-						Class.class,
-						Composite.class,
-						CompositeParams.class
-						);															
-				}
-				logger().debug("Контекст бандла для запуска юзкейса: {}", mBundleContext.toString());
-				if (mBundleContext == null) {
-					handleError("Невозможно запустить юзкейс "+usecaseController.getName()+", неизвестен контекст бандла.", null);
-					return null;
-				}
-
-				logger().info("Запуск контроллерак юзкейса: {}", usecaseController.getName());
-				CompositeController c;
-				if (container == null) {
-					c = (CompositeController) constr.newInstance(this, dataClass, params);
-				} else {
-					// Очистить контейнер нннада
-					c = (CompositeController) constr.newInstance(this, dataClass, container, params);
-				}
-				c.setBundleContext(mBundleContext);
-				
-				return c;
-			} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-				String errorText = "Невозможно создать контроллер.";
-				handleError(errorText, ex);
-			} catch (InstantiationException | NoSuchMethodException  ex) {
-				String errorText = "Юзкейс не может быть запущен. Проверьте наличие в контроллере соответствующего конструктора.";
-				handleError(errorText, ex);
-			}
-
-			return null;			
-		}
-		
-		public final CompositeController getUsecaseController(
-				String usecaseBundle,
-				Class<? extends CommonObject> dataClass,
-				Composite container,
-				CompositeParams params) {
-
-			Class<? extends CompositeController> usecaseController = 
-					getUsecaseControllerClass(usecaseBundle);
-
-			return getUsecaseController(usecaseController, dataClass, container, params);
-		}
-		
+	
 		/**
 		 * Обновление данных контроллера. Вызывает обновление всех субконтроллеров.
 		 * <p>Можно переопределить на дочерних классах, чтобы обработать обновление данных

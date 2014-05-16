@@ -25,7 +25,7 @@ public interface IController {
 	public int 		getSubControllerCount();
 
 	/* Обработка сообщений */
-	
+
 	public void addControllerListener(CommonControllerListener listener);
 	public CommonControllerListener getControllerListener();
 
