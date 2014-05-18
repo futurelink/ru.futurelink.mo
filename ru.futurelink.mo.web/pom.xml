@@ -43,6 +43,7 @@
 							ru.futurelink.mo.web.recycle,
 							ru.futurelink.mo.web.exceptions,
 							ru.futurelink.mo.web.utils,
+							ru.futurelink.mo.web.export,
 							ru.futurelink.mo.web.topmenu
 						</Export-Package>
 						<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>

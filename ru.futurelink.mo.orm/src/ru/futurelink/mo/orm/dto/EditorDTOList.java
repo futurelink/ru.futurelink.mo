@@ -16,7 +16,8 @@ import ru.futurelink.mo.orm.exceptions.DTOException;
  * @author pavlov
  *
  */
-public class EditorDTOList<T extends CommonDTO> extends CommonDTOList<T> {
+public class EditorDTOList<T extends CommonDTO> 
+	extends CommonDTOList<T> {
 
 	/**
 	 * @param persistent

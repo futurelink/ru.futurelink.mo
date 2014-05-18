@@ -82,7 +82,8 @@ public abstract class CommonDTOList<T extends IDTO> {
 	 * @param dtoItem
 	 * @throws DTOException 
 	 */
-	public void addDTOItem(T dtoItem) throws DTOException {
+	@SuppressWarnings("unchecked")
+	public void addDTOItem(IDTO dtoItem) throws DTOException {
 		// Добавляем только новые элементы, если элемент уже есть,
 		// его дублировать не надо.
 		if (!mDTOList.containsValue(dtoItem)) {
@@ -92,7 +93,7 @@ public abstract class CommonDTOList<T extends IDTO> {
 			// внутренненго индекса.
 			if ((id == null) || id.isEmpty()) { id = "ID_"+String.valueOf(mIndex); }
 			mOrderList.put(mIndex, id);
-			mDTOList.put(id, dtoItem);
+			mDTOList.put(id, (T) dtoItem);
 			mIndex++;
 		}
 	}
