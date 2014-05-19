@@ -51,6 +51,7 @@ public class LinkedField extends TextField {
 	private CommonPopup		mPopup;
 	private boolean		justShown;
 	private HashMap<String, Object> mSelectionParams;
+	private ModifyListener mModifyListener;
 	
 	// Костыль, для того, чтобы когда показываем попап и теряется
 	// фокус - это не считалось окончанием редактирования.

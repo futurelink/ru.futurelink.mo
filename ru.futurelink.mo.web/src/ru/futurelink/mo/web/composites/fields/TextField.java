@@ -6,8 +6,6 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Text;
 
@@ -21,7 +19,7 @@ import ru.futurelink.mo.web.controller.CommonItemControllerListener;
 import ru.futurelink.mo.web.controller.CompositeParams;
 
 public class TextField extends CommonField {
-	protected ModifyListener 	mModifyListener;
+	//protected ModifyListener 	mModifyListener;
 	protected String			mInitialText;
 	protected String			mRealText;
 	private String				mHint;
@@ -76,7 +74,7 @@ public class TextField extends CommonField {
 			}
 		});
 		
-		mModifyListener = new ModifyListener() {			
+		/*mModifyListener = new ModifyListener() {			
 			private static final long serialVersionUID = 1L;
 			@Override
 			public void modifyText(ModifyEvent arg0) {
@@ -94,7 +92,7 @@ public class TextField extends CommonField {
 				}
 			}
 		};
-		((Text)mControl).addModifyListener(mModifyListener);
+		((Text)mControl).addModifyListener(mModifyListener);*/
 		
 		mControl.addFocusListener(new FocusListener() {
 			private static final long serialVersionUID = 1L;

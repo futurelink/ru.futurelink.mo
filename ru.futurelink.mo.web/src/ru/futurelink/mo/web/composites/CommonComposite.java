@@ -44,8 +44,8 @@ public class CommonComposite extends Composite {
 	private Logger				mLogger;
 
 	public CommonComposite(ApplicationSession session, Composite parent, int style, CompositeParams params) {
-		super(parent, style);
-		
+		super(parent, style  | SWT.NO_FOCUS );
+
 		setData(RWT.CUSTOM_VARIANT, "commonComposite");
 
 		mLogger = LoggerFactory.getLogger(getClass());
