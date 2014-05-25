@@ -32,4 +32,9 @@ public interface IController {
 	public void handleError(String errorText, Exception exception);
 
 	public void refresh(boolean refreshSubcontrollers) throws Exception;
+
+	/**
+	 * @return
+	 */
+	public boolean getInitialized();
 }

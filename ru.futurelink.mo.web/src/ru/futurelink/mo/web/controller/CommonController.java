@@ -70,6 +70,12 @@ public abstract class CommonController
 				//registerEventHandler();
 			} else 
 				logger().info("Нет контекста бандла, запущен без взаимодействия OSGI.");
+
+			// Check session user existance, user must exist in session scope
+			/*if (mSession.getUser() == null) {
+				throw new InitException("В сессии отсутствует пользователь, вероятно она закончилась.");
+			}*/
+
 			doBeforeInit();
 			for (IController sub : mSubControllers) {
 				sub.init();
@@ -132,10 +138,15 @@ public abstract class CommonController
 			// Если главный контроллер уже иницализирован, надо вызвать
 			// процедуру инициализацию после добавления подконтроллера.
 			try {
-				if (mInitialized) controller.init();
+				if (getInitialized()) controller.init();
 			} catch (InitException ex) {
 				ex.printStackTrace();
 			}
+		}
+		
+		@Override
+		public boolean getInitialized() {
+			return mInitialized;
 		}
 		
 		/**
@@ -145,7 +156,7 @@ public abstract class CommonController
 		 */
 		@Override
 		public void removeSubController(int index) {
-			if (mInitialized) mSubControllers.get(index).uninit();
+			if (mSubControllers.get(index).getInitialized()) mSubControllers.get(index).uninit();
 			
 			mSubControllers.remove(index);
 		}

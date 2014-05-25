@@ -286,8 +286,14 @@ public abstract class CompositeController
 	public void handleError(String errorText, Exception exception) {
 		// Оишбкм связанные с нехваткой прав доступа логируем отдельно,
 		// в общий лог их сыпать не надо.
-		if ((exception != null) && !DTOAccessException.class.isAssignableFrom(exception.getClass())) {
-			logger().error(errorText, exception);
+		if ((exception != null)) {
+			if (!DTOAccessException.class.isAssignableFrom(exception.getClass())) {
+				logger().error(errorText, exception);
+			} else {
+				// Ошибка доступа логгируем отдельно
+				logger().info(((DTOAccessException)exception).getAccessData());
+				logger().info(errorText, exception);
+			}
 		}
 
 		// Показать месседжбокс нннада
@@ -375,7 +381,7 @@ public abstract class CompositeController
 	 * 
 	 * @param picker
 	 */
-	protected void handleOpenDataPickerDialog(DataPicker picker) {
+	public void handleOpenDataPickerDialog(DataPicker picker) {
 		CommonDialog d = new CommonDialog(getSession(), getComposite().getShell(), SWT.NONE);		
 		Class<? extends CommonDataPickerController> pickerControllerClass = picker.getPickerController();
 		if (pickerControllerClass == null) {
@@ -616,7 +622,10 @@ public abstract class CompositeController
 	
 	public void close() {
 		uninit();
-		if (getComposite() != null)
-			getComposite().dispose();	
+		setComposite(null);		
+		doAfterClose();
 	}
+	
+	public void doAfterClose() {}
 }
+

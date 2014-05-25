@@ -20,6 +20,7 @@ import ru.futurelink.mo.web.composites.SimpleListComposite;
 import ru.futurelink.mo.web.composites.CommonListComposite;
 import ru.futurelink.mo.web.composites.dialogs.CommonItemDialog;
 import ru.futurelink.mo.web.composites.table.CommonTable;
+import ru.futurelink.mo.web.controller.iface.ICompositeController;
 import ru.futurelink.mo.web.controller.iface.IListEditController;
 import ru.futurelink.mo.web.exceptions.InitException;
 
@@ -43,6 +44,8 @@ abstract public class SimpleListController
 	extends CommonListController
 	implements IListEditController {
 
+	public enum EditMode { DIALOG, CONTAINER };
+	
 	public SimpleListController(CompositeController parentController,
 			Class<? extends CommonObject> dataClass, CompositeParams compositeParams) {
 		super(parentController, dataClass, compositeParams);
@@ -54,12 +57,18 @@ abstract public class SimpleListController
 	}
 	
 	public void handleItemDoubleClicked(CommonDTO data) {
-		if ((data != null) && (openEditDialog((EditorDTO)data) != null)) {
-			// Обновить список, перечитать данные
-			try {
-				handleDataQuery();
-			} catch (DTOException ex) {
-				handleError("невозможно обновить список.", ex);
+		if (data != null) {
+			if (params().get("itemEditMode") != EditMode.CONTAINER) {
+				if (openEditDialog((EditorDTO)data) != null) {
+					// Обновить список, перечитать данные
+					try {
+						handleDataQuery();
+					} catch (DTOException ex) {
+						handleError("невозможно обновить список.", ex);
+					}
+				}
+			} else {
+				openEdit(getParentController(), (EditorDTO)data);
 			}
 		}
 	}
@@ -73,13 +82,28 @@ abstract public class SimpleListController
 	// Обработка создания новго элемента
 	@Override
 	public void handleCreate() {
-		if (openEditDialog(null) != null) {	
-			// Обновить список, перечитать данные
-			try {
-				handleDataQuery();
-			} catch (DTOException ex) {
-				handleError("невозможно обновить список.", ex);
+		if (params().get("itemEditMode") != EditMode.CONTAINER) {
+			if (openEditDialog(null) != null) {	
+				// Обновить список, перечитать данные
+				try {
+					handleDataQuery();
+				} catch (DTOException ex) {
+					handleError("невозможно обновить список.", ex);
+				}
 			}
+		} else {
+			// Запустить контроллер редактирования в главном контейнере, как
+			// юзкейс, а после закрытия этого контроллера запустить юзкейс,
+			// который был там раньше
+			openEdit(getParentController(), null);
+			/*if (result != null) {
+				// Обновить список, перечитать данные
+				try {
+					handleDataQuery();
+				} catch (DTOException ex) {
+					handleError("невозможно обновить список.", ex);
+				}				
+			}*/
 		}
 	}
 	
@@ -172,6 +196,73 @@ abstract public class SimpleListController
 	 */
 	private Object openEditDialog(EditorDTO data) {
 		return new CommonItemDialog(getSession(), getComposite(), this, params()).open(data);
+	}
+	
+	private Object openEdit(ICompositeController parentController, EditorDTO data) {
+		Composite container = (Composite) params().get("itemEditContainer");
+		
+		if (parentController != null)
+			parentController.clear();
+
+		CommonItemController ctrl = createItemController(parentController, container);
+
+		try {
+			if (parentController != null)
+				parentController.addSubController(ctrl);
+		} catch (InitException ex) {
+			ctrl.handleError("Ошибка инициализации контроллера.", ex);
+			return null;
+		}
+
+		// Initialize controller
+		try {
+			ctrl.init();
+		} catch (InitException ex1) {
+			ctrl.handleError("Ошибка инициализации контроллера.", ex1);
+			return null;
+		}
+		
+		// Check composite is created right
+		if (ctrl.getComposite() == null) {			
+			ctrl.uninit();
+			ctrl.handleError("Композит для отображения в диалоговом окне не создан!", null);
+			return -1;
+		}
+		
+		ctrl.getComposite().layout(true, true);
+
+		// Create or open data
+		if (data == null) {
+			// Создание нового элемента
+			try {
+				ctrl.create();
+			} catch (DTOException ex) {
+				ctrl.handleError("Ошибка создания нового элемента.", ex);
+				ctrl.uninit();
+				return null;
+			}
+		} else {
+			// Открыть на редактирование существующий элемент
+			try {
+				String id = data.getDataField("id", "getId", "setId").toString();
+				ctrl.getSession().logger().debug("Открытие окна редакитрования для элмента с ID: {}", id);
+				ctrl.openById(id);
+			} catch (NumberFormatException ex) {
+				handleError("Неверный формат ID.", ex);
+				ctrl.uninit();
+				return null;
+			} catch (OpenException ex) {
+				handleError("Ошибка открытия элемента.", ex);				
+				ctrl.uninit();
+				return null;
+			} catch (DTOException ex) {
+				handleError("Ошибка доступа в DTO.", ex);
+				ctrl.uninit();
+				return null;
+			}
+		}
+
+		return ctrl;		
 	}
 	
 	@Override

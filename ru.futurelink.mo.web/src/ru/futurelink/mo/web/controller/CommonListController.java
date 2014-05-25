@@ -190,18 +190,27 @@ abstract public class CommonListController
 	 * @param parentComposite
 	 * @return
 	 */
-	public CommonItemController createItemController(Composite parentComposite) {
+	public CommonItemController createItemController(ICompositeController parentController, Composite parentComposite) {
 		Class<?> itemControllerClass = (Class<?>) params().get("itemControllerClass");
 		if (itemControllerClass != null) {			
 			Constructor<?> constr;
 			CommonItemController result = null;
 			try {
-				constr = itemControllerClass.getConstructor(
+				if (parentComposite == null) {
+					constr = itemControllerClass.getConstructor(
+							ICompositeController.class,
+							Class.class, 
+							CompositeParams.class);
+
+					result = (CommonItemController) constr.newInstance(parentController, getDataClass(), new CompositeParams());					
+				} else {
+					constr = itemControllerClass.getConstructor(
 						ICompositeController.class, 
 						Class.class, 
 						Composite.class, 
 						CompositeParams.class);
-				result = (CommonItemController) constr.newInstance(this, getDataClass(), parentComposite, new CompositeParams());
+					result = (CommonItemController) constr.newInstance(parentController, getDataClass(), parentComposite, new CompositeParams());
+				}
 			} catch (Exception ex) {
 				handleError("Ошибка при создании контроллера элемента данных. Проверьте конструктор.", ex);
 				ex.printStackTrace();

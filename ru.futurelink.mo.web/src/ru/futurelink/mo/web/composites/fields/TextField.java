@@ -4,8 +4,6 @@ import org.eclipse.rap.rwt.scripting.ClientListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Text;
 
@@ -24,16 +22,15 @@ public class TextField extends CommonField {
 	protected String			mRealText;
 	private String				mHint;
 	private String				mTextBeforeFocus;
-
-	private String enterAsTabJS = 
-			"var handleEvent = function( event ) {\n"
-			+ "	if( event.keyCode == 13 ) {\n"
-			+ "		event.keyCode = 9;\n"
-			+ "		event.doit = true;\n"
-			+ "		return event;\n"
-			+ "	}\n"
-			+ "};\n"; 
 	
+	private ClientListener 		mUppercaseListener;
+	private boolean			mUppercase;
+	
+	private static String uppercaseJS = 
+			"var handleEvent = function( event ) {\n"
+			+ "	event.text = event.text.toUpperCase();\n"
+			+ "};\n"; 
+ 	
 	public TextField(ApplicationSession session, CommonComposite parent, int style,
 			CompositeParams params, CommonItemComposite c) {
 		super(session, parent, style, params, c);
@@ -48,32 +45,24 @@ public class TextField extends CommonField {
 		createControls(style);
 	}
 
+	public void setUppercase(boolean uppercase) {
+		if (uppercase && !mUppercase) {
+			mUppercaseListener = new ClientListener(uppercaseJS);
+			mControl.addListener(SWT.Verify, mUppercaseListener);
+			mUppercase = true;
+		} else {
+			mControl.removeListener(SWT.Verify, mUppercaseListener);
+			mUppercase = false;
+		}
+	}
+	
 	protected void createControls(int style) {
 		mHint = new String();
 		mRealText = new String();
 
 		mControl = new Text(mParent, SWT.BORDER | (style & SWT.READ_ONLY) | (style & SWT.MULTI));
 		setTextLimit(255);	// По-умолчанию ограничение 255 символов
-		
-		ClientListener clientListener = new ClientListener(enterAsTabJS);
-		mControl.addListener(SWT.KeyUp, clientListener);
 
-		((Text)mControl).addKeyListener(new KeyListener() {		
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void keyReleased(KeyEvent arg0) {
-				if (arg0.keyCode == 13) {
-
-				}				
-			}
-			
-			@Override
-			public void keyPressed(KeyEvent arg0) {
-
-			}
-		});
-		
 		/*mModifyListener = new ModifyListener() {			
 			private static final long serialVersionUID = 1L;
 			@Override
@@ -93,7 +82,7 @@ public class TextField extends CommonField {
 			}
 		};
 		((Text)mControl).addModifyListener(mModifyListener);*/
-		
+
 		mControl.addFocusListener(new FocusListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -117,7 +106,7 @@ public class TextField extends CommonField {
 						(!getText().equals(mTextBeforeFocus))
 					) {
 						((CommonItemControllerListener)getControllerListener()).dataChangeFinished(getSelf());
-					}				
+					}
 				} catch (DTOException ex) {
 					getControllerListener().sendError("Ошибка обновления текстового поля!", ex);
 				}

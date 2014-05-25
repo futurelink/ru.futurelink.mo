@@ -19,7 +19,7 @@ public class GradientedSeparator extends Composite {
 	 * @param style
 	 */
 	public GradientedSeparator(Composite parent, int style) {
-		super(parent, style);
+		super(parent, style | SWT.NO_FOCUS);
 		
 		setData(RWT.CUSTOM_VARIANT, "gradientedSeparator");
 		setBackgroundMode(SWT.INHERIT_NONE);

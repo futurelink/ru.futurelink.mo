@@ -14,7 +14,7 @@ import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.PersistentManager;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
-import ru.futurelink.mo.orm.dto.access.AllowOwnAndLinkedChecker;
+import ru.futurelink.mo.orm.dto.access.AllowAllChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
 import ru.futurelink.mo.web.exceptions.InitException;
@@ -90,6 +90,7 @@ public abstract class RelatedItemController
 				mFieldGetterName, 
 				mFieldSetterName
 			);
+			if (object != null) object.addAccessChecker(new AllowAllChecker());
 		} else if (mDirection == Direction.BACKWARD) {
 			
 			if (mFieldName == null) {
@@ -108,7 +109,7 @@ public abstract class RelatedItemController
 					CommonObject dataItem = (CommonObject) q.getResultList().get(0);
 					dataItem.setPersistentManager(getSession().persistent());
 					object = new EditorDTO(dataItem);
-					object.addAccessChecker(new AllowOwnAndLinkedChecker(getSession().getUser()));
+					object.addAccessChecker(new AllowAllChecker());
 				}
 			}
 			
@@ -123,7 +124,7 @@ public abstract class RelatedItemController
 					CommonObject dataItem = constr.newInstance(getSession().persistent());
 					
 					object = new EditorDTO(dataItem);
-					object.addAccessChecker(new AllowOwnAndLinkedChecker(getSession().getUser()));
+					object.addAccessChecker(new AllowAllChecker());
 					
 					// Установим связку сразу
 					object.setDataField(mFieldName, mFieldGetterName, mFieldSetterName, mRelatedController.getDTO());

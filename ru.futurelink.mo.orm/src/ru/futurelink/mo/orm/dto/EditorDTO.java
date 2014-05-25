@@ -430,7 +430,9 @@ public class EditorDTO extends CommonDTO {
 		}
 
 		if (!mAccessChecker.checkRead(this, fieldName)) {
-			throw new DTOAccessException("У вас нет права на получение данных из этого элемента.", null);
+			DTOAccessException ex = new DTOAccessException("У вас нет права на получение данных из этого элемента.", null);
+			ex.setAccessData("field name is "+fieldName+" getter is "+fieldGetterName);
+			throw ex;
 		}
 
 		Object a = null;

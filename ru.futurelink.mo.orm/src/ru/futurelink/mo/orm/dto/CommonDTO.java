@@ -97,7 +97,7 @@ public abstract class CommonDTO implements Serializable, IDTO {
 	
 	@Override
 	public User getCreator() {
-		if (CommonObject.class.isAssignableFrom(mData.getClass())) {
+		if ((mData != null) && CommonObject.class.isAssignableFrom(mData.getClass())) {
 			return ((CommonObject)mData).getCreator();
 		}
 		return null;

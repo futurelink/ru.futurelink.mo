@@ -299,7 +299,7 @@ public abstract class CommonItemController
 	@Override
 	public ArrayList<String> getDataChanged() throws DTOException {
 		if ((getDTO() != null) && (getDTO().getChangedData() != null)) {
-			logger().info("Состав измененных данных : {}", getDTO().getChangedData());
+			logger().info("getDataChanged: состав измененных данных : {}", getDTO().getChangedData());
 			return getDTO().getChangedData();
 		} else {
 			return null;
@@ -353,7 +353,7 @@ public abstract class CommonItemController
 	 *  
 	 * @param enabled
 	 */
-	protected void setSaveButtonEnabled(boolean enabled) {
+	public void setSaveButtonEnabled(boolean enabled) {
 		if (getComposite() != null) {
 			// Если не заполнены обязательные поля - никогда не разрешать сохранение!
 			boolean mandatoryFilled = ((CommonItemComposite)getComposite()).getIsMandatoryFilled(); 
