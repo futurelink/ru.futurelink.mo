@@ -22,7 +22,7 @@ import ru.futurelink.mo.orm.security.User;
  */
 final public class ApplicationSession {
 	private PersistentManager 	mPersistent;
-	private MongoDBProvider		mMongoDB;;
+	private MongoDBProvider		mMongoDB;
 	private String				mLogin = "";
 	private Locale				mLocale = null;
 	private User				mDatabaseUser;
@@ -38,8 +38,8 @@ final public class ApplicationSession {
 		);
 
 		// Make session never ending
-		RWT.getUISession().getHttpSession().setMaxInactiveInterval(86400);
-		
+		RWT.getUISession().getHttpSession().setMaxInactiveInterval(8640000);
+
 		// Создаем подключение к MongoDB, база "fluvio"
 		mMongoDB = new MongoDBProvider("fluvio");
 		
@@ -54,7 +54,7 @@ final public class ApplicationSession {
 			if (RWT.getUISession().getHttpSession().getAttribute("login") != null)
 				mLogin = (String) RWT.getUISession().getHttpSession().getAttribute("login");
 		}
-		
+
 		mLogger = LoggerFactory.getLogger(ApplicationSession.class);
 		
 		logger().debug("Локаль пользователя {}", RWT.getLocale().toString());
@@ -106,6 +106,12 @@ final public class ApplicationSession {
 	}
 	
 	final public PersistentManager persistent() {
+		// If user is released by some reason, try to reset it from session variable
+		if (mPersistent.getUser() == null) {
+			mPersistent.setUser(
+				(User) RWT.getUISession().getHttpSession().getAttribute("user")
+			);
+		}
 		return mPersistent;
 	}
 

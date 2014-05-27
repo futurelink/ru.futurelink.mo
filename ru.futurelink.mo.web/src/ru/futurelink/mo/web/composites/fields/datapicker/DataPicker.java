@@ -225,7 +225,7 @@ public class DataPicker extends CommonField implements IField {
 				);
 			else
 				//mEdit.setText(getLocaleString("noValue"));
-				mEdit.setText("-");
+				mEdit.setText("- не выбрано -");
 		}
 
 		handleMandatory();
@@ -353,7 +353,12 @@ public class DataPicker extends CommonField implements IField {
 
 	@Override
 	public boolean isEmpty() {
-		return (getDTO() == null);
+		try {
+			return (getSelectedDTO() == null);
+		} catch (DTOException ex) {
+			ex.printStackTrace();				
+			return true;
+		}
 	}
 		
 	@Override
@@ -428,7 +433,13 @@ public class DataPicker extends CommonField implements IField {
 
 	@Override
 	public Object getValue() {
-		return getDTO();
+		try {
+			return getSelectedDTO();
+		} catch (DTOException e) {
+			e.printStackTrace();
+			
+			return null;
+		}
 	}
 	
 }

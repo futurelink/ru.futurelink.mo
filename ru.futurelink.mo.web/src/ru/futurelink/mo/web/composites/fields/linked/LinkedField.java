@@ -76,7 +76,8 @@ public class LinkedField extends TextField {
 		mSelectionParams = new HashMap<String, Object>();
 
 		// Убираем старый обработчик, который создал конструктор
-		((Text)mControl).removeModifyListener(mModifyListener);
+		if (mModifyListener != null)
+			((Text)mControl).removeModifyListener(mModifyListener);
 
 		// Задаем новый обработчик
 		mModifyListener = new ModifyListener() {

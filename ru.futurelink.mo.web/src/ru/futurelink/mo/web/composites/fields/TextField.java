@@ -16,6 +16,12 @@ import ru.futurelink.mo.web.composites.CommonItemComposite;
 import ru.futurelink.mo.web.controller.CommonItemControllerListener;
 import ru.futurelink.mo.web.controller.CompositeParams;
 
+/**
+ * Common text input field.
+ * 
+ * @author pavlov
+ *
+ */
 public class TextField extends CommonField {
 	//protected ModifyListener 	mModifyListener;
 	protected String			mInitialText;
@@ -23,14 +29,12 @@ public class TextField extends CommonField {
 	private String				mHint;
 	private String				mTextBeforeFocus;
 	
-	private ClientListener 		mUppercaseListener;
-	private boolean			mUppercase;
+	private ClientListener 		mValidateListener;
+	private boolean			mUppercase;	
+	private boolean			mDisallowSpaces;
 	
-	private static String uppercaseJS = 
-			"var handleEvent = function( event ) {\n"
-			+ "	event.text = event.text.toUpperCase();\n"
-			+ "};\n"; 
- 	
+	private boolean			mStopOnError;
+	
 	public TextField(ApplicationSession session, CommonComposite parent, int style,
 			CompositeParams params, CommonItemComposite c) {
 		super(session, parent, style, params, c);
@@ -45,15 +49,55 @@ public class TextField extends CommonField {
 		createControls(style);
 	}
 
+	private final String generateValidator() {
+		StringBuilder validator = new StringBuilder();
+		validator.append("var handleEvent = function( event ) {\n");
+		
+		if (mDisallowSpaces)
+			validator.append("	if (event.text == ' ') event.doit = false;\n");
+
+		if (mUppercase)
+			validator.append("	event.text = event.text.toUpperCase();\n");
+		
+		validator.append("};\n"); 
+
+		return validator.toString();
+	}
+	
+	private final void setValidator() {
+		if (mValidateListener != null)
+			mControl.removeListener(SWT.Verify, mValidateListener);	
+
+		mValidateListener = new ClientListener(generateValidator());
+		mControl.addListener(SWT.Verify, mValidateListener);		
+	}
+	
+	/**
+	 * Force uppercase for user's input.
+	 * 
+	 * @param uppercase
+	 */
 	public void setUppercase(boolean uppercase) {
 		if (uppercase && !mUppercase) {
-			mUppercaseListener = new ClientListener(uppercaseJS);
-			mControl.addListener(SWT.Verify, mUppercaseListener);
 			mUppercase = true;
 		} else {
-			mControl.removeListener(SWT.Verify, mUppercaseListener);
 			mUppercase = false;
 		}
+		setValidator();
+	}
+	
+	/**
+	 * Disallow spaces for user's input (force one word).
+	 * 
+	 * @param disallowSpaces
+	 */
+	public void setDisallowSpaces(boolean disallowSpaces) {
+		if (disallowSpaces && !mDisallowSpaces) {
+			mDisallowSpaces = true;
+		} else {
+			mDisallowSpaces = false;
+		}
+		setValidator();
 	}
 	
 	protected void createControls(int style) {
@@ -88,6 +132,11 @@ public class TextField extends CommonField {
 
 			@Override
 			public void focusLost(FocusEvent arg0) {
+				
+				// Do not propagate focus lost event because of exception,
+				// even if message box appeared and focus lost again.
+				if (mStopOnError) return;
+				
 				try {
 					// Это событие должно происходить при потере фокуса в том случае
 					// если данные реально менялись. Сохраняем текст еще раз, так как мы не
@@ -108,6 +157,7 @@ public class TextField extends CommonField {
 						((CommonItemControllerListener)getControllerListener()).dataChangeFinished(getSelf());
 					}
 				} catch (DTOException ex) {
+					mStopOnError = true;
 					getControllerListener().sendError("Ошибка обновления текстового поля!", ex);
 				}
 			}
@@ -171,7 +221,7 @@ public class TextField extends CommonField {
 	}
 	
 	/**
-	 * Установить значение поля.
+	 * Set field text value.
 	 * 
 	 * @param text
 	 * @throws DTOException
@@ -189,14 +239,27 @@ public class TextField extends CommonField {
 		handleMandatory();
 	}
 
+	/**
+	 * Get field text value.
+	 * 
+	 * @return
+	 */
 	public String getText() {
 		return mRealText;
 	}
 
+	/**
+	 * Set maximum text length for field.
+	 * 
+	 * @param limit
+	 */
 	public void setTextLimit(int limit) {
 		((Text)mControl).setTextLimit(limit);
 	}
 	
+	/**
+	 * Set text field editable.
+	 */
 	@Override
 	public void setEditable(boolean isEditable) {
 		if (((Text)mControl).getEditable() != isEditable) {
@@ -204,10 +267,20 @@ public class TextField extends CommonField {
 		}
 	}
 	
+	/**
+	 * Set field foreground color.
+	 * 
+	 * @param color
+	 */
 	public void setForeground(Color color) {
 		mControl.setForeground(color);
 	}
 	
+	/**
+	 * Set field background color.
+	 * 
+	 * @param color
+	 */
 	public void setBackground(Color color) {
 		mControl.setBackground(color);
 	}
@@ -221,7 +294,7 @@ public class TextField extends CommonField {
 	}
 
 	/**
-	 * Установить символ, который маскирует вводимые значения.
+	 * Set field echo character, ex. for password chars.
 	 * 
 	 * @param character
 	 */
@@ -230,7 +303,7 @@ public class TextField extends CommonField {
 	}
 	
 	/**
-	 * Установить подсказку поля.
+	 * Set field hint, displayed inside text input box.
 	 * 
 	 * @param hintText
 	 */
@@ -241,7 +314,7 @@ public class TextField extends CommonField {
 	}
 	
 	/**
-	 * Возвращает подсказку поля.
+	 * Get field hint.
 	 * 
 	 * @return
 	 */
