@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
-import ru.futurelink.mo.orm.security.User;
 
 /**
  * Менеджер персистент объектов:
@@ -32,14 +31,14 @@ import ru.futurelink.mo.orm.security.User;
  *
  */
 public class PersistentManager {
-	private EntityManagerFactory mFactory;
-	private EntityManager 				mEm;
-	private EntityManager 				mOldEm;
-	private Logger						mLogger;
+	private EntityManagerFactory 	mFactory;
+	private EntityManager 			mEm;
+	private EntityManager 			mOldEm;
+	private Logger					mLogger;
 
-	private BundleContext				mBundleContext;
-	private String						mPersistenceUnitName;
-	private Dictionary<String, Object>			mProperties;
+	private BundleContext			mBundleContext;
+	private String					mPersistenceUnitName;
+	private Dictionary<String, Object>	mProperties;
 	
 	// Делаем конструктор по умолчанию приватным,
 	// чтобы нельзя было вызвать его.
@@ -130,26 +129,7 @@ public class PersistentManager {
 		} else
 			return mOldEm;
 	}
-		
-	/**
-	 * Пользователь от имени которого совершаются действия
-	 * персистент-менеджера.
-	 */
-	private User mUser;
-	public void setUser(User user) { mUser = user; }
-	public User getUser() { return mUser; } 
 
-	/**
-	 * Пользователь, которому принадлжеат данные.
-	 */
-	private User mAccessUser;
-	public void setAccessUser(User user) { mAccessUser = user; }
-	public User getAccessUser() {
-		if (mAccessUser == null) 
-			return mUser; 
-		else
-			return mAccessUser; 
-	} 
 
 	/**
 	 * Операция сохранения объекта на менеджере.
@@ -157,13 +137,9 @@ public class PersistentManager {
 	 * @return
 	 * @throws SaveException
 	 */
-	protected	Object save(CommonObject object) throws SaveException {
+	protected	Object save(CommonObject object, PersistentManagerSession session) throws SaveException {
 		int saveFlag = CommonObject.SAVE_CREATE;
 
-		if (getUser() == null) {
-			throw new SaveException("No user in persistent manager!", null);
-		}
-		
 		// Перед сохранением сохраняем неизмененную копию объекта
 		// это актуально если объект сохраняется, а потом изменяется
 		// тот же экземпляр и снова сохраняется.
@@ -174,23 +150,23 @@ public class PersistentManager {
 		}
 		
 		try {
-			object.onBeforeSave(saveFlag);			// Вызов перед сохранением объекта			
-			getEm().getTransaction().begin();			// Сохранение объекта
-			
 			// Создатель элемента - по сути его владелец, в данном случае,
 			// это пользователь в базе которого производится модификация.
-			if (object.getCreator() == null) object.setCreator(getAccessUser());
-			if (object.getAuthor() == null) object.setAuthor(getUser());
-			
+			if (object.getCreator() == null) object.setCreator(session.getAccessUser());
+			if (object.getAuthor() == null) object.setAuthor(session.getUser());
+
+			object.onBeforeSave(saveFlag);			// Вызов перед сохранением объекта			
+			getEm().getTransaction().begin();			// Сохранение объекта
+		
 			// Добавляем в ворклог данные о том, что элменет был изменен
 			// у добавим ссылку на элемент ворклога в элемент данных.
 			// Для элемента ворклога запись в ворклоге делать не надо!
 			WorkLogSupport workLogObject = null;
 			if (object.getWorkLogSupport()) {
 				if (!object.getClass().getSimpleName().equals("WorkLogSupport")) {
-					workLogObject = new WorkLogSupport(this);
+					workLogObject = new WorkLogSupport(session);
 					workLogObject.setCreateDate(Calendar.getInstance().getTime());
-					workLogObject.setCreator(getUser());
+					workLogObject.setCreator(session.getUser());
 					if (object.getId() == null) {
 						workLogObject.setDescription("CREATED");
 					} else {
@@ -233,15 +209,12 @@ public class PersistentManager {
 	 * @return
 	 * @throws SaveException
 	 */
-	public Object saveWithHistory(HistoryObject object, String oldId) throws SaveException, OpenException {
+	public Object saveWithHistory(HistoryObject object, String oldId, PersistentManagerSession session) 
+		throws SaveException, OpenException {
 		// Записать ссылку на следующий объект в предыдущий
 		// Записать ссылку на предыдущий объект в следующий
 		// Создаем новый объект	
 		int saveFlag = CommonObject.SAVE_CREATE;
-
-		if (getUser() == null) {
-			throw new SaveException("No user in persistent manager!", null);
-		}
 
 		if (object != null) {
 			try {
@@ -255,10 +228,11 @@ public class PersistentManager {
 				object.setId(newId);				// Сетим следующую ID
 				object.setModifyDate(Calendar.getInstance(TimeZone.getTimeZone("GMT")).getTime());
 				object.setPrevId(oldId);			// Сохраняем старую ID
+
 				// Создатель элемента - по сути его владелец, в данном случае,
 				// это пользователь в базе которого производится модификация.
-				if (object.getCreator() == null) object.setCreator(getAccessUser());
-				if (object.getAuthor() == null) object.setAuthor(getUser());
+				if (object.getCreator() == null) object.setCreator(session.getAccessUser());
+				if (object.getAuthor() == null) object.setAuthor(session.getUser());
 		
 				// Добавляем в ворклог данные о том, что элменет был изменен
 				// у добавим ссылку на элемент ворклога в элемент данных.
@@ -266,9 +240,9 @@ public class PersistentManager {
 				WorkLogSupport workLogObject = null;
 				if (object.getWorkLogSupport()) {				
 					if (!object.getClass().getName().equals("WorkLog")) {
-						workLogObject = new WorkLogSupport(this);
+						workLogObject = new WorkLogSupport(session);
 						workLogObject.setCreateDate(Calendar.getInstance().getTime());
-						workLogObject.setCreator(getUser());
+						workLogObject.setCreator(session.getUser());
 						workLogObject.setObjectId(newId);
 						workLogObject.setDescription("MODIFIED");
 						getEm().persist(workLogObject);
@@ -324,7 +298,6 @@ public class PersistentManager {
 		if (obj == null) throw new OpenException(id, "Элемент не найден.", null);
 		
 		obj.setUnmodifiedObject(getOldEm().find(cls, id));
-		obj.setPersistentManager(this);
 		
 		return  obj;
 	}

@@ -64,24 +64,34 @@ public abstract class CommonController
 		 */
 		@Override
 		public synchronized void init() throws InitException {
-			logger().debug("Инициализация контроллера");
-			if (mBundleContext != null) {
-				logger().debug("Мой контекст бандала: "+mBundleContext.toString());
+			if (!mInitialized) {
+				// Log session ID for debugging purposes
+				logger().info("JSESSIONID={}, user={}", 
+						getSession().getId(), 
+						getSession().getUser() != null ? getSession().getUser().getId() : null
+					);
+			
+				logger().debug("Инициализация контроллера");
+				if (mBundleContext != null) {
+					logger().debug("Мой контекст бандала: "+mBundleContext.toString());
 				//registerEventHandler();
-			} else 
-				logger().info("Нет контекста бандла, запущен без взаимодействия OSGI.");
+				} else 
+					logger().info("Нет контекста бандла, запущен без взаимодействия OSGI.");
 
-			// Check session user existance, user must exist in session scope
-			/*if (mSession.getUser() == null) {
-				throw new InitException("В сессии отсутствует пользователь, вероятно она закончилась.");
-			}*/
+				// Check session user existance, user must exist in session scope
+				/*if (mSession.getUser() == null) {
+					throw new InitException("В сессии отсутствует пользователь, вероятно она закончилась.");
+				}*/
 
-			doBeforeInit();
-			for (IController sub : mSubControllers) {
-				sub.init();
+				doBeforeInit();
+				for (IController sub : mSubControllers) {
+					sub.init();
+				}
+				mInitialized = true;
+				doAfterInit();
+			} else {
+				logger().warn("Контроллер зачем-то пытается вызвать init() хотя он уже инициализирован!");
 			}
-			mInitialized = true;
-			doAfterInit();
 		}
 		
 		abstract protected void doBeforeInit() throws InitException;

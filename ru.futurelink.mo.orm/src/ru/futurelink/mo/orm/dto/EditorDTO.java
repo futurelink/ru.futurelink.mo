@@ -10,6 +10,7 @@ import java.util.Map;
 
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
@@ -46,8 +47,8 @@ public class EditorDTO extends CommonDTO {
 		mChangesBuffer = new HashMap<String, Object[]>();
 	}
 
-	protected PersistentManager getPersistenceManager() {
-		return ((CommonObject)mData).getPersistenceManager();
+	protected PersistentManagerSession getPersistenceManagerSession() {
+		return ((CommonObject)mData).getPersistenceManagerSession();
 	}
 	
 	public static EditorDTO create(Class <? extends CommonObject> dataClass, PersistentManager pm, IDTOAccessChecker accessChecker) throws DTOException {
@@ -89,14 +90,14 @@ public class EditorDTO extends CommonDTO {
 	 */
 	public static Map<String, EditorDTO> fromResultList(
 			List<? extends CommonObject> resultList, 
-			PersistentManager pm, 
+			PersistentManagerSession pm, 
 			Class<? extends CommonDTO> itemDTOClass,
 			IDTOAccessChecker accessChecker) throws DTOException {
 		Map<String, EditorDTO> list = new HashMap<String, EditorDTO>();
 		if ((resultList != null) && (resultList.size() > 0)) {
 			for (Object c : resultList) {
-				((CommonObject)c).setPersistentManager(pm);
-				
+				((CommonObject)c).setPersistentManagerSession(pm);
+
 				// Создаем DTO рефлексией
 				try {
 					Constructor<? extends CommonDTO> ctr = itemDTOClass.getConstructor(CommonObject.class);
@@ -135,7 +136,7 @@ public class EditorDTO extends CommonDTO {
 	public static void fillResultList(
 			Map<String, ? extends CommonDTO> resultList,
 			List<?> sourceList, 
-			PersistentManager pm, 
+			PersistentManagerSession pm, 
 			Class<? extends CommonDTO> itemDTOClass,
 			IDTOAccessChecker accessChecker			
 		) throws DTOException  {
@@ -148,7 +149,7 @@ public class EditorDTO extends CommonDTO {
 			return;
 		} else {
 			for (Object c : sourceList) {
-				((CommonObject)c).setPersistentManager(pm);
+				((CommonObject)c).setPersistentManagerSession(pm);
 				
 				// Создаем DTO рефлексией
 				try {
@@ -431,7 +432,7 @@ public class EditorDTO extends CommonDTO {
 
 		if (!mAccessChecker.checkRead(this, fieldName)) {
 			DTOAccessException ex = new DTOAccessException("У вас нет права на получение данных из этого элемента.", null);
-			ex.setAccessData("field name is "+fieldName+" getter is "+fieldGetterName);
+			ex.setAccessData("EditorDTO get data from field: name is "+fieldName+" getter is "+fieldGetterName);
 			throw ex;
 		}
 
@@ -455,7 +456,7 @@ public class EditorDTO extends CommonDTO {
 	        	// когда этот объект, то есть значение поля в ORM не null.
 	        	CommonObject obj = (CommonObject) getValueMethod.invoke(mData);
 	        	if (obj != null) {
-	        		obj.setPersistentManager(getPersistenceManager());
+	        		obj.setPersistentManagerSession(getPersistenceManagerSession());
 		        	a = new EditorDTO((CommonObject)obj);
 		        	((CommonDTO)a).addAccessChecker(mAccessChecker);
 	        	}
@@ -507,6 +508,6 @@ public class EditorDTO extends CommonDTO {
 	
 	@Override
 	public void refresh() {
-		getPersistenceManager().getEm().refresh(mData);
+		getPersistenceManagerSession().getPersistent().getEm().refresh(mData);
 	}
 }

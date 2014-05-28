@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.rap.rwt.RWT;
 
 import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.mongodb.MongoDBProvider;
 import ru.futurelink.mo.orm.mongodb.objects.LoginEventObject;
 import ru.futurelink.mo.orm.mongodb.objects.UserParams;
@@ -21,7 +22,8 @@ import ru.futurelink.mo.orm.security.User;
  *
  */
 final public class ApplicationSession {
-	private PersistentManager 	mPersistent;
+	private PersistentManagerSession 	mPersistentSession;
+
 	private MongoDBProvider		mMongoDB;
 	private String				mLogin = "";
 	private Locale				mLocale = null;
@@ -33,9 +35,11 @@ final public class ApplicationSession {
 	public ApplicationSession(BundleContext context) {
 		mBundleContext = context;
 		mLocale = new Locale("ru", "RU");
-		mPersistent = (PersistentManager) mBundleContext.getService(
+		PersistentManager persistent = (PersistentManager) mBundleContext.getService(
 				mBundleContext.getServiceReference(PersistentManager.class.getName())
 		);
+
+		mPersistentSession = new PersistentManagerSession(persistent);
 
 		// Make session never ending
 		RWT.getUISession().getHttpSession().setMaxInactiveInterval(8640000);
@@ -49,7 +53,7 @@ final public class ApplicationSession {
 		if (RWT.getUISession().getHttpSession().getAttribute("user") != null) {
 			// Если у нас есть пользователь, залогиненый в сессии, его
 			// надо передать персистент-менеджеру.
-			mPersistent.setUser((User)RWT.getUISession().getHttpSession().getAttribute("user"));
+			mPersistentSession.setUser((User)RWT.getUISession().getHttpSession().getAttribute("user"));
 
 			if (RWT.getUISession().getHttpSession().getAttribute("login") != null)
 				mLogin = (String) RWT.getUISession().getHttpSession().getAttribute("login");
@@ -64,8 +68,8 @@ final public class ApplicationSession {
 
 	final public void login(User user, String login) {
 		mLogin = login;
-		mPersistent.setUser(user);
-		
+		mPersistentSession.setUser(user);
+
 		RWT.getUISession().getHttpSession().setAttribute("login", mLogin);
 		RWT.getUISession().getHttpSession().setAttribute("user", user);
 
@@ -85,6 +89,12 @@ final public class ApplicationSession {
 	
 	final public void setUser(User user) {
 		RWT.getUISession().getHttpSession().setAttribute("user", user);
+		
+		// Log user enter events to debug session lificycle
+		if (user == null) 
+			logger().info("Session user is set to null, this means log out.");
+		else
+			logger().info("Session user is set to object, this means log in.");
 	}
 
 	final public User getUser() {
@@ -93,8 +103,8 @@ final public class ApplicationSession {
 
 	final public void setDatabaseUser(User user) {
 		mDatabaseUser = user;
-		persistent().setAccessUser(user);
-		logger().debug("Database user set to: "+user.getUserName());
+		mPersistentSession.setAccessUser(user);
+		logger().debug("Application access user set to: "+user.getUserName());
 	}
 	
 	final public User getDatabaseUser() {
@@ -105,14 +115,15 @@ final public class ApplicationSession {
 		}
 	}
 	
-	final public PersistentManager persistent() {
+	final public PersistentManagerSession persistent() {
 		// If user is released by some reason, try to reset it from session variable
-		if (mPersistent.getUser() == null) {
-			mPersistent.setUser(
+		if (mPersistentSession.getUser() == null) {
+			logger().warn("Persistent manager has null user. Trying to reset from session.");
+			mPersistentSession.setUser(
 				(User) RWT.getUISession().getHttpSession().getAttribute("user")
 			);
 		}
-		return mPersistent;
+		return mPersistentSession;
 	}
 
 	final public MongoDBProvider mongo() {
@@ -146,7 +157,7 @@ final public class ApplicationSession {
 		logger().debug("Завершена сессия пользователя {}", mLogin);
 		
 		mLogin = null;
-		mPersistent.setUser(null);
+		mPersistentSession.setUser(null);
 
 		RWT.getUISession().getHttpSession().setAttribute("login", mLogin);
 		RWT.getUISession().getHttpSession().setAttribute("user", null);

@@ -9,6 +9,7 @@ import javax.persistence.Table;
 
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 
 @Entity(name = "Client")
 @Table(name = "CLIENTS")
@@ -20,7 +21,7 @@ public class Client extends CommonObject {
 
 	protected Client() {}
 
-	public Client(PersistentManager manager) {
+	public Client(PersistentManagerSession manager) {
 		super(manager);
 	}
 

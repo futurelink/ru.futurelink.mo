@@ -9,6 +9,7 @@ import java.util.List;
 
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 
@@ -24,7 +25,7 @@ public class EditorDTOList<T extends CommonDTO>
 	 * @param accessChecker
 	 * @param DTOclass
 	 */
-	public EditorDTOList(PersistentManager persistent,
+	public EditorDTOList(PersistentManagerSession persistent,
 			IDTOAccessChecker accessChecker, Class<T> DTOclass) {
 		super(persistent, accessChecker, DTOclass);
 	}
@@ -41,7 +42,7 @@ public class EditorDTOList<T extends CommonDTO>
 			return;
 		} else {
 			for (CommonObject object : sourceList) {
-				object.setPersistentManager(getPersistent());
+				object.setPersistentManagerSession(getPersistentManagerSession());
 				try {
 					Constructor<T> ctr = getDTOClass().getConstructor(CommonObject.class);
 					T dto = ctr.newInstance(object);

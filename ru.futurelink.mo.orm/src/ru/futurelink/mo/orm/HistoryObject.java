@@ -34,8 +34,8 @@ public class HistoryObject extends CommonObject {
 	
 	protected HistoryObject() {}
 	
-	public HistoryObject(PersistentManager manager) {
-		super(manager);
+	public HistoryObject(PersistentManagerSession session) {
+		super(session);
 	}
 	
 	/**
@@ -77,7 +77,7 @@ public class HistoryObject extends CommonObject {
 	 */
 	@Transient
 	public HistoryObject getPrevObject() {
-		HistoryObject obj = mPersistentManager.getEm().find(HistoryObject.class, mPrevId);
+		HistoryObject obj = mPersistentManagerSession.getPersistent().getEm().find(HistoryObject.class, mPrevId);
 		return obj; 
 	}
 
@@ -88,7 +88,7 @@ public class HistoryObject extends CommonObject {
 	 */
 	@Transient
 	public HistoryObject getNextObject() {
-		Query q = mPersistentManager.getEm().createQuery("select obj from "+this.getClass().getSimpleName()+" obj where obj.prevId = :id");
+		Query q = mPersistentManagerSession.getPersistent().getEm().createQuery("select obj from "+this.getClass().getSimpleName()+" obj where obj.prevId = :id");
 		q.setParameter("id", getId());
 		HistoryObject obj = (HistoryObject) q.getSingleResult();
 		return obj; 
@@ -150,7 +150,7 @@ public class HistoryObject extends CommonObject {
 	@Override
 	public Object save() throws SaveException {
 		Object retVal = null;
-		if (mPersistentManager == null) { 
+		if (mPersistentManagerSession == null) { 
 			throw new SaveException("No persistent manager on HistoryObject!", null); 
 		}
 
@@ -160,7 +160,7 @@ public class HistoryObject extends CommonObject {
 				// Перед сохранением сохраняем неизмененную копию объекта
 				// это актуально если объект сохраняется, а потом изменяется
 				// тот же экземпляр и снова сохраняется.
-				setUnmodifiedObject(mPersistentManager.getOldEm().find(getClass(), oldId));
+				setUnmodifiedObject(mPersistentManagerSession.getPersistent().getOldEm().find(getClass(), oldId));
 
 				if (checkDontCreateHistory()) {
 					// Сохраняем элемент без создания исторического элемента,
@@ -168,7 +168,7 @@ public class HistoryObject extends CommonObject {
 					// элментов.
 					retVal = super.save();
 				} else {										
-					retVal = mPersistentManager.saveWithHistory(this, oldId);
+					retVal = mPersistentManagerSession.saveWithHistory(this, oldId);
 				}
 			} else {
 				// Если объект создается в первый раз, то

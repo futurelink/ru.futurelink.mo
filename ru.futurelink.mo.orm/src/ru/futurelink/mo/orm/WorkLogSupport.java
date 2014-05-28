@@ -25,7 +25,7 @@ public class WorkLogSupport extends CommonObject {
 
 	protected WorkLogSupport() {}
 
-	public WorkLogSupport(PersistentManager manager) {
+	public WorkLogSupport(PersistentManagerSession manager) {
 		super(manager);
 	}
 	

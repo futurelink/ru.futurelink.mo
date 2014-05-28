@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
 import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
@@ -25,7 +26,7 @@ public abstract class CommonItemController
 	extends CompositeController
 	implements IItemController
 {
-	private 	PersistentManager 			mPersistent;
+	private 	PersistentManagerSession	mPersistentSession;
 	private		ArrayList<RelatedController> mRelatedControllers;
 
 	private		CommonDTO					mDTO;
@@ -36,8 +37,8 @@ public abstract class CommonItemController
 		super(parentController, dataClass, compositeParams);
 		
 		mRelatedControllers = new ArrayList<RelatedController>();
-		mPersistent = getSession().persistent();
-		
+		mPersistentSession = getSession().persistent();
+
 		// Проверялка прав доступа
 		mChecker = new AllowOwnChecker(getSession().getUser());
 	}
@@ -47,8 +48,8 @@ public abstract class CommonItemController
 		super(parentController, dataClass, container, compositeParams);
 
 		mRelatedControllers = new ArrayList<RelatedController>();
-		mPersistent = getSession().persistent();
-		
+		mPersistentSession = getSession().persistent();
+
 		// Проверялка прав доступа
 		mChecker = new AllowOwnChecker(getSession().getUser());
 	}
@@ -70,8 +71,8 @@ public abstract class CommonItemController
 	 * @return объект DTO
 	 */
 	protected CommonDTO createDTO(CommonObject data) throws DTOException {
-		if (data.getPersistenceManager() == null) 
-			data.setPersistentManager(mPersistent);
+		if (data.getPersistenceManagerSession() == null) 
+			data.setPersistentManagerSession(mPersistentSession);
 		
 		EditorDTO dto = new EditorDTO(data);
 		dto.addAccessChecker(mChecker);
@@ -86,8 +87,8 @@ public abstract class CommonItemController
 	 * @return объект DTO
 	 */
 	protected CommonDTO openDTO(CommonObject data) throws DTOException {
-		if (data.getPersistenceManager() == null) 
-			data.setPersistentManager(mPersistent);
+		if (data.getPersistenceManagerSession() == null) 
+			data.setPersistentManagerSession(mPersistentSession);
 
 		EditorDTO dto = new EditorDTO(data);
 		dto.addAccessChecker(mChecker);
@@ -114,8 +115,8 @@ public abstract class CommonItemController
 		}
 
 		try {
-			Constructor<?> ctor = mDataClass.getConstructor(PersistentManager.class);
-			return (CommonObject) ctor.newInstance(mPersistent);
+			Constructor<?> ctor = mDataClass.getConstructor(PersistentManagerSession.class);
+			return (CommonObject) ctor.newInstance(mPersistentSession);
 		} catch (NoSuchMethodException ex) {
 			throw new DTOException("В объекте ORM, возможно, не определен правильный конструктор!", ex);			
 		} catch (SecurityException ex) {
@@ -170,7 +171,7 @@ public abstract class CommonItemController
 	 */
 	@Override
 	public final void openById(String id) throws OpenException {	
-		CommonObject data = (CommonObject) mPersistent.open(mDataClass, id);
+		CommonObject data = (CommonObject) mPersistentSession.open(mDataClass, id);
 		if (data != null) {
 			open(data);
 		}

@@ -119,7 +119,7 @@ public class LinkedListController extends CompositeController {
 		
 		// Задача - выбрать все места, точки которых находятся ближе всего к заданной,
 		// отсортированными по расстоянию до заданной точки. Если точек нет - они в конце выборки.
-		TypedQuery<String> q = getSession().persistent().getEm().createQuery(
+		TypedQuery<String> q = getSession().persistent().getPersistent().getEm().createQuery(
 				"select DISTINCT p.mPlace.mTitle "
 				+ "from CommonGeoPoint p where p.mPlace.mTitle like :text and "
 				+ "p.mAbsoluteLongtitude > :absLon1 and p.mAbsoluteLongtitude < :absLon2 and "

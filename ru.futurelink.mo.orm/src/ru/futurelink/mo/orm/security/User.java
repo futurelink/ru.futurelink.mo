@@ -12,6 +12,7 @@ import javax.persistence.TypedQuery;
 
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 
 @Entity(name = "User")
 @Table(name = "USERS")
@@ -28,7 +29,7 @@ public class User extends CommonObject {
 
 	protected User() {}
 
-	public User(PersistentManager manager) {
+	public User(PersistentManagerSession manager) {
 		super(manager);
 	}
 
@@ -85,7 +86,7 @@ public class User extends CommonObject {
 	}
 	
 	public String getGrantedUsersCount() {
-		Query q = mPersistentManager.getEm().createQuery("select count(d) from Access d where d.mCreator = :creator and d.mDeleteFlag = 0");
+		Query q = getPersistenceManagerSession().getPersistent().getEm().createQuery("select count(d) from Access d where d.mCreator = :creator and d.mDeleteFlag = 0");
 		q.setParameter("creator", this);
 		if (q.getResultList().size() > 0) {
 			logger().debug("Количество: {}", q.getSingleResult());
@@ -96,7 +97,7 @@ public class User extends CommonObject {
 	}
 
 	public User getSystemUser() {
-		TypedQuery<User> q = mPersistentManager.getEm().createNamedQuery("User.findUserByLogin", User.class);
+		TypedQuery<User> q = getPersistenceManagerSession().getPersistent().getEm().createNamedQuery("User.findUserByLogin", User.class);
 		q.setParameter("login", "futurelink.vl@gmail.com");
 		if (q.getResultList().size() > 0) {
 			return q.getSingleResult();

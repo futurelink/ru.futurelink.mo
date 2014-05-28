@@ -12,6 +12,7 @@ import javax.persistence.Table;
 
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 
 /**
  * @author pavlov
@@ -33,7 +34,7 @@ public class MailServer extends CommonObject {
 	 */
 	protected MailServer() {}
 
-	public MailServer(PersistentManager manager) {
+	public MailServer(PersistentManagerSession manager) {
 		super(manager);
 	}
 

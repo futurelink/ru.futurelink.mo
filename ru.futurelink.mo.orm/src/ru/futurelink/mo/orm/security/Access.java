@@ -9,6 +9,7 @@ import javax.persistence.Transient;
 
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 
 @Entity(name = "Access")
 @Table(name = "ACCESS")
@@ -22,7 +23,7 @@ public class Access extends CommonObject {
 
 	}
 
-	public Access(PersistentManager manager) {
+	public Access(PersistentManagerSession manager) {
 		super(manager);
 	}
 	
