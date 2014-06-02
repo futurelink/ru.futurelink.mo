@@ -8,7 +8,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManager;
 import ru.futurelink.mo.orm.PersistentManagerSession;
 
 @Entity(name = "Access")

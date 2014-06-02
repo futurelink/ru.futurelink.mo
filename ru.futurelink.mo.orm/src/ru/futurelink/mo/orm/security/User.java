@@ -11,7 +11,6 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManager;
 import ru.futurelink.mo.orm.PersistentManagerSession;
 
 @Entity(name = "User")

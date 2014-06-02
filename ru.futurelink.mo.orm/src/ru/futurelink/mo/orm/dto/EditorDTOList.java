@@ -8,7 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManager;
 import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;

@@ -49,27 +49,6 @@ public class DoubleField extends TextField {
 		
 		ClientListener clientListener = new ClientListener(digitsOnlyJS);
 		mControl.addListener(SWT.Verify, clientListener);
-		
-		// Добавим листенер для того, чтобы можно было вводить только цифры с плавающей точкой
-		/*((Text)mControl).addVerifyListener(new VerifyListener() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void verifyText(VerifyEvent e) {
-	            Text text = (Text)e.getSource();
-	            final String oldS = text.getText();
-	            String newS = oldS.substring(0, e.start) + e.text + oldS.substring(e.end);
-
-	            boolean isDouble = true;
-	            try {
-	                Double.parseDouble(newS);
-	            } catch(NumberFormatException ex) {
-	                isDouble = false;
-	            }
-
-	            if(!isDouble) e.doit = false;				
-			}
-		});*/
 	}
 
 	@Override

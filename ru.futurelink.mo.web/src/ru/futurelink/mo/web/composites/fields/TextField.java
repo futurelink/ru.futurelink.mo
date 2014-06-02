@@ -107,26 +107,6 @@ public class TextField extends CommonField {
 		mControl = new Text(mParent, SWT.BORDER | (style & SWT.READ_ONLY) | (style & SWT.MULTI));
 		setTextLimit(255);	// По-умолчанию ограничение 255 символов
 
-		/*mModifyListener = new ModifyListener() {			
-			private static final long serialVersionUID = 1L;
-			@Override
-			public void modifyText(ModifyEvent arg0) {
-				try {
-					if (storeText()) {
-						if (mFieldModifyListener != null) {
-							mFieldModifyListener.modifyText(arg0);
-						}						
-					}
-
-					if (getControllerListener() != null)
-						((CommonItemControllerListener)getControllerListener()).dataChanged(getSelf());
-				} catch (DTOException ex) {
-					getControllerListener().sendError("Ошибка обновления текстового поля!", ex);
-				}
-			}
-		};
-		((Text)mControl).addModifyListener(mModifyListener);*/
-
 		mControl.addFocusListener(new FocusListener() {
 			private static final long serialVersionUID = 1L;
 
@@ -213,6 +193,9 @@ public class TextField extends CommonField {
 			}
 			
 			isModified = true;
+
+			if (getControllerListener() != null)
+				((CommonItemControllerListener)getControllerListener()).dataChanged(getSelf());
 		}
 		
 		handleMandatory();

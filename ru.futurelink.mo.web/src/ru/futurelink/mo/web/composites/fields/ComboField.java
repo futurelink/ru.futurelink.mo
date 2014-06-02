@@ -21,6 +21,10 @@ import ru.futurelink.mo.web.controller.CompositeParams;
 /**
  * Поле комбо-выбора, для использования внутри фреймворка NO.
  * 
+ * - dataChanged event is called on controller if data was changed in data field, no matter what
+ * caused that update,
+ * - dataChangeFinished is called on controller if data was changed through GUI, but not programmatically.  
+ * 
  * @author pavlov
  *
  */
@@ -52,10 +56,8 @@ public class ComboField extends CommonField {
 						mFieldModifyListener.modifyText(e);
 					}			
 					
-					if (getControllerListener() != null) {
-						((CommonItemControllerListener)getControllerListener()).dataChanged(getSelf());
+					if (getControllerListener() != null)
 						((CommonItemControllerListener)getControllerListener()).dataChangeFinished(getSelf());
-					}
 				} catch (DTOException ex) {
 					getControllerListener().sendError("Ошибка обновления элмента выбора!", ex);
 				}				
@@ -73,6 +75,9 @@ public class ComboField extends CommonField {
 		if ((getDTO() != null) && (EditorDTO.class.isAssignableFrom(getDTO().getClass()))) {
 			getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, 
 					getSelection());
+
+			if (getControllerListener() != null)
+				((CommonItemControllerListener)getControllerListener()).dataChanged(getSelf());			
 		}
 		
 		handleMandatory();		

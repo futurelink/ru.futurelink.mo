@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import org.eclipse.swt.widgets.Composite;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManager;
 import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;

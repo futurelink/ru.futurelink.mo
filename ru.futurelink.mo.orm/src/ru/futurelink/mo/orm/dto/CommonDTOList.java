@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import ru.futurelink.mo.orm.PersistentManager;
 import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;

@@ -51,12 +51,12 @@ public class EditorDTO extends CommonDTO {
 		return ((CommonObject)mData).getPersistenceManagerSession();
 	}
 	
-	public static EditorDTO create(Class <? extends CommonObject> dataClass, PersistentManager pm, IDTOAccessChecker accessChecker) throws DTOException {
+	public static EditorDTO create(Class <? extends CommonObject> dataClass, PersistentManagerSession session, IDTOAccessChecker accessChecker) throws DTOException {
 		Constructor<? extends CommonObject> cons = null;
 		CommonObject						data = null;
 		try {
 			cons = dataClass.getConstructor(PersistentManager.class);
-			data = cons.newInstance(pm);
+			data = cons.newInstance(session);
 		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new DTOException("Ошибка вызова create для EditorDTO.", e);
 		}

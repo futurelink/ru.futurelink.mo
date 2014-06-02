@@ -11,7 +11,7 @@ import javax.persistence.Query;
 import org.eclipse.swt.widgets.Composite;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
 import ru.futurelink.mo.orm.dto.access.AllowAllChecker;
@@ -120,7 +120,7 @@ public abstract class RelatedItemController
 			if (object == null) {
 				// Cоздаем новую DTO для связки, пустую.
 				try {
-					Constructor<? extends CommonObject> constr = mDataClass.getConstructor(PersistentManager.class);
+					Constructor<? extends CommonObject> constr = mDataClass.getConstructor(PersistentManagerSession.class);
 					CommonObject dataItem = constr.newInstance(getSession().persistent());
 					
 					object = new EditorDTO(dataItem);

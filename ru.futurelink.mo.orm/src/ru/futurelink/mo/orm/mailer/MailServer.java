@@ -11,7 +11,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManager;
 import ru.futurelink.mo.orm.PersistentManagerSession;
 
 /**
