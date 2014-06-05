@@ -48,7 +48,8 @@ abstract public class CommonListController
 	@Override
 	public void init() throws InitException {
 		// Создаем пустой объект фильтра
-		mFilter = new FilterDTO();		
+		if (mFilter == null)
+			mFilter = new FilterDTO();		
 
 		// Всегда создаем пустой список DTO для контроллера,
 		// если надо, его всегда можно заменить своим списком.	
@@ -184,6 +185,15 @@ abstract public class CommonListController
 		return mFilter;
 	}
 
+	/**
+	 * Установить внешний объект DTO фильтра.
+	 * 
+	 * @param filter
+	 */
+	public void setFilter(FilterDTO filter) {
+		mFilter = filter;
+	}
+	
 	/**
 	 * Создание контроллера элемента.
 	 * 

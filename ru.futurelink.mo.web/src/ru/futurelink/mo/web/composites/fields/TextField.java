@@ -1,10 +1,13 @@
 package ru.futurelink.mo.web.composites.fields;
 
+import java.util.List;
+
 import org.eclipse.rap.rwt.scripting.ClientListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
 
 import ru.futurelink.mo.orm.dto.EditorDTO;
@@ -32,9 +35,14 @@ public class TextField extends CommonField {
 	private ClientListener 		mValidateListener;
 	private boolean			mUppercase;	
 	private boolean			mDisallowSpaces;
-	
+
+	private List<String>		mSource;
+
 	private boolean			mStopOnError;
 	
+	public static int			COMBO = 0b10000000;
+	public int					mStyle;
+
 	public TextField(ApplicationSession session, CommonComposite parent, int style,
 			CompositeParams params, CommonItemComposite c) {
 		super(session, parent, style, params, c);
@@ -104,7 +112,13 @@ public class TextField extends CommonField {
 		mHint = new String();
 		mRealText = new String();
 
-		mControl = new Text(mParent, SWT.BORDER | (style & SWT.READ_ONLY) | (style & SWT.MULTI));
+		mStyle = style;
+
+		if ((style & TextField.COMBO) == TextField.COMBO) {
+			mControl = new Combo(mParent, SWT.BORDER);
+		} else {
+			mControl = new Text(mParent, SWT.BORDER | (style & SWT.READ_ONLY) | (style & SWT.MULTI));
+		}
 		setTextLimit(255);	// По-умолчанию ограничение 255 символов
 
 		mControl.addFocusListener(new FocusListener() {
@@ -126,8 +140,10 @@ public class TextField extends CommonField {
 					storeText();
 				
 					// Если в данных пусто - покажем подсказку
-					if ((getText() == null) || getText().equals("")) {
-						((Text)mControl).setText(getHint());
+					if ((mStyle & TextField.COMBO) != TextField.COMBO) {
+						if ((getText() == null) || getText().equals("")) {
+							((Text)mControl).setText(getHint());
+						}
 					}
 
 					if (
@@ -148,8 +164,10 @@ public class TextField extends CommonField {
 				mTextBeforeFocus = getText();
 
 				// Сбросим подсказку, если получили фокус, и текст равер подсказке
-				if (((Text)mControl).getText().equals(getHint())) {
-					((Text)mControl).setText(getText());
+				if ((mStyle & TextField.COMBO) != TextField.COMBO) {
+					if (((Text)mControl).getText().equals(getHint())) {
+						((Text)mControl).setText(getText());
+					}
 				}
 			}
 		});				
@@ -165,12 +183,16 @@ public class TextField extends CommonField {
 		boolean isModified = false;
 
 		// Если текст изменился на подсказку - то считаем что текст пустой
-		if (((Text)mControl).getText().equals(getHint())) {
-			mRealText = new String();
+		if ((mStyle & TextField.COMBO) != TextField.COMBO) {
+			if (((Text)mControl).getText().equals(getHint())) {
+				mRealText = new String();
+			} else {
+				mRealText = String.copyValueOf(((Text)mControl).getText().toCharArray());
+			}
 		} else {
-			mRealText = String.copyValueOf(((Text)mControl).getText().toCharArray());
+			mRealText = String.copyValueOf(((Combo)mControl).getText().toCharArray());
 		}
-		
+
 		// Вызываем этот метод только для DTO предназначенных для редакитрования					
 		if ((getDTO() != null) && 
 				(EditorDTO.class.isAssignableFrom(getDTO().getClass()) || 
@@ -211,11 +233,17 @@ public class TextField extends CommonField {
 	 */
 	public void setText(String text) throws DTOException {
 		if ((text == null) || text.equals("")) {
-			((Text)mControl).setText(getHint());
-			mRealText = text;
+			if ((mStyle & TextField.COMBO) != TextField.COMBO) {
+				((Text)mControl).setText(getHint());
+				mRealText = text;
+			}
 		} else {
-			((Text)mControl).setText(text);
-			((Text)mControl).setSelection(text.length());	// Переместим курсор в конец
+			if ((mStyle & TextField.COMBO) != TextField.COMBO) {
+				((Text)mControl).setText(text);
+				((Text)mControl).setSelection(text.length());	// Переместим курсор в конец
+			} else {
+				((Combo)mControl).setText(text);			
+			}
 			mRealText = String.copyValueOf(text.toCharArray());
 		}
 		
@@ -237,7 +265,11 @@ public class TextField extends CommonField {
 	 * @param limit
 	 */
 	public void setTextLimit(int limit) {
-		((Text)mControl).setTextLimit(limit);
+		if ((mStyle & TextField.COMBO) == TextField.COMBO) {
+			((Combo)mControl).setTextLimit(limit);
+		} else {
+			((Text)mControl).setTextLimit(limit);
+		}
 	}
 	
 	/**
@@ -245,8 +277,12 @@ public class TextField extends CommonField {
 	 */
 	@Override
 	public void setEditable(boolean isEditable) {
-		if (((Text)mControl).getEditable() != isEditable) {
-			((Text)mControl).setEditable(isEditable);
+		if ((mStyle & TextField.COMBO) == TextField.COMBO) {
+			
+		} else {
+			if (((Text)mControl).getEditable() != isEditable) {
+				((Text)mControl).setEditable(isEditable);
+			}			
 		}
 	}
 	
@@ -292,8 +328,12 @@ public class TextField extends CommonField {
 	 */
 	public void setHint(String hintText) {
 		mHint = hintText;
-		if ((getText() == null) || getText().equals(""))
-			((Text)mControl).setText(mHint);
+		if ((mStyle & TextField.COMBO) == TextField.COMBO) {
+			
+		} else {
+			if ((getText() == null) || getText().equals(""))
+				((Text)mControl).setText(mHint);
+		}
 	}
 	
 	/**
@@ -333,4 +373,13 @@ public class TextField extends CommonField {
 		return getText();
 	}
 
+	public void setSource(List<String> sourceList) {
+		mSource = sourceList;
+		if ((mStyle & TextField.COMBO) == TextField.COMBO) {
+			for (String s : mSource) {
+				((Combo)mControl).add(s);
+			}
+		}
+	}
+	
 }

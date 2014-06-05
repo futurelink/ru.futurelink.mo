@@ -7,6 +7,7 @@ import java.io.InputStream;
 
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
+import ru.futurelink.mo.orm.security.User;
 import ru.futurelink.mo.web.controller.CommonControllerListener;
 
 /**
@@ -17,7 +18,16 @@ public abstract class ExportView {
 	
 	private CommonDTOList<? extends CommonDTO> 	mList;
 	private CommonControllerListener				mControllerListener;
+	private User									mUser;
 
+	public ExportView(User user) {
+		mUser = user;
+	}
+	
+	final public User getUser() {
+		return mUser;
+	}
+	
 	final public void setDTO(CommonDTOList<? extends CommonDTO> dto) {
 		mList = dto;
 	}
