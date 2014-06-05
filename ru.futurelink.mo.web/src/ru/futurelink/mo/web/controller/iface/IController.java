@@ -25,11 +25,16 @@ public interface IController {
 	public int 		getSubControllerCount();
 
 	/* Обработка сообщений */
-	
+
 	public void addControllerListener(CommonControllerListener listener);
 	public CommonControllerListener getControllerListener();
 
 	public void handleError(String errorText, Exception exception);
 
 	public void refresh(boolean refreshSubcontrollers) throws Exception;
+
+	/**
+	 * @return
+	 */
+	public boolean getInitialized();
 }

@@ -96,7 +96,7 @@ public class DataPicker extends CommonField implements IField {
 	}
 
 	private void createControls(int style) {
-		mControl = new CommonComposite(mParent.getSession(), mParent, SWT.READ_ONLY, null);
+		mControl = new CommonComposite(mParent.getSession(), mParent, SWT.BORDER, null);
 
 		GridLayout gl = new GridLayout(3, false);
 		gl.marginWidth = 0;
@@ -106,7 +106,7 @@ public class DataPicker extends CommonField implements IField {
 
 		((CommonComposite)mControl).setLayout(gl);
 
-		mEdit = new Text((Composite) mControl, SWT.BORDER | SWT.READ_ONLY);
+		mEdit = new Text((Composite) mControl, SWT.READ_ONLY);
 		mEdit.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 		mEdit.pack();
 
@@ -117,7 +117,6 @@ public class DataPicker extends CommonField implements IField {
 		mClearButton.pack();
 		if ((style & SWT.READ_ONLY) > 0) mClearButton.setEnabled(true);
 		mClearButton.addMouseListener(new MouseListener() {
-			
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -225,7 +224,7 @@ public class DataPicker extends CommonField implements IField {
 				);
 			else
 				//mEdit.setText(getLocaleString("noValue"));
-				mEdit.setText("-");
+				mEdit.setText("- не выбрано -");
 		}
 
 		handleMandatory();
@@ -353,7 +352,12 @@ public class DataPicker extends CommonField implements IField {
 
 	@Override
 	public boolean isEmpty() {
-		return (getDTO() == null);
+		try {
+			return (getSelectedDTO() == null);
+		} catch (DTOException ex) {
+			ex.printStackTrace();				
+			return true;
+		}
 	}
 		
 	@Override
@@ -428,7 +432,12 @@ public class DataPicker extends CommonField implements IField {
 
 	@Override
 	public Object getValue() {
-		return getDTO();
+		try {
+			return getSelectedDTO();
+		} catch (DTOException e) {
+			e.printStackTrace();
+			
+			return null;
+		}
 	}
-	
 }

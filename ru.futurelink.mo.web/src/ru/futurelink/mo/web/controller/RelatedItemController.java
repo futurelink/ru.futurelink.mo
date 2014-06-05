@@ -11,10 +11,10 @@ import javax.persistence.Query;
 import org.eclipse.swt.widgets.Composite;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
-import ru.futurelink.mo.orm.dto.access.AllowOwnAndLinkedChecker;
+import ru.futurelink.mo.orm.dto.access.AllowAllChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
 import ru.futurelink.mo.web.exceptions.InitException;
@@ -90,6 +90,7 @@ public abstract class RelatedItemController
 				mFieldGetterName, 
 				mFieldSetterName
 			);
+			if (object != null) object.addAccessChecker(new AllowAllChecker());
 		} else if (mDirection == Direction.BACKWARD) {
 			
 			if (mFieldName == null) {
@@ -99,16 +100,16 @@ public abstract class RelatedItemController
 			// Если направление связки обратное, то есть в этом элементе данных есть
 			// ссылка на родительский объект, то получаем объект связанный.
 			if (mRelatedController.getDTO().getId() != null) { 
-				Query q = getSession().persistent().getEm().createQuery(
+				Query q = getSession().persistent().getPersistent().getEm().createQuery(
 						"select d from "+mDataClass.getSimpleName()+" d where d."+mFieldName+".mId = :relatedItemId and d.mCreator = :creator"
 					);
 				q.setParameter("relatedItemId", mRelatedController.getDTO().getId());
 				q.setParameter("creator", getSession().getDatabaseUser());
 				if (!q.getResultList().isEmpty()) {
 					CommonObject dataItem = (CommonObject) q.getResultList().get(0);
-					dataItem.setPersistentManager(getSession().persistent());
+					dataItem.setPersistentManagerSession(getSession().persistent());
 					object = new EditorDTO(dataItem);
-					object.addAccessChecker(new AllowOwnAndLinkedChecker(getSession().getUser()));
+					object.addAccessChecker(new AllowAllChecker());
 				}
 			}
 			
@@ -119,11 +120,11 @@ public abstract class RelatedItemController
 			if (object == null) {
 				// Cоздаем новую DTO для связки, пустую.
 				try {
-					Constructor<? extends CommonObject> constr = mDataClass.getConstructor(PersistentManager.class);
+					Constructor<? extends CommonObject> constr = mDataClass.getConstructor(PersistentManagerSession.class);
 					CommonObject dataItem = constr.newInstance(getSession().persistent());
 					
 					object = new EditorDTO(dataItem);
-					object.addAccessChecker(new AllowOwnAndLinkedChecker(getSession().getUser()));
+					object.addAccessChecker(new AllowAllChecker());
 					
 					// Установим связку сразу
 					object.setDataField(mFieldName, mFieldGetterName, mFieldSetterName, mRelatedController.getDTO());

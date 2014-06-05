@@ -42,13 +42,13 @@ public class CommonObject extends ModelObject {
 	 * есть объект может сохранить себя сам благодаря этому.
 	 */
 	@Transient
-	protected PersistentManager mPersistentManager;	
-	final public void setPersistentManager(PersistentManager pm) {
-		mPersistentManager = pm;
+	protected PersistentManagerSession mPersistentManagerSession;	
+	final public void setPersistentManagerSession(PersistentManagerSession pm) {
+		mPersistentManagerSession = pm;
 	}
 
-	final public PersistentManager getPersistenceManager() {
-		return mPersistentManager;
+	final public PersistentManagerSession getPersistenceManagerSession() {
+		return mPersistentManagerSession;
 	}
 	
 	public static Query getSingleObjectSelectQuery(PersistentManager pm, Class<?> cls, Long id) {
@@ -68,13 +68,13 @@ public class CommonObject extends ModelObject {
 	 * Правильный конструктор, который позволяет создать объект сразу
 	 * с менеджером хранения.
 	 * 
-	 * @param manager
+	 * @param pmSession
 	 */	
-	public CommonObject(PersistentManager manager) {
-		mPersistentManager = manager;
+	public CommonObject(PersistentManagerSession pmSession) {
+		mPersistentManagerSession = pmSession;
 		mDeleteFlag = false;
-		if (mCreator == null) mCreator = manager.getUser();
-		if (mAuthor == null) mAuthor = manager.getUser();
+		if (mCreator == null) mCreator = pmSession.getUser();
+		if (mAuthor == null) mAuthor = pmSession.getUser();
 	}
 
 	/**
@@ -190,12 +190,12 @@ public class CommonObject extends ModelObject {
 	 */
 	public 		Object save() throws SaveException {
 		mModifyDate = null;
-		if (mPersistentManager == null) { throw new SaveException("No persistent manager on CommonObject!", null); }
+		if (mPersistentManagerSession == null) { throw new SaveException("No persistent manager on CommonObject!", null); }
 		
 		// Дата создания и модификации - во временной зоне GMT.
 		if (mCreateDate == null) setCreateDate(Calendar.getInstance(TimeZone.getTimeZone("GMT")).getTime());
-		if (getCreator() == null) setCreator(mPersistentManager.getAccessUser());
-		if (getAuthor() == null) setAuthor(mPersistentManager.getUser());
+		if (getCreator() == null) setCreator(mPersistentManagerSession.getAccessUser());
+		if (getAuthor() == null) setAuthor(mPersistentManagerSession.getUser());
 		if (getCode() == null) { 
 			mCode = new CodeSupport();
 			mCode.setObject(this);
@@ -207,7 +207,7 @@ public class CommonObject extends ModelObject {
 		
 		Object result;
 		try {
-			 result = mPersistentManager.save(this);
+			 result = mPersistentManagerSession.save(this);
 		} catch (Exception ex) {
 			throw new SaveException("Ошибка при сохранении элемента в save()", ex);
 		}
@@ -216,11 +216,11 @@ public class CommonObject extends ModelObject {
 	}
 	
 	public void refresh() {
-		mPersistentManager.getEm().refresh(this);
+		mPersistentManagerSession.getPersistent().getEm().refresh(this);
 	}
 	
 	public Logger logger() {
-		return mPersistentManager.logger();
+		return mPersistentManagerSession.getPersistent().logger();
 	}
 	
 	/**
@@ -241,7 +241,7 @@ public class CommonObject extends ModelObject {
 	 * @throws LockException 
 	 */
 	public		Object edit() throws LockException {
-		UserLock.acquireLock(mPersistentManager, getClass().getSimpleName(), getId());
+		UserLock.acquireLock(mPersistentManagerSession.getPersistent(), getClass().getSimpleName(), getId());
 		mEditFlag = true;		
 		return null;
 	}
@@ -251,7 +251,7 @@ public class CommonObject extends ModelObject {
 	 * @throws LockException 
 	 */
 	public		void close() throws LockException {		
-		UserLock.releaseLock(mPersistentManager, getClass().getSimpleName(), getId());
+		UserLock.releaseLock(mPersistentManagerSession.getPersistent(), getClass().getSimpleName(), getId());
 		mUnmodifiedObject = null;
 		mEditFlag = false;
 	}
@@ -273,13 +273,13 @@ public class CommonObject extends ModelObject {
 	 * @param dataItem
 	 */
 	public void forceUpdateField(String field, CommonObject dataItem) {
-		Query q = mPersistentManager.getEm().createQuery("update "+getClass().getSimpleName()+" set "+field+" = :param where mId = :id");
+		Query q = mPersistentManagerSession.getPersistent().getEm().createQuery("update "+getClass().getSimpleName()+" set "+field+" = :param where mId = :id");
 		q.setParameter("param", dataItem);
 		q.setParameter("id", getId());
 		
-		mPersistentManager.getEm().getTransaction().begin();
+		mPersistentManagerSession.getPersistent().getEm().getTransaction().begin();
 		q.executeUpdate();
-		mPersistentManager.getEm().getTransaction().commit();
+		mPersistentManagerSession.getPersistent().getEm().getTransaction().commit();
 	}
 	
 	/**

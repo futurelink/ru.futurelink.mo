@@ -51,7 +51,7 @@ public class DateField extends CommonField {
 					}
 
 					if (getControllerListener() != null)
-						((CommonItemControllerListener)getControllerListener()).dataChanged(null);
+						((CommonItemControllerListener)getControllerListener()).dataChanged(getSelf());
 				} catch (DTOException ex) {
 					getControllerListener().sendError("Ошибка обновления даты!", ex);
 				}				
@@ -66,7 +66,7 @@ public class DateField extends CommonField {
 			((DateTime)mControl).setDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
 		}
 		if (getControllerListener() != null)
-			((CommonItemControllerListener)getControllerListener()).dataChanged(null);
+			((CommonItemControllerListener)getControllerListener()).dataChanged(getSelf());
 	}
 	
 	public Date getDate() {

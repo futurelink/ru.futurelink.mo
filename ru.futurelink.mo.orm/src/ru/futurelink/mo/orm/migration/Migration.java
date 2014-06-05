@@ -8,7 +8,7 @@ import javax.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 
 /**
  * Процедура миграции данных, которая должна быть выполнена после того, как
@@ -25,12 +25,13 @@ import ru.futurelink.mo.orm.PersistentManager;
  *
  */
 public abstract class Migration {
-	private		PersistentManager 	mPersistent;
+	private		PersistentManagerSession mPersistent;
+
 	private		int					mVersionFrom;
 	private		int					mVersionTo;
 	private		Logger				mLogger;
 	
-	public Migration(PersistentManager pm, int versionFrom, int versionTo) {
+	public Migration(PersistentManagerSession pm, int versionFrom, int versionTo) {
 		mPersistent = pm;
 		mVersionFrom = versionFrom;
 		mVersionTo = versionTo;
@@ -38,7 +39,7 @@ public abstract class Migration {
 		mLogger = LoggerFactory.getLogger(getClass());
 	}
 	
-	protected PersistentManager getPersistent() {
+	protected PersistentManagerSession getPersistent() {
 		return mPersistent;
 	}
 	

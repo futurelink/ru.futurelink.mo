@@ -1,11 +1,13 @@
 package ru.futurelink.mo.web.composites.fields;
 
+import java.util.List;
+
+import org.eclipse.rap.rwt.scripting.ClientListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
 
 import ru.futurelink.mo.orm.dto.EditorDTO;
@@ -17,12 +19,29 @@ import ru.futurelink.mo.web.composites.CommonItemComposite;
 import ru.futurelink.mo.web.controller.CommonItemControllerListener;
 import ru.futurelink.mo.web.controller.CompositeParams;
 
+/**
+ * Common text input field.
+ * 
+ * @author pavlov
+ *
+ */
 public class TextField extends CommonField {
-	protected ModifyListener 	mModifyListener;
+	//protected ModifyListener 	mModifyListener;
 	protected String			mInitialText;
 	protected String			mRealText;
 	private String				mHint;
 	private String				mTextBeforeFocus;
+	
+	private ClientListener 		mValidateListener;
+	private boolean			mUppercase;	
+	private boolean			mDisallowSpaces;
+
+	private List<String>		mSource;
+
+	private boolean			mStopOnError;
+	
+	public static int			COMBO = 0b10000000;
+	public int					mStyle;
 
 	public TextField(ApplicationSession session, CommonComposite parent, int style,
 			CompositeParams params, CommonItemComposite c) {
@@ -38,38 +57,80 @@ public class TextField extends CommonField {
 		createControls(style);
 	}
 
+	private final String generateValidator() {
+		StringBuilder validator = new StringBuilder();
+		validator.append("var handleEvent = function( event ) {\n");
+		
+		if (mDisallowSpaces)
+			validator.append("	if (event.text == ' ') event.doit = false;\n");
+
+		if (mUppercase)
+			validator.append("	event.text = event.text.toUpperCase();\n");
+		
+		validator.append("};\n"); 
+
+		return validator.toString();
+	}
+	
+	private final void setValidator() {
+		if (mValidateListener != null)
+			mControl.removeListener(SWT.Verify, mValidateListener);	
+
+		mValidateListener = new ClientListener(generateValidator());
+		mControl.addListener(SWT.Verify, mValidateListener);		
+	}
+	
+	/**
+	 * Force uppercase for user's input.
+	 * 
+	 * @param uppercase
+	 */
+	public void setUppercase(boolean uppercase) {
+		if (uppercase && !mUppercase) {
+			mUppercase = true;
+		} else {
+			mUppercase = false;
+		}
+		setValidator();
+	}
+	
+	/**
+	 * Disallow spaces for user's input (force one word).
+	 * 
+	 * @param disallowSpaces
+	 */
+	public void setDisallowSpaces(boolean disallowSpaces) {
+		if (disallowSpaces && !mDisallowSpaces) {
+			mDisallowSpaces = true;
+		} else {
+			mDisallowSpaces = false;
+		}
+		setValidator();
+	}
+	
 	protected void createControls(int style) {
 		mHint = new String();
 		mRealText = new String();
 
-		mControl = new Text(mParent, SWT.BORDER | (style & SWT.READ_ONLY) | (style & SWT.MULTI));
-		setTextLimit(255);	// По-умолчанию ограничение 255 символов
-		
-		mModifyListener = new ModifyListener() {			
-			private static final long serialVersionUID = 1L;
-			@Override
-			public void modifyText(ModifyEvent arg0) {
-				try {
-					if (storeText()) {
-						if (mFieldModifyListener != null) {
-							mFieldModifyListener.modifyText(arg0);
-						}						
-					}
+		mStyle = style;
 
-					if (getControllerListener() != null)
-						((CommonItemControllerListener)getControllerListener()).dataChanged(getSelf());
-				} catch (DTOException ex) {
-					getControllerListener().sendError("Ошибка обновления текстового поля!", ex);
-				}
-			}
-		};
-		((Text)mControl).addModifyListener(mModifyListener);
-		
+		if ((style & TextField.COMBO) == TextField.COMBO) {
+			mControl = new Combo(mParent, SWT.BORDER);
+		} else {
+			mControl = new Text(mParent, SWT.BORDER | (style & SWT.READ_ONLY) | (style & SWT.MULTI));
+		}
+		setTextLimit(255);	// По-умолчанию ограничение 255 символов
+
 		mControl.addFocusListener(new FocusListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void focusLost(FocusEvent arg0) {
+				
+				// Do not propagate focus lost event because of exception,
+				// even if message box appeared and focus lost again.
+				if (mStopOnError) return;
+				
 				try {
 					// Это событие должно происходить при потере фокуса в том случае
 					// если данные реально менялись. Сохраняем текст еще раз, так как мы не
@@ -79,8 +140,10 @@ public class TextField extends CommonField {
 					storeText();
 				
 					// Если в данных пусто - покажем подсказку
-					if ((getText() == null) || getText().equals("")) {
-						((Text)mControl).setText(getHint());
+					if ((mStyle & TextField.COMBO) != TextField.COMBO) {
+						if ((getText() == null) || getText().equals("")) {
+							((Text)mControl).setText(getHint());
+						}
 					}
 
 					if (
@@ -88,8 +151,9 @@ public class TextField extends CommonField {
 						(!getText().equals(mTextBeforeFocus))
 					) {
 						((CommonItemControllerListener)getControllerListener()).dataChangeFinished(getSelf());
-					}				
+					}
 				} catch (DTOException ex) {
+					mStopOnError = true;
 					getControllerListener().sendError("Ошибка обновления текстового поля!", ex);
 				}
 			}
@@ -100,8 +164,10 @@ public class TextField extends CommonField {
 				mTextBeforeFocus = getText();
 
 				// Сбросим подсказку, если получили фокус, и текст равер подсказке
-				if (((Text)mControl).getText().equals(getHint())) {
-					((Text)mControl).setText(getText());
+				if ((mStyle & TextField.COMBO) != TextField.COMBO) {
+					if (((Text)mControl).getText().equals(getHint())) {
+						((Text)mControl).setText(getText());
+					}
 				}
 			}
 		});				
@@ -117,12 +183,16 @@ public class TextField extends CommonField {
 		boolean isModified = false;
 
 		// Если текст изменился на подсказку - то считаем что текст пустой
-		if (((Text)mControl).getText().equals(getHint())) {
-			mRealText = new String();
+		if ((mStyle & TextField.COMBO) != TextField.COMBO) {
+			if (((Text)mControl).getText().equals(getHint())) {
+				mRealText = new String();
+			} else {
+				mRealText = String.copyValueOf(((Text)mControl).getText().toCharArray());
+			}
 		} else {
-			mRealText = String.copyValueOf(((Text)mControl).getText().toCharArray());
+			mRealText = String.copyValueOf(((Combo)mControl).getText().toCharArray());
 		}
-		
+
 		// Вызываем этот метод только для DTO предназначенных для редакитрования					
 		if ((getDTO() != null) && 
 				(EditorDTO.class.isAssignableFrom(getDTO().getClass()) || 
@@ -145,6 +215,9 @@ public class TextField extends CommonField {
 			}
 			
 			isModified = true;
+
+			if (getControllerListener() != null)
+				((CommonItemControllerListener)getControllerListener()).dataChanged(getSelf());
 		}
 		
 		handleMandatory();
@@ -153,43 +226,80 @@ public class TextField extends CommonField {
 	}
 	
 	/**
-	 * Установить значение поля.
+	 * Set field text value.
 	 * 
 	 * @param text
 	 * @throws DTOException
 	 */
 	public void setText(String text) throws DTOException {
 		if ((text == null) || text.equals("")) {
-			((Text)mControl).setText(getHint());
-			mRealText = text;
+			if ((mStyle & TextField.COMBO) != TextField.COMBO) {
+				((Text)mControl).setText(getHint());
+				mRealText = text;
+			}
 		} else {
-			((Text)mControl).setText(text);
-			((Text)mControl).setSelection(text.length());	// Переместим курсор в конец
+			if ((mStyle & TextField.COMBO) != TextField.COMBO) {
+				((Text)mControl).setText(text);
+				((Text)mControl).setSelection(text.length());	// Переместим курсор в конец
+			} else {
+				((Combo)mControl).setText(text);			
+			}
 			mRealText = String.copyValueOf(text.toCharArray());
 		}
 		
 		handleMandatory();
 	}
 
+	/**
+	 * Get field text value.
+	 * 
+	 * @return
+	 */
 	public String getText() {
 		return mRealText;
 	}
 
+	/**
+	 * Set maximum text length for field.
+	 * 
+	 * @param limit
+	 */
 	public void setTextLimit(int limit) {
-		((Text)mControl).setTextLimit(limit);
-	}
-	
-	@Override
-	public void setEditable(boolean isEditable) {
-		if (((Text)mControl).getEditable() != isEditable) {
-			((Text)mControl).setEditable(isEditable);
+		if ((mStyle & TextField.COMBO) == TextField.COMBO) {
+			((Combo)mControl).setTextLimit(limit);
+		} else {
+			((Text)mControl).setTextLimit(limit);
 		}
 	}
 	
+	/**
+	 * Set text field editable.
+	 */
+	@Override
+	public void setEditable(boolean isEditable) {
+		if ((mStyle & TextField.COMBO) == TextField.COMBO) {
+			
+		} else {
+			if (((Text)mControl).getEditable() != isEditable) {
+				((Text)mControl).setEditable(isEditable);
+			}			
+		}
+	}
+	
+	/**
+	 * Set field foreground color.
+	 * 
+	 * @param color
+	 */
 	public void setForeground(Color color) {
 		mControl.setForeground(color);
 	}
 	
+	/**
+	 * Set field background color.
+	 * 
+	 * @param color
+	 */
 	public void setBackground(Color color) {
 		mControl.setBackground(color);
 	}
@@ -203,7 +313,7 @@ public class TextField extends CommonField {
 	}
 
 	/**
-	 * Установить символ, который маскирует вводимые значения.
+	 * Set field echo character, ex. for password chars.
 	 * 
 	 * @param character
 	 */
@@ -212,18 +322,22 @@ public class TextField extends CommonField {
 	}
 	
 	/**
-	 * Установить подсказку поля.
+	 * Set field hint, displayed inside text input box.
 	 * 
 	 * @param hintText
 	 */
 	public void setHint(String hintText) {
 		mHint = hintText;
-		if ((getText() == null) || getText().equals(""))
-			((Text)mControl).setText(mHint);
+		if ((mStyle & TextField.COMBO) == TextField.COMBO) {
+			
+		} else {
+			if ((getText() == null) || getText().equals(""))
+				((Text)mControl).setText(mHint);
+		}
 	}
 	
 	/**
-	 * Возвращает подсказку поля.
+	 * Get field hint.
 	 * 
 	 * @return
 	 */
@@ -259,4 +373,13 @@ public class TextField extends CommonField {
 		return getText();
 	}
 
+	public void setSource(List<String> sourceList) {
+		mSource = sourceList;
+		if ((mStyle & TextField.COMBO) == TextField.COMBO) {
+			for (String s : mSource) {
+				((Combo)mControl).add(s);
+			}
+		}
+	}
+	
 }

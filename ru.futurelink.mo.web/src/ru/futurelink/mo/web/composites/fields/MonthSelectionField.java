@@ -54,7 +54,7 @@ public class MonthSelectionField extends CommonField {
 	}	
 
 	private void createControls() {		
-		mControl = new CommonComposite(mParent.getSession(), mParent, SWT.BORDER | SWT.READ_ONLY, null);
+		mControl = new CommonComposite(mParent.getSession(), mParent, SWT.NONE, null);
 
 		GridLayout gl = new GridLayout(2, true);
 		((CommonComposite)mControl).setLayout(gl);

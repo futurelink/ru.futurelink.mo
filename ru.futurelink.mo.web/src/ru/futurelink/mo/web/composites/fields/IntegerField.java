@@ -52,37 +52,6 @@ public class IntegerField extends TextField {
 	
 		ClientListener clientListener = new ClientListener(digitsOnlyJS);
 		mControl.addListener(SWT.Verify, clientListener);
-		
-		// Добавим листенер для того, чтобы можно было вводить только цифры с плавающей точкой
-		/*((Text)mControl).addVerifyListener(new VerifyListener() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void verifyText(VerifyEvent e) {
-	            Text text = (Text)e.getSource();	            	            
-	            final String oldS = text.getText();
-	            String newS = oldS.substring(0, e.start) + e.text + oldS.substring(e.end);
-
-	            // Проверяем текст на соотстветствие подсказке
-	            // если текст - подсказка, то разрешает ее.
-	            if (newS != null && newS.equals(getHint())) {
-	            	e.doit = true;
-	            	return;
-	            }
-
-	            boolean isInteger = true;
-	            // Если число или пустая строка - разрешаем!
-	            if (!newS.equals("")) {
-	            	try {
-	            		Integer.parseInt(newS);
-	            	} catch(NumberFormatException ex) {
-	            		isInteger = false;
-	            	}
-	            }
-
-	            if(!isInteger) e.doit = false;				
-			}
-		});*/	
 	}
 	
 	@Override

@@ -27,6 +27,8 @@ public class AllowOwnChecker implements IDTOAccessChecker {
 	
 	@Override
 	public boolean checkRead(CommonDTO dto, String fieldName) {
+		if ("admin".equals(mUser.getLogin())) return true;
+
 		if (dto != null && dto.getCreator() != null) {
 			if (dto.getCreator().getId().equals(mUser.getId())) return true;
 			return false;
@@ -36,6 +38,8 @@ public class AllowOwnChecker implements IDTOAccessChecker {
 
 	@Override
 	public boolean checkWrite(CommonDTO dto, String fieldName) {
+		if ("admin".equals(mUser.getLogin())) return true;
+
 		if (dto != null && dto.getCreator() != null) {
 			if (dto.getCreator().getId().equals(mUser.getId())) return true;
 			return false;
@@ -45,6 +49,8 @@ public class AllowOwnChecker implements IDTOAccessChecker {
 
 	@Override
 	public boolean checkSave(CommonDTO dto) {
+		if ("admin".equals(mUser.getLogin())) return true;
+
 		if (dto != null && dto.getCreator() != null) {
 			if (dto.getCreator().getId().equals(mUser.getId())) return true;
 			return false;
@@ -54,6 +60,8 @@ public class AllowOwnChecker implements IDTOAccessChecker {
 
 	@Override
 	public boolean checkCreate(CommonDTO dto) {
+		if ("admin".equals(mUser.getLogin())) return true;
+
 		if (dto != null && dto.getCreator() != null) {
 			if (dto.getCreator().getId().equals(mUser.getId())) return true;
 			return false;

@@ -118,4 +118,14 @@ public class SimpleListControllerListener implements
 		mListController.onTableColumnAdded(column, filterField, filterFieldGetter, filterFieldSetter, filterFieldType);
 	}
 
+	/**
+	 * Refresh list.
+	 * 
+	 * @param refreshSubcontrollers
+	 * @throws DTOException
+	 */
+	public void refresh(boolean refreshSubcontrollers) throws DTOException {
+		mListController.refresh(refreshSubcontrollers);
+	}
+
 }

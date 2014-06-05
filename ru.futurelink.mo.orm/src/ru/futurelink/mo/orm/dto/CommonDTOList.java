@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 
@@ -28,7 +28,7 @@ public abstract class CommonDTOList<T extends IDTO> {
 	private HashMap<String, T>			mDTOList;	// Данные
 	
 	private IDTOAccessChecker			mAccessChecker;
-	private PersistentManager			mPersistent;
+	private PersistentManagerSession	mPersistent;
 	
 	private Class<T>					mDTOClass;
 	private Integer						mIndex;		// Счетчик-индекс
@@ -36,7 +36,7 @@ public abstract class CommonDTOList<T extends IDTO> {
 	/**
 	 * 
 	 */
-	public CommonDTOList(PersistentManager persistent, IDTOAccessChecker accessChecker, Class<T> DTOclass) {
+	public CommonDTOList(PersistentManagerSession persistent, IDTOAccessChecker accessChecker, Class<T> DTOclass) {
 		mPersistent = persistent;
 		mAccessChecker = accessChecker;
 		mDTOClass = DTOclass;
@@ -82,7 +82,8 @@ public abstract class CommonDTOList<T extends IDTO> {
 	 * @param dtoItem
 	 * @throws DTOException 
 	 */
-	public void addDTOItem(T dtoItem) throws DTOException {
+	@SuppressWarnings("unchecked")
+	public void addDTOItem(IDTO dtoItem) throws DTOException {
 		// Добавляем только новые элементы, если элемент уже есть,
 		// его дублировать не надо.
 		if (!mDTOList.containsValue(dtoItem)) {
@@ -92,7 +93,7 @@ public abstract class CommonDTOList<T extends IDTO> {
 			// внутренненго индекса.
 			if ((id == null) || id.isEmpty()) { id = "ID_"+String.valueOf(mIndex); }
 			mOrderList.put(mIndex, id);
-			mDTOList.put(id, dtoItem);
+			mDTOList.put(id, (T) dtoItem);
 			mIndex++;
 		}
 	}
@@ -139,7 +140,7 @@ public abstract class CommonDTOList<T extends IDTO> {
 	/**
 	 * @return
 	 */
-	protected PersistentManager getPersistent() {
+	protected PersistentManagerSession getPersistentManagerSession() {
 		return mPersistent;
 	}
 }

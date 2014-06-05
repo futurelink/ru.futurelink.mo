@@ -1,15 +1,8 @@
 package ru.futurelink.mo.web.composites;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Locale;
 import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
-import java.util.ResourceBundle.Control;
 
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.swt.SWT;
@@ -22,6 +15,7 @@ import ru.futurelink.mo.web.composites.dialogs.CommonDialog;
 import ru.futurelink.mo.web.controller.CommonControllerListener;
 import ru.futurelink.mo.web.controller.CompositeParams;
 import ru.futurelink.mo.web.exceptions.InitException;
+import ru.futurelink.mo.web.utils.UTF8Control;
 
 /**
  * Окно композита для всех целей. Класс используется в приложении как база для любых кастомных
@@ -50,8 +44,8 @@ public class CommonComposite extends Composite {
 	private Logger				mLogger;
 
 	public CommonComposite(ApplicationSession session, Composite parent, int style, CompositeParams params) {
-		super(parent, style);
-		
+		super(parent, style  | SWT.NO_FOCUS );
+
 		setData(RWT.CUSTOM_VARIANT, "commonComposite");
 
 		mLogger = LoggerFactory.getLogger(getClass());
@@ -223,38 +217,5 @@ public class CommonComposite extends Composite {
 			return mParams.get(paramName);
 		return null;
 	}
-	
-	public class UTF8Control extends Control {
-	    public ResourceBundle newBundle
-	        (String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
-	            throws IllegalAccessException, InstantiationException, IOException
-	    {
-	        // The below is a copy of the default implementation.
-	        String bundleName = toBundleName(baseName, locale);
-	        String resourceName = toResourceName(bundleName, "properties");
-	        ResourceBundle bundle = null;
-	        InputStream stream = null;
-	        if (reload) {
-	            URL url = loader.getResource(resourceName);
-	            if (url != null) {
-	                URLConnection connection = url.openConnection();
-	                if (connection != null) {
-	                    connection.setUseCaches(false);
-	                    stream = connection.getInputStream();
-	                }
-	            }
-	        } else {
-	            stream = loader.getResourceAsStream(resourceName);
-	        }
-	        if (stream != null) {
-	            try {
-	                // Only this line is changed to make it to read properties files as UTF-8.
-	                bundle = new PropertyResourceBundle(new InputStreamReader(stream, "UTF-8"));
-	            } finally {
-	                stream.close();
-	            }
-	        }
-	        return bundle;
-	    }
-	}
+
 }

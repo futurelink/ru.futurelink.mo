@@ -3,14 +3,13 @@ package ru.futurelink.mo.web.app;
 import java.util.Calendar;
 import java.util.Locale;
 
-import javax.servlet.http.HttpSession;
-
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.eclipse.rap.rwt.RWT;
 
 import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.mongodb.MongoDBProvider;
 import ru.futurelink.mo.orm.mongodb.objects.LoginEventObject;
 import ru.futurelink.mo.orm.mongodb.objects.UserParams;
@@ -23,13 +22,11 @@ import ru.futurelink.mo.orm.security.User;
  *
  */
 final public class ApplicationSession {
-	private PersistentManager 	mPersistent;
-	private MongoDBProvider		mMongoDB;;
-	private HttpSession			mHttpSession;
+	private PersistentManagerSession 	mPersistentSession;
+
+	private MongoDBProvider		mMongoDB;
 	private String				mLogin = "";
-	private Boolean				mLoggedIn = false;
 	private Locale				mLocale = null;
-	private User				mUser;
 	private User				mDatabaseUser;
 	private Logger				mLogger;
 	private BundleContext		mBundleContext;
@@ -38,10 +35,14 @@ final public class ApplicationSession {
 	public ApplicationSession(BundleContext context) {
 		mBundleContext = context;
 		mLocale = new Locale("ru", "RU");
-		mHttpSession = RWT.getUISession().getHttpSession();
-		mPersistent = (PersistentManager) mBundleContext.getService(
+		PersistentManager persistent = (PersistentManager) mBundleContext.getService(
 				mBundleContext.getServiceReference(PersistentManager.class.getName())
 		);
+
+		mPersistentSession = new PersistentManagerSession(persistent);
+
+		// Make session never ending
+		RWT.getUISession().getHttpSession().setMaxInactiveInterval(8640000);
 
 		// Создаем подключение к MongoDB, база "fluvio"
 		mMongoDB = new MongoDBProvider("fluvio");
@@ -49,20 +50,15 @@ final public class ApplicationSession {
 		/*
 		 * Восстанавливаем данные из сессии в объект.
 		 */
-		if (mHttpSession.getAttribute("user") != null) {
-			mUser = (User) mHttpSession.getAttribute("user");
-
+		if (RWT.getUISession().getHttpSession().getAttribute("user") != null) {
 			// Если у нас есть пользователь, залогиненый в сессии, его
 			// надо передать персистент-менеджеру.
-			mPersistent.setUser(mUser);
-			
-			if (mHttpSession.getAttribute("loggedIn") != null)
-				mLoggedIn = (Boolean) mHttpSession.getAttribute("loggedIn");
+			mPersistentSession.setUser((User)RWT.getUISession().getHttpSession().getAttribute("user"));
 
-			if (mHttpSession.getAttribute("login") != null)
-				mLogin = (String) mHttpSession.getAttribute("login");
+			if (RWT.getUISession().getHttpSession().getAttribute("login") != null)
+				mLogin = (String) RWT.getUISession().getHttpSession().getAttribute("login");
 		}
-		
+
 		mLogger = LoggerFactory.getLogger(ApplicationSession.class);
 		
 		logger().debug("Локаль пользователя {}", RWT.getLocale().toString());
@@ -72,12 +68,10 @@ final public class ApplicationSession {
 
 	final public void login(User user, String login) {
 		mLogin = login;
-		mLoggedIn = true;
-		mPersistent.setUser(user);
-		
-		mHttpSession.setAttribute("loggedIn", mLoggedIn);
-		mHttpSession.setAttribute("login", mLogin);
-		mHttpSession.setAttribute("user", user);
+		mPersistentSession.setUser(user);
+
+		RWT.getUISession().getHttpSession().setAttribute("login", mLogin);
+		RWT.getUISession().getHttpSession().setAttribute("user", user);
 
 		// Сохраняем данные о входе пользователя
 		Calendar c = Calendar.getInstance();		
@@ -94,30 +88,42 @@ final public class ApplicationSession {
 	}
 	
 	final public void setUser(User user) {
-		mUser = user;
-		mHttpSession.setAttribute("user", user);
+		RWT.getUISession().getHttpSession().setAttribute("user", user);
+		
+		// Log user enter events to debug session lificycle
+		if (user == null) 
+			logger().info("Session user is set to null, this means log out.");
+		else
+			logger().info("Session user is set to object, this means log in.");
 	}
 
 	final public User getUser() {
-		return mUser;
+		return (User) RWT.getUISession().getHttpSession().getAttribute("user");
 	}
 
 	final public void setDatabaseUser(User user) {
 		mDatabaseUser = user;
-		persistent().setAccessUser(user);
-		logger().debug("Database user set to: "+user.getUserName());
+		mPersistentSession.setAccessUser(user);
+		logger().debug("Application access user set to: "+user.getUserName());
 	}
 	
 	final public User getDatabaseUser() {
 		if (mDatabaseUser != null) {
 			return mDatabaseUser;
 		} else {
-			return mUser;
+			return (User) RWT.getUISession().getHttpSession().getAttribute("user");
 		}
 	}
 	
-	final public PersistentManager persistent() {
-		return mPersistent;
+	final public PersistentManagerSession persistent() {
+		// If user is released by some reason, try to reset it from session variable
+		if (mPersistentSession.getUser() == null) {
+			logger().warn("Persistent manager has null user. Trying to reset from session.");
+			mPersistentSession.setUser(
+				(User) RWT.getUISession().getHttpSession().getAttribute("user")
+			);
+		}
+		return mPersistentSession;
 	}
 
 	final public MongoDBProvider mongo() {
@@ -125,11 +131,11 @@ final public class ApplicationSession {
 	}
 	
 	final public Boolean isLoggedIn() {
-		return mLoggedIn;
+		return getUser() != null;
 	}
 
 	final public String getId() {		
-		return mHttpSession.getId();
+		return RWT.getUISession().getHttpSession().getId();
 	}
 
 	final public Locale getLocale() {
@@ -151,12 +157,10 @@ final public class ApplicationSession {
 		logger().debug("Завершена сессия пользователя {}", mLogin);
 		
 		mLogin = null;
-		mLoggedIn = false;
-		mPersistent.setUser(null);
+		mPersistentSession.setUser(null);
 
-		mHttpSession.setAttribute("loggedIn", mLoggedIn);
-		mHttpSession.setAttribute("login", mLogin);
-		mHttpSession.setAttribute("user", null);
+		RWT.getUISession().getHttpSession().setAttribute("login", mLogin);
+		RWT.getUISession().getHttpSession().setAttribute("user", null);
 	}
 	
 	public void setMobileMode(boolean isMobile) {
@@ -177,7 +181,7 @@ final public class ApplicationSession {
 	public UserParams getUserParams(String usecaseName, String paramName) {		
 		// Формируем запрос параметров
 		UserParams paramsQuery = new UserParams(mMongoDB);
-		paramsQuery.setUser(mUser.getId());
+		paramsQuery.setUser(getUser().getId());
 		paramsQuery.setUsecaseName(usecaseName);
 		paramsQuery.setParamName(paramName);
 		

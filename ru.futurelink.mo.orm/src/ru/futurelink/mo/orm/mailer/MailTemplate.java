@@ -9,7 +9,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 
 @Entity (name = "MailTemplate")
 @Table(name = "MAIL_TEMPLATE")
@@ -28,7 +28,7 @@ public class MailTemplate extends CommonObject {
 	 */
 	protected MailTemplate() {}
 
-	public MailTemplate(PersistentManager manager) {
+	public MailTemplate(PersistentManagerSession manager) {
 		super(manager);
 
 		mSubject = "";

@@ -115,10 +115,10 @@ public class FilterDTO extends CommonDTO {
 										((DateRange)mQueryConditions.get(fieldName).get(n)).getBeginDate());						
 									mAdditionalValues.put("fieldData" + k + n+"max", 
 										((DateRange)mQueryConditions.get(fieldName).get(n)).getEndDate());						
+								} else {					
+									cond = cond + fieldName + " = :fieldData" + k + n;
+									mAdditionalValues.put("fieldData" + k + n, mQueryConditions.get(fieldName).get(n));
 								}
-							} else {					
-								cond = cond + fieldName + " = :fieldData" + k + n;
-								mAdditionalValues.put("fieldData" + k + n, mQueryConditions.get(fieldName).get(n));
 							}
 						}
 
