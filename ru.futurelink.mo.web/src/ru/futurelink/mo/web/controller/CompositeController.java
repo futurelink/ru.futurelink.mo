@@ -28,6 +28,8 @@ import ru.futurelink.mo.web.exceptions.InitException;
 import ru.futurelink.mo.web.register.UseCaseRegister;
 
 /**
+ * Abstract class for composite controller.
+ * 
  * @since 1.2
  */
 public abstract class CompositeController 
@@ -66,7 +68,7 @@ public abstract class CompositeController
 		super(parentController.getSession(), dataClass);
 
 		doAfterConstruct(parentController, compositeParams);
-		mContainer = mParentController.getComposite(); // Контейнер для композита берем из родителя
+		mContainer = mParentController.getComposite(); // Контейнер для композита берем из родителя		
 	}
 
 	/**
@@ -102,11 +104,13 @@ public abstract class CompositeController
 			setBundleContext(mParentController.getBundleContext());
 		}
 
-		if (params == null) {
+		mCompositeParams = params;
+
+		/*if (params == null) {
 			mCompositeParams = new CompositeParams();
 		} else {
 			mCompositeParams = params;
-		}
+		}*/
 	}
 
 	/**
@@ -122,7 +126,7 @@ public abstract class CompositeController
 		if (!mInitialized)
 			try {
 				creation(mCompositeParams);
-				if (getComposite() == null) {
+				if ((params() != null) && (getComposite() == null)) {
 					throw new InitException("Ошибка инициализации: не создан композит окна.");
 				}
 			} catch (CreationException ex) {
@@ -146,8 +150,8 @@ public abstract class CompositeController
 	 * @param compositeParams
 	 */
 	private synchronized void creation(CompositeParams compositeParams) throws CreationException {
-		if (compositeParams == null)
-			compositeParams = new CompositeParams();
+		/*if (compositeParams == null)
+			compositeParams = new CompositeParams();*/
 
 		mCompositeParams = compositeParams;
 
@@ -158,14 +162,20 @@ public abstract class CompositeController
 			if (c != null) {
 				c.init();
 			} else {
-				throw new CreationException("Произошла ошибка при инициализации композита: композит не создан");
+				if (compositeParams != null) {
+					throw new CreationException("Произошла ошибка при инициализации композита: композит не создан");					
+				} else {
+					logger().info("Composite was not created and it is null. This state is ignored because"
+							+ "of composite params is passed null.");
+				}
 			}
 		} catch (InitException ex) {
 			if (c != null) {
 				if (!c.isDisposed()) c.dispose();
 				c = null;
 			}
-			throw new CreationException("Произошла ошибка при инициализации композита: "+ex.getMessage());
+			if (compositeParams != null)
+				throw new CreationException("Произошла ошибка при инициализации композита: "+ex.getMessage());
 		}
 		setComposite(c);
 		doAfterCreateComposite();

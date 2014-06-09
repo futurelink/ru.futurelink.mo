@@ -21,6 +21,15 @@ import ru.futurelink.mo.web.controller.RelatedController.SaveMode;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
 import ru.futurelink.mo.web.controller.iface.IItemController;
 
+/**
+ * Abstract controller class for data items. It must have composite by default, but it can
+ * be overridden by composite params value. If composite params passed to constructor is null,
+ * the composite for this controller is not important and if it's not created durind initialization
+ * the exception will not be thrown. 
+ * 
+ * @author pavlov
+ *
+ */
 public abstract class CommonItemController 
 	extends CompositeController
 	implements IItemController

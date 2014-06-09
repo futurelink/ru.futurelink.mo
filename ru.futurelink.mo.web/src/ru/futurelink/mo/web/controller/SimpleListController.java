@@ -204,7 +204,7 @@ abstract public class SimpleListController
 		if (parentController != null)
 			parentController.clear();
 
-		CommonItemController ctrl = createItemController(parentController, container);
+		CommonItemController ctrl = createItemController(parentController, container, new CompositeParams());
 
 		try {
 			if (parentController != null)
