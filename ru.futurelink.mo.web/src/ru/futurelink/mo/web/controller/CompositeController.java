@@ -427,7 +427,9 @@ public abstract class CompositeController
 						// Параметры, которые касаются возможностей пикера
 						add("itemControllerClass", picker.getItemControllerClass()).
 						add("itemDialogParams", picker.getItemDialogParams()).
-						add("allowCreate", picker.getAllowCreate()));
+						add("allowCreate", picker.getAllowCreate()).
+						add("public", picker.getPublic())
+						);
 			c.init();
 			d.attachComposite(c.getComposite());
 			d.setSize(CommonDialog.LARGE);			

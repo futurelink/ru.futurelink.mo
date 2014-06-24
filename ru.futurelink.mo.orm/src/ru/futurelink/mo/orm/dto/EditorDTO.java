@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManager;
 import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
@@ -55,7 +54,7 @@ public class EditorDTO extends CommonDTO {
 		Constructor<? extends CommonObject> cons = null;
 		CommonObject						data = null;
 		try {
-			cons = dataClass.getConstructor(PersistentManager.class);
+			cons = dataClass.getConstructor(PersistentManagerSession.class);
 			data = cons.newInstance(session);
 		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new DTOException("Ошибка вызова create для EditorDTO.", e);

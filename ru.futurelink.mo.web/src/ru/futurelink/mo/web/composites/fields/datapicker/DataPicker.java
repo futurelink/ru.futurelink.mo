@@ -58,13 +58,20 @@ public class DataPicker extends CommonField implements IField {
 	
 	private String			mDisplayFieldName;
 	private String			mDisplayFieldGetterName;
-	
+
+	private String			mSelectedFieldName;
+	private String			mSelectedFieldGetterName;
+
 	private Map<String, ArrayList<Object>> mQueryConditions;
 	private String			mOrderBy;	
 	
 	// Свойства используемые для определения 
 	// создания элемента из списка выбора
 	private boolean		mAllowCreate;
+
+	// Не учитывать создателя-владельца элемента при
+	// построении списка (публичный список-справочник)
+	private boolean		mPublic;
 	
 	protected CommonItemControllerListener mParentControllerListener;
 	
@@ -110,8 +117,13 @@ public class DataPicker extends CommonField implements IField {
 		mEdit.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 		mEdit.pack();
 
+		GridData gd = new GridData();
+		gd.verticalAlignment = GridData.CENTER;
+		gd.heightHint = 24;
+		gd.widthHint = 24;
+
 		mClearButton = new Label((Composite) mControl, SWT.NONE);
-		mClearButton.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+		mClearButton.setLayoutData(gd);
 		mClearButton.setData(RWT.CUSTOM_VARIANT, "dataPickerButton");
 		mClearButton.setImage(new Image(mControl.getDisplay(), getClass().getResourceAsStream("/images/24/delete.png")));
 		mClearButton.pack();
@@ -138,8 +150,13 @@ public class DataPicker extends CommonField implements IField {
 			public void mouseDoubleClick(MouseEvent arg0) {}
 		});
 		
+		GridData gd2 = new GridData();
+		gd2.verticalAlignment = GridData.CENTER;
+		gd2.heightHint = 24;
+		gd2.widthHint = 24;
+
 		mSelectButton = new Label((Composite) mControl, SWT.NONE);
-		mSelectButton.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+		mSelectButton.setLayoutData(gd2);
 		mSelectButton.setData(RWT.CUSTOM_VARIANT, "dataPickerButton");
 		mSelectButton.setImage(new Image(mControl.getDisplay(), getClass().getResourceAsStream("/images/24/find.png")));
 		mSelectButton.pack();
@@ -198,11 +215,17 @@ public class DataPicker extends CommonField implements IField {
 
 			// Set current selected item with value got from getDTO() method
 			if (getDTO() != null) {
+				Object dataToSet = null;
 				// Это касается фильтра
 				if (FilterDTO.class.isAssignableFrom(getDTO().getClass()) && getUseOnlyOneCondition())
 					getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, null);
 
-				getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, data);
+				// If we need to set data from DTO field, get it an set.
+				if ((data != null) && (mSelectedFieldName != null) && (mSelectedFieldGetterName != null))
+					dataToSet = data.getDataField(mSelectedFieldName, mSelectedFieldGetterName, null);
+				else
+					dataToSet = data;			
+				getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, dataToSet);
 			}
 
 			if (mModifyListener != null) {
@@ -240,7 +263,7 @@ public class DataPicker extends CommonField implements IField {
 	}
 	
 	/**
-	 * Задать поле DTO отображения данных в поле выбора.
+	 * Set active data field to display its value in data picker field.
 	 * 
 	 * @param fieldName
 	 * @param getterName
@@ -249,6 +272,17 @@ public class DataPicker extends CommonField implements IField {
 	final public void setDisplayField(String fieldName, String getterName) {
 		mDisplayFieldName = fieldName;
 		mDisplayFieldGetterName = getterName;
+	}
+	
+	/**
+	 * Set active data field to take selected value from.
+	 * 
+	 * @param fieldName
+	 * @param getterName
+	 */
+	final public void setSelectedField(String fieldName, String getterName) {
+		mSelectedFieldGetterName = getterName;
+		mSelectedFieldName = fieldName;
 	}
 	
 	/**
@@ -362,11 +396,14 @@ public class DataPicker extends CommonField implements IField {
 		
 	@Override
 	public void handleMandatory() {
+		Color c;
 		if (getMandatory()&&isEmpty()) {
-			mEdit.setBackground(new Color(mEdit.getDisplay(), 255, 169, 169));
+			c = new Color(mEdit.getDisplay(), 255, 169, 169);
 		} else {
-			mEdit.setBackground(new Color(mEdit.getDisplay(), 255, 255, 255));
+			c = new Color(mEdit.getDisplay(), 255, 255, 255);
 		}
+		mEdit.setBackground(c);
+		mControl.setBackground(c);
 	}
 
 	/**
@@ -385,6 +422,25 @@ public class DataPicker extends CommonField implements IField {
 	 */
 	public boolean getAllowCreate() {
 		return mAllowCreate;
+	}
+
+	/**
+	 * Is the data picker public or not.
+	 * 
+	 * @return
+	 */
+	public boolean getPublic() {
+		return mPublic;
+	}
+
+	/**
+	 * Allow select any items from data picker if it's public,
+	 * or only current access user created items for non-public.
+	 * 
+	 * @param pub
+	 */
+	public void setPublic(boolean pub) {
+		mPublic = pub;
 	}
 
 	/**

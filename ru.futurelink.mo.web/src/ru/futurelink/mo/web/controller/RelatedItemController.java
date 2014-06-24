@@ -16,6 +16,7 @@ import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
 import ru.futurelink.mo.orm.dto.access.AllowAllChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
 import ru.futurelink.mo.web.exceptions.InitException;
 
@@ -81,6 +82,7 @@ public abstract class RelatedItemController
 	
 	@Override
 	public void refresh(boolean refreshSubcontrollers) throws DTOException {
+		boolean isNew = false;
 		CommonDTO object = null;
 		if (mDirection == Direction.FORWARD) {
 			// Если направление связки прямое, то есть в родительском элементе данных
@@ -128,6 +130,8 @@ public abstract class RelatedItemController
 					
 					// Установим связку сразу
 					object.setDataField(mFieldName, mFieldGetterName, mFieldSetterName, mRelatedController.getDTO());
+					
+					isNew = true;
 				} catch (NoSuchMethodException | 
 						SecurityException | 
 						InstantiationException | 
@@ -141,6 +145,15 @@ public abstract class RelatedItemController
 
 		setDTONoRefresh(object);
 
+		try {
+			if (isNew)
+				doAfterCreate();
+			else
+				doAfterOpen();
+		} catch (OpenException ex) {
+			throw new DTOException("Ошибка после открытия элемента!", ex);
+		}
+		
 		super.refresh(refreshSubcontrollers);
 	}
 
