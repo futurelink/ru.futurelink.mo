@@ -56,10 +56,21 @@ abstract public class SimpleListController
 		super(parentController, dataClass, container, compositeParams);
 	}
 	
+	/**
+	 * Handler for item double click event.<be/>
+	 * <br/>
+	 * This handler works with data item got by getActiveData(),
+	 * note the @data parameter is not the same as getActiveData(),
+	 * the method can be overridden in child classes to work with other
+	 * data item then selected in list, but @data always contains selected
+	 * data item DTO. 
+	 * 
+	 * @param data
+	 */
 	public void handleItemDoubleClicked(CommonDTO data) {
 		if (data != null) {
 			if (params().get("itemEditMode") != EditMode.CONTAINER) {
-				if (openEditDialog((EditorDTO)data) != null) {
+				if (openEditDialog((EditorDTO)getActiveData()) != null) {
 					// Обновить список, перечитать данные
 					try {
 						handleDataQuery();
@@ -112,10 +123,9 @@ abstract public class SimpleListController
 	public void handleDelete() {
 		String id = "";
 		// Только если есть выбранный элемент, есть активные данные
-		if (((CommonListComposite)getComposite()).getActiveData() != null) {
+		if (getActiveData() != null) {
 			try {
-				id = ((CommonListComposite)getComposite()).
-						getActiveData().
+				id = getActiveData().
 						getDataField("mId", "getId", "setId").toString();
 				CommonObject obj = getSession().persistent().open(getDataClass(), id);
 				obj.delete();
@@ -141,7 +151,7 @@ abstract public class SimpleListController
 	// Обработка редактирования элемента
 	@Override
 	public void handleEdit() {
-		handleItemDoubleClicked(((CommonListComposite)getComposite()).getActiveData());
+		handleItemDoubleClicked(getActiveData());
 	}
 
 	@Override
@@ -194,7 +204,7 @@ abstract public class SimpleListController
 	 * @param data
 	 * @return
 	 */
-	private Object openEditDialog(EditorDTO data) {
+	protected Object openEditDialog(EditorDTO data) {
 		return new CommonItemDialog(getSession(), getComposite(), this, params()).open(data);
 	}
 	

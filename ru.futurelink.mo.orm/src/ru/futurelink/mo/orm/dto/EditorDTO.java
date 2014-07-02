@@ -424,12 +424,12 @@ public class EditorDTO extends CommonDTO {
 	 * @return
 	 * @throws DTOException
 	 */
-	public Object getDataField(String fieldName, String fieldGetterName, String fieldSetterName) throws DTOException {
-		if (mAccessChecker == null) {
+	public Object getDataField(String fieldName, String fieldGetterName, String fieldSetterName, boolean checkAccess) throws DTOException {
+		if (mAccessChecker == null && checkAccess) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}
 
-		if (!mAccessChecker.checkRead(this, fieldName)) {
+		if (checkAccess && !mAccessChecker.checkRead(this, fieldName)) {
 			DTOAccessException ex = new DTOAccessException("У вас нет права на получение данных из этого элемента.", null);
 			ex.setAccessData("EditorDTO get data from field: name is "+fieldName+" getter is "+fieldGetterName);
 			throw ex;

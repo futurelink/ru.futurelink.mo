@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import ru.futurelink.mo.orm.CommonObject;
+import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
@@ -35,15 +36,22 @@ public class EditorDTOList<T extends CommonDTO>
 	 * @param sourceList
 	 * @throws DTOException
 	 */
-	public void addObjectList(List<? extends CommonObject> sourceList) throws DTOException {
+	public void addObjectList(List<? extends ModelObject> sourceList) throws DTOException {
 		if ((sourceList == null) || (sourceList.size() == 0)) {
 			clear();
 			return;
 		} else {
-			for (CommonObject object : sourceList) {
-				object.setPersistentManagerSession(getPersistentManagerSession());
+			for (ModelObject object : sourceList) {
+				if (CommonObject.class.isAssignableFrom(object.getClass())) {
+					((CommonObject)object).setPersistentManagerSession(getPersistentManagerSession());
+				}
 				try {
-					Constructor<T> ctr = getDTOClass().getConstructor(CommonObject.class);
+					Constructor<T> ctr = null;				
+					if (CommonObject.class.isAssignableFrom(object.getClass())) {
+						ctr = getDTOClass().getConstructor(CommonObject.class);
+					} else {
+						ctr = getDTOClass().getConstructor(ModelObject.class);
+					}
 					T dto = ctr.newInstance(object);
 					if (dto != null) {
 						if (dto.getAccessChecker() == null) dto.addAccessChecker(getAccessChecker());

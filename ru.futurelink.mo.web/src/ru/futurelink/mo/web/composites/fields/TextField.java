@@ -6,6 +6,8 @@ import org.eclipse.rap.rwt.scripting.ClientListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
@@ -118,9 +120,19 @@ public class TextField extends CommonField {
 			mControl = new Combo(mParent, SWT.BORDER);
 		} else {
 			mControl = new Text(mParent, SWT.BORDER | (style & SWT.READ_ONLY) | (style & SWT.MULTI));
+
+			((Text)mControl).addModifyListener(new ModifyListener() {			
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void modifyText(ModifyEvent arg0) {
+					if (mFieldModifyListener != null)
+						mFieldModifyListener.modifyText(arg0);				
+				}
+			});
 		}
 		setTextLimit(255);	// По-умолчанию ограничение 255 символов
-
+		
 		mControl.addFocusListener(new FocusListener() {
 			private static final long serialVersionUID = 1L;
 

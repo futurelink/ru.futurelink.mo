@@ -27,7 +27,7 @@ public class FilterDTO extends CommonDTO {
 
 	@Override
 	public Object getDataField(String fieldName, String fieldGetterName,
-			String fieldSetterName) throws DTOException {
+			String fieldSetterName, boolean checkAccess) throws DTOException {
 		return getCondition(fieldName); 
 	}
 

@@ -58,10 +58,18 @@ public abstract class CommonItemController
 		mRelatedControllers = new ArrayList<RelatedController>();
 		mPersistentSession = getSession().persistent();
 
-		// Проверялка прав доступа
-		mChecker = new AllowOwnChecker(getSession().getUser());
+		mChecker = createAccessChecker();
 	}
 
+	/**
+	 * Метод создающий проверялку прав доступа.
+	 * Можно переопределить на дочернем классе, если нужно
+	 * обеспечить доступ к элементам иным чем созданные этим пользователем. 
+	 */
+	public IDTOAccessChecker createAccessChecker() {
+		return new AllowOwnChecker(getSession().getUser());		
+	}
+	
 	/**
 	 * Получить DTO элемента данных.
 	 * 
