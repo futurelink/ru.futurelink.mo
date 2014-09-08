@@ -411,7 +411,7 @@ public abstract class CompositeController
 			return;
 		}
 		
-		d.setText("Выбор элмента");				
+		d.setText("Выбор элемента");				
 		try {		
 			CommonDataPickerController c = (CommonDataPickerController) constr.newInstance(
 					(CompositeController) mThisController,

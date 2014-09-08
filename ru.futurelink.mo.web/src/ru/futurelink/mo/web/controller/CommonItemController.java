@@ -48,7 +48,7 @@ public abstract class CommonItemController
 		mPersistentSession = getSession().persistent();
 
 		// Проверялка прав доступа
-		mChecker = new AllowOwnChecker(getSession().getUser());
+		mChecker = createAccessChecker();
 	}
 
 	public CommonItemController(ICompositeController parentController, Class<? extends CommonObject> dataClass,
@@ -210,7 +210,7 @@ public abstract class CommonItemController
 				// использовать данные композита - надо, чтобы DTO на композите уже был.
 				doAfterOpen();
 			} catch (DTOException ex) {				
-				throw new OpenException(data.getId(), "Невозможно получить данные: "+ex.getMessage(), ex);
+				throw new OpenException(data.getId(), "Невозможно получить данные "+data.getClass().getSimpleName()+": "+ex.getMessage(), ex);
 			}
 		}
 	}
