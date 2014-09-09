@@ -103,6 +103,10 @@ public abstract class CommonDTO implements Serializable, IDTO {
 		return null;
 	}
 
+	public Object getDataField(String fieldName, String fieldGetterName, String fieldSetterName) throws DTOException {
+		return getDataField(fieldName, fieldGetterName, fieldSetterName, true);
+	}
+
 	public String getDataFieldAsString(String fieldName, String getter, String defaultValue) {
 		try {
 			Object f = getDataField(fieldName, getter, null);

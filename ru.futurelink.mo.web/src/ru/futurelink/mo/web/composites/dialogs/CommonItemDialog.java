@@ -54,7 +54,7 @@ public class CommonItemDialog {
 	}
 	
 	public Object open(CommonDTO data) {
-		mController = mListController.createItemController(mListController, mDialog.getShell());
+		mController = mListController.createItemController(mListController, mDialog.getShell(), new CompositeParams());
 		
 		try {
 			mController.init();

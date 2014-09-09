@@ -1,8 +1,11 @@
 package ru.futurelink.mo.web.app;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.application.EntryPoint;
-import org.eclipse.rap.rwt.client.service.JavaScriptExecutor;
+import org.eclipse.rap.rwt.client.service.JavaScriptLoader;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Control;
@@ -12,27 +15,20 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.BundleContext;
 
+/**
+ * Application entry point.
+ * 
+ * @author pavlov
+ *
+ */
 abstract public class ApplicationEntryPoint implements EntryPoint {
 	private ApplicationSession			mSession;
-	private ApplicationWindow			mApplicationWindow;
-	private ApplicationController		mController;
+	private ApplicationWindow		mApplicationWindow;
+	private ApplicationController	mController;
 	private String						mDeferredUsecaseRun;
 	private BundleContext				mBundleContext;
 
-	private static String sourceURL = "https://fluvio.ru";	
-	private static String loadFontJS = 
-			"var $ = document; // shortcut\n"+
-			"var cssId = 'fontCSS';  // you could encode the css path itself to generate id..\n"+
-			"if (!$.getElementById(cssId)) {\n"+
-			"	var head  = $.getElementsByTagName('head')[0];\n"+
-			"	var link  = $.createElement('link');\n"+
-			"	link.id   = cssId;\n"+
-			"	link.rel  = 'stylesheet';\n"+
-			"	link.type = 'text/css';\n"+
-			"	link.href = '"+sourceURL+"/static/fonts/roboto.css';\n"+
-			"	link.media = 'all';\n"+
-			"	head.appendChild(link);\n"+
-			"}\n";	
+	private static String fontCSSJS = "resources/fontcss.js";
 
 	public ApplicationEntryPoint(BundleContext context) {
 		mSession = new ApplicationSession(context);
@@ -40,7 +36,7 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 	}
 
 	/**
-	 * Получить сессию пользователя.
+	 * Get application session.
 	 * 
 	 * @return
 	 */
@@ -48,10 +44,22 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 		return mSession;
 	}
 	
+	/**
+	 * Set an application controller.
+	 * 
+	 * @see getController
+	 * @param controller
+	 */
 	protected void setController(ApplicationController controller) {
 		mController = controller;
 	}
 	
+	/**
+	 * Get an application controller.
+	 * 
+	 * @see setController
+	 * @return
+	 */
 	protected ApplicationController getController() {
 		return mController;
 	}
@@ -67,7 +75,6 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 	 * Юзкейс будет запущен как раз после того, как создастся окно приложения.
 	 * 
 	 * @param usecaseBundle
-	 * @return
 	 */
 	public void runDeferredUsecase(String usecaseBundle) {
 		mDeferredUsecaseRun = usecaseBundle;
@@ -84,22 +91,55 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 				mController.handleRunUsecase(mDeferredUsecaseRun, null);
 		}
 	}
-
+	
+	/**
+	 * Set application composite window for application entry point.
+	 * 
+	 * @param window application composite window
+	 */
 	protected void setApplicationWindow(ApplicationWindow window) {
 		mApplicationWindow = window;
 	}
 
+	/**
+	 * Removes and disposes application composite window.
+	 * 
+	 * @see setApplicationWindow
+	 */
 	protected void removeApplicationWindow() {
 		//mApplicationWindow.mController.uninit();
 		mApplicationWindow.dispose();
 		mApplicationWindow = null;
 	}
 
+	private void registerFontCSS() throws IOException {
+		InputStream inputStream = ApplicationEntryPoint.class.getClassLoader().getResourceAsStream(fontCSSJS);
+		try {
+			if (inputStream != null)
+				RWT.getResourceManager().register(fontCSSJS, inputStream);
+		} finally {
+			if (inputStream != null)
+				inputStream.close();
+	    }		
+	}
+	
+	/**
+	 * Creates shell for application entry point.
+	 * 
+	 * @see Shell
+	 * @param display
+	 * @return shell object
+	 */
 	protected Shell createMainShell( Display display ) {
+		try {
+			registerFontCSS();
 
-		JavaScriptExecutor executor = RWT.getClient().getService( JavaScriptExecutor.class );
-		executor.execute( loadFontJS );		
-		
+			JavaScriptLoader executor = RWT.getClient().getService(JavaScriptLoader.class);
+			executor.require(RWT.getResourceManager().getLocation(fontCSSJS));
+		} catch (IOException ex) {
+			// Failed to load font CSS javascript...
+		}
+
 		display.setData( RWT.MNEMONIC_ACTIVATOR, "CTRL+ALT" );
 	    display.addListener( SWT.Resize, new Listener() {
 			private static final long serialVersionUID = 1L;
@@ -113,10 +153,15 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 	    shell.setMaximized(true);
 	    shell.setData(RWT.CUSTOM_VARIANT, "mainshell");
 	    shell.setLayout(new FillLayout());
-    
+   
 	    return shell;
 	}
 
+	/**
+	 * Disposes all controls in shwll window and completely clears it.
+	 * 
+	 * @param shell
+	 */
 	protected void clearShell(Shell shell) {
 		Control[] controls = shell.getChildren();
 		for (int i = 0; i < controls.length; i++) {

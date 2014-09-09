@@ -33,6 +33,8 @@ public class CommonDataPickerToolbar extends ItemToolbar {
 			Composite parent, int style, CompositeParams params) {
 		super(session, parent, style);
 		
+		getSaveButton().setText(getLocaleString("select"));
+
 		addSpacer();
 		
 		if ((params.get("allowCreate") != null) && ((boolean)params.get("allowCreate")) &&

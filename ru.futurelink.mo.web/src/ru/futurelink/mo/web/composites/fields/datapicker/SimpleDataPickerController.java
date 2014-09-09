@@ -17,7 +17,9 @@ import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.HistoryObject;
 import ru.futurelink.mo.orm.dto.EditorDTO;
 import ru.futurelink.mo.orm.dto.EditorDTOList;
+import ru.futurelink.mo.orm.dto.access.AllowAllChecker;
 import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
+import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.composites.CommonComposite;
 import ru.futurelink.mo.web.controller.CompositeController;
@@ -37,6 +39,7 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 
 	private Map<String, ArrayList<Object>> mQueryConditions;
 	private String					mOrderBy;
+	private boolean				mPublic;
 
 	private EditorDTOList<EditorDTO> mList;
 
@@ -51,8 +54,6 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 			Class<? extends CommonObject> dataClass, Composite container,
 			CompositeParams compositeParams) {
 		super(parentController, dataClass, container, compositeParams);
-
-		mList = new EditorDTOList<EditorDTO>(getSession().persistent(), new AllowOwnChecker(getSession().getUser()), EditorDTO.class);
 		
 		if (compositeParams.get("queryConditions") != null) {
 			mQueryConditions = (Map<String, ArrayList<Object>>) compositeParams.get("queryConditions"); 
@@ -61,6 +62,20 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 		if (compositeParams.get("orderBy") != null) {
 			mOrderBy = (String)compositeParams.get("orderBy");
 		}
+		
+		if (compositeParams.get("public") != null) {
+			mPublic = (Boolean)compositeParams.get("public");
+		}
+		
+		// For public data pickers set allow all access checker to DTO
+		IDTOAccessChecker accessChecker = null;
+		if (mPublic) {
+			accessChecker = new AllowAllChecker();
+		} else {
+			accessChecker = new AllowOwnChecker(getSession().getUser());
+		}
+		
+		mList = new EditorDTOList<EditorDTO>(getSession().persistent(), accessChecker, EditorDTO.class);		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -72,10 +87,15 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 		String queryString = "";
 		if (HistoryObject.class.isAssignableFrom(mDataClass)) {
 			queryString = 
-				"select d from "+mDataClass.getName()+" d where d.mDeleteFlag = 0 and d.mOutdated = 0 and d.mCreator = :creator";
+				"select d from "+mDataClass.getName()+" d where d.mDeleteFlag = 0 and d.mOutdated = 0";
 		} else {
 			queryString = 
-				"select d from "+mDataClass.getName()+" d where d.mDeleteFlag = 0 and d.mCreator = :creator";
+				"select d from "+mDataClass.getName()+" d where d.mDeleteFlag = 0";
+		}
+		
+		// If data picker is not public use only creator filtered records to select
+		if (!mPublic) {
+			 queryString += " and d.mCreator = :creator";
 		}
 		
 		// Перелопатим допусловия первый раз...
@@ -105,8 +125,8 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 			queryString += " order by d."+mOrderBy;
 		}
 
-		q2 = mSession.persistent().getPersistent().getEm().createQuery(queryString, mDataClass);		
-		q2.setParameter("creator", getSession().getDatabaseUser());
+		q2 = mSession.persistent().getPersistent().getEm().createQuery(queryString, mDataClass);
+		if (!mPublic) q2.setParameter("creator", getSession().getDatabaseUser());
 		if (additionalValues.size() > 0) {
 			for (String key : additionalValues.keySet()) {
 				q2.setParameter(key, additionalValues.get(key));

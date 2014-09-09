@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManager;
 import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
@@ -55,7 +54,7 @@ public class EditorDTO extends CommonDTO {
 		Constructor<? extends CommonObject> cons = null;
 		CommonObject						data = null;
 		try {
-			cons = dataClass.getConstructor(PersistentManager.class);
+			cons = dataClass.getConstructor(PersistentManagerSession.class);
 			data = cons.newInstance(session);
 		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new DTOException("Ошибка вызова create для EditorDTO.", e);
@@ -425,12 +424,12 @@ public class EditorDTO extends CommonDTO {
 	 * @return
 	 * @throws DTOException
 	 */
-	public Object getDataField(String fieldName, String fieldGetterName, String fieldSetterName) throws DTOException {
-		if (mAccessChecker == null) {
+	public Object getDataField(String fieldName, String fieldGetterName, String fieldSetterName, boolean checkAccess) throws DTOException {
+		if (mAccessChecker == null && checkAccess) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}
 
-		if (!mAccessChecker.checkRead(this, fieldName)) {
+		if (checkAccess && !mAccessChecker.checkRead(this, fieldName)) {
 			DTOAccessException ex = new DTOAccessException("У вас нет права на получение данных из этого элемента.", null);
 			ex.setAccessData("EditorDTO get data from field: name is "+fieldName+" getter is "+fieldGetterName);
 			throw ex;

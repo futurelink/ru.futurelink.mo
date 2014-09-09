@@ -28,6 +28,10 @@ public interface IDTO {
 	public Object getDataField(String fieldName, String fieldGetterName, 
 			String fieldSetterName) throws DTOException;
 	
+	
+	public Object getDataField(String fieldName, String fieldGetterName, 
+			String fieldSetterName, boolean checkAccess) throws DTOException;
+
 	/**
 	 * Сохраняет данные в модели DTO определенным образом, в зависимости от реализации.
 	 * 

@@ -39,8 +39,8 @@ public class ViewerDTO extends CommonDTO {
 
 	@Override
 	public Object getDataField(String fieldName, String fieldGetterName,
-			String fieldSetterName) throws DTOException {
-		if (mAccessChecker == null) {
+			String fieldSetterName, boolean checkAccess) throws DTOException {
+		if (mAccessChecker == null && checkAccess) {
 			throw new DTOException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}
 

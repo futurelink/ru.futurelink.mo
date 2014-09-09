@@ -21,6 +21,15 @@ import ru.futurelink.mo.web.controller.RelatedController.SaveMode;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
 import ru.futurelink.mo.web.controller.iface.IItemController;
 
+/**
+ * Abstract controller class for data items. It must have composite by default, but it can
+ * be overridden by composite params value. If composite params passed to constructor is null,
+ * the composite for this controller is not important and if it's not created durind initialization
+ * the exception will not be thrown. 
+ * 
+ * @author pavlov
+ *
+ */
 public abstract class CommonItemController 
 	extends CompositeController
 	implements IItemController
@@ -39,7 +48,7 @@ public abstract class CommonItemController
 		mPersistentSession = getSession().persistent();
 
 		// Проверялка прав доступа
-		mChecker = new AllowOwnChecker(getSession().getUser());
+		mChecker = createAccessChecker();
 	}
 
 	public CommonItemController(ICompositeController parentController, Class<? extends CommonObject> dataClass,
@@ -49,10 +58,18 @@ public abstract class CommonItemController
 		mRelatedControllers = new ArrayList<RelatedController>();
 		mPersistentSession = getSession().persistent();
 
-		// Проверялка прав доступа
-		mChecker = new AllowOwnChecker(getSession().getUser());
+		mChecker = createAccessChecker();
 	}
 
+	/**
+	 * Метод создающий проверялку прав доступа.
+	 * Можно переопределить на дочернем классе, если нужно
+	 * обеспечить доступ к элементам иным чем созданные этим пользователем. 
+	 */
+	public IDTOAccessChecker createAccessChecker() {
+		return new AllowOwnChecker(getSession().getUser());		
+	}
+	
 	/**
 	 * Получить DTO элемента данных.
 	 * 
@@ -193,7 +210,7 @@ public abstract class CommonItemController
 				// использовать данные композита - надо, чтобы DTO на композите уже был.
 				doAfterOpen();
 			} catch (DTOException ex) {				
-				throw new OpenException(data.getId(), "Невозможно получить данные: "+ex.getMessage(), ex);
+				throw new OpenException(data.getId(), "Невозможно получить данные "+data.getClass().getSimpleName()+": "+ex.getMessage(), ex);
 			}
 		}
 	}

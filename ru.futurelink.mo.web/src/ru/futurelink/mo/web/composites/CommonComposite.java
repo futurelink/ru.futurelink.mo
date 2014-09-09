@@ -35,8 +35,8 @@ public class CommonComposite extends Composite {
 	private static final long serialVersionUID = 1L;
 
 	private ApplicationSession mSession;
-	private ResourceBundle		mStrings;
-	private ResourceBundle		mLocalStrings;
+	private ResourceBundle	mStrings;
+	private ResourceBundle	mLocalStrings;
 	private CommonDialog		mOwnerDialog;	// Диалоговое окно - если открыто в диалоге
 	private CompositeParams		mParams;
 

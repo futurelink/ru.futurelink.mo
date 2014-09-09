@@ -86,6 +86,8 @@ public abstract class CommonTable
 		mTableViewer.getTable().setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL
 				| GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
 
+		mTableViewer.getTable().setData(RWT.MARKUP_ENABLED, Boolean.TRUE);
+
 		/*
 		 * Нимняя линейка-контейнер
 		 */
