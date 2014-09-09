@@ -16,9 +16,9 @@ import ru.futurelink.mo.orm.mongodb.objects.UserParams;
 import ru.futurelink.mo.orm.security.User;
 
 /**
- * Объект оболочка для сессии приложения над HttpSession.
- * @author Futurelink
- * @since 1.2
+ * HttpSession wrapper for MO application sessions.
+ * 
+ * @author pavlov
  *
  */
 final public class ApplicationSession {
@@ -83,10 +83,21 @@ final public class ApplicationSession {
 		logger().debug("Начата сессия пользователя {}", mLogin);		
 	}
 
+	/**
+	 * Get session @see Logger object.
+	 * 
+	 * @return
+	 */
 	final public Logger logger() {
 		return mLogger;
 	}
 	
+	/**
+	 * Set session user. Valid @see User object means user is logging in, and
+	 * null means user is to be logged out.
+	 * 
+	 * @param user
+	 */
 	final public void setUser(User user) {
 		RWT.getUISession().getHttpSession().setAttribute("user", user);
 		
@@ -97,6 +108,11 @@ final public class ApplicationSession {
 			logger().info("Session user is set to object, this means log in.");
 	}
 
+	/**
+	 * Get session @see User object.
+	 * 
+	 * @return current session user or null if no user logged in
+	 */
 	final public User getUser() {
 		return (User) RWT.getUISession().getHttpSession().getAttribute("user");
 	}
@@ -115,6 +131,17 @@ final public class ApplicationSession {
 		}
 	}
 	
+	/**
+	 * <p>Get persistent manager session.</p>
+	 * 
+	 * <p>The persistent manager session is used to create entity managers, manipulate
+	 * object via EclipseLink ORM. Other words it's a wrapper for persistence provider
+	 * created by Gemini DBA and EclipseLink.</p>
+	 * 
+	 * @see PersistentManagerSession
+	 * 
+	 * @return
+	 */
 	final public PersistentManagerSession persistent() {
 		// If user is released by some reason, try to reset it from session variable
 		if (mPersistentSession.getUser() == null) {
@@ -130,14 +157,32 @@ final public class ApplicationSession {
 		return mMongoDB;
 	}
 	
+	/**
+	 * Get if user is logged in.
+	 * 
+	 * @return
+	 */
 	final public Boolean isLoggedIn() {
 		return getUser() != null;
 	}
 
+	/**
+	 * Get HttpSession ID.
+	 * 
+	 * @return
+	 */
 	final public String getId() {		
 		return RWT.getUISession().getHttpSession().getId();
 	}
 
+	/**
+	 * <p>Get user locale object.</p>
+	 * 
+	 * <p>The locale object may be set by user or is detected from the
+	 * browser locale.</p>
+	 * 
+	 * @return
+	 */
 	final public Locale getLocale() {
 		return mLocale;
 	}
@@ -151,7 +196,7 @@ final public class ApplicationSession {
 	}
 
 	/**
-	 * 
+	 * Terminate user session.
 	 */
 	final public void logout() {
 		logger().debug("Завершена сессия пользователя {}", mLogin);
@@ -163,10 +208,20 @@ final public class ApplicationSession {
 		RWT.getUISession().getHttpSession().setAttribute("user", null);
 	}
 	
+	/**
+	 * Set session mobile mode.
+	 * 
+	 * @param isMobile
+	 */
 	public void setMobileMode(boolean isMobile) {
 		mMobileMode = isMobile;
 	}
 	
+	/**
+	 * Get session is in mobile mode.
+	 * 
+	 * @return
+	 */
 	public boolean getMobileMode() {
 		return mMobileMode;
 	}

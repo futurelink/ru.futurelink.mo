@@ -12,10 +12,16 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.BundleContext;
 
+/**
+ * Application entry point.
+ * 
+ * @author pavlov
+ *
+ */
 abstract public class ApplicationEntryPoint implements EntryPoint {
 	private ApplicationSession			mSession;
-	private ApplicationWindow			mApplicationWindow;
-	private ApplicationController		mController;
+	private ApplicationWindow		mApplicationWindow;
+	private ApplicationController	mController;
 	private String						mDeferredUsecaseRun;
 	private BundleContext				mBundleContext;
 
@@ -40,7 +46,7 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 	}
 
 	/**
-	 * Получить сессию пользователя.
+	 * Get application session.
 	 * 
 	 * @return
 	 */
@@ -48,10 +54,22 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 		return mSession;
 	}
 	
+	/**
+	 * Set an application controller.
+	 * 
+	 * @see getController
+	 * @param controller
+	 */
 	protected void setController(ApplicationController controller) {
 		mController = controller;
 	}
 	
+	/**
+	 * Get an application controller.
+	 * 
+	 * @see setController
+	 * @return
+	 */
 	protected ApplicationController getController() {
 		return mController;
 	}
@@ -67,7 +85,6 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 	 * Юзкейс будет запущен как раз после того, как создастся окно приложения.
 	 * 
 	 * @param usecaseBundle
-	 * @return
 	 */
 	public void runDeferredUsecase(String usecaseBundle) {
 		mDeferredUsecaseRun = usecaseBundle;
@@ -84,19 +101,35 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 				mController.handleRunUsecase(mDeferredUsecaseRun, null);
 		}
 	}
-
+	
+	/**
+	 * Set application composite window for application entry point.
+	 * 
+	 * @param window application composite window
+	 */
 	protected void setApplicationWindow(ApplicationWindow window) {
 		mApplicationWindow = window;
 	}
 
+	/**
+	 * Removes and disposes application composite window.
+	 * 
+	 * @see setApplicationWindow
+	 */
 	protected void removeApplicationWindow() {
 		//mApplicationWindow.mController.uninit();
 		mApplicationWindow.dispose();
 		mApplicationWindow = null;
 	}
 
+	/**
+	 * Creates shell for application entry point.
+	 * 
+	 * @see Shell
+	 * @param display
+	 * @return shell object
+	 */
 	protected Shell createMainShell( Display display ) {
-
 		JavaScriptExecutor executor = RWT.getClient().getService( JavaScriptExecutor.class );
 		executor.execute( loadFontJS );		
 		
@@ -117,6 +150,11 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 	    return shell;
 	}
 
+	/**
+	 * Disposes all controls in shwll window and completely clears it.
+	 * 
+	 * @param shell
+	 */
 	protected void clearShell(Shell shell) {
 		Control[] controls = shell.getChildren();
 		for (int i = 0; i < controls.length; i++) {

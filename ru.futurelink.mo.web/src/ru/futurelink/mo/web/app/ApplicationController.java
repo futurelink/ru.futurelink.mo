@@ -15,7 +15,17 @@ import ru.futurelink.mo.web.exceptions.InitException;
 import ru.futurelink.mo.web.register.UseCaseRegister;
 
 /**
- * Контроллер приложения.
+ * <p>Basic application controller.</p>
+ * 
+ * <p>This class is the ancestor for applications implemented with
+ * MO framework. The ApplicationController is a standard CompositeController and
+ * implements ICompositeController intefface.</p>
+ * 
+ * <p>The AppliucationControllerListener is used to implement application
+ * listener.</p>
+ * 
+ * @see ApplicationControllerListener
+ * @see ICompositeController
  * 
  * @author pavlov
  *
@@ -37,28 +47,19 @@ abstract public class ApplicationController extends CompositeController {
 	}
 
 	@Override
-	protected void doBeforeCreateComposite() {
-
-	}
+	protected void doBeforeCreateComposite() {}
 
 	@Override
-	protected void doAfterCreateComposite() {
-
-	}
+	protected void doAfterCreateComposite() {}
 
 	@Override
-	protected void doBeforeInit() {
-
-	}
+	protected void doBeforeInit() {}
 
 	@Override
 	protected void doAfterInit() throws InitException {
 		startFeedback();
 	}
 
-	/* (non-Javadoc)
-	 * @see ru.futurelink.mo.web.controller.CommonController#uninit()
-	 */
 	@Override
 	public synchronized void uninit() {
 		super.uninit();
