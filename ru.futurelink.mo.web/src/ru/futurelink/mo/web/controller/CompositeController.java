@@ -411,7 +411,7 @@ public abstract class CompositeController
 			return;
 		}
 		
-		d.setText("Выбор элемента");				
+		d.setText(getComposite().getLocaleString("selection"));				
 		try {		
 			CommonDataPickerController c = (CommonDataPickerController) constr.newInstance(
 					(CompositeController) mThisController,
@@ -432,7 +432,13 @@ public abstract class CompositeController
 						);
 			c.init();
 			d.attachComposite(c.getComposite());
-			d.setSize(CommonDialog.LARGE);			
+			if (getSession().getMobileMode()) {
+				// In mobile mode we use fullscreen list sizing
+				d.setSize(CommonDialog.FULL);
+			} else {
+				// In desktop mode we use screen-relative list sizing
+				d.setSize(CommonDialog.LARGE);
+			}
 			d.open();
 			
 			// Пикеру просетили элемент DTO чтобы он уже отобразил данные на своем поле

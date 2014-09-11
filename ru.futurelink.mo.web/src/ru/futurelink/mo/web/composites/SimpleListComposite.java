@@ -12,6 +12,7 @@ import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.table.CommonTable;
 import ru.futurelink.mo.web.composites.table.CommonTableListener;
+import ru.futurelink.mo.web.composites.table.ICommonTable;
 import ru.futurelink.mo.web.composites.toolbar.CommonToolbar;
 import ru.futurelink.mo.web.composites.toolbar.JournalToolbar;
 import ru.futurelink.mo.web.composites.toolbar.ToolbarListener;
@@ -37,7 +38,7 @@ public class SimpleListComposite extends CommonListComposite {
 
 	private static final long serialVersionUID = 1L;
 
-	protected	CommonTable	mTable;
+	protected	ICommonTable	mTable;
 	private		Class<?>	mTableClass;
 	
 	public SimpleListComposite(ApplicationSession session, Composite parent, int style, CompositeParams params) {
@@ -63,7 +64,7 @@ public class SimpleListComposite extends CommonListComposite {
 					Composite.class, 
 					int.class, 
 					CompositeParams.class);
-			mTable = (CommonTable) constr.newInstance(getSession(), this, SWT.NONE, null);
+			mTable = (ICommonTable) constr.newInstance(getSession(), this, SWT.NONE, null);
 			mTable.addTableListener(new CommonTableListener() {			
 				@Override
 				public void itemSelected(CommonDTO data) {
@@ -103,13 +104,13 @@ public class SimpleListComposite extends CommonListComposite {
 			getControllerListener().sendError("SimpleListComposite: Ошибка создания.", ex);
 		}		
 
-		return mTable;
+		return (CommonComposite)mTable;
 	}
 
 	// Создание колонок таблицы надо вызывать отдельно, чтобы был уже привязан
 	// обработчик событий от таблицы.
 	public void createTableColumns() {
-		mTable.createTableColumns();
+		((ICommonTable)mTable).createTableColumns();
 	}
 
 	@Override
@@ -146,7 +147,7 @@ public class SimpleListComposite extends CommonListComposite {
 		mTable.selectByDTO(dto);
 	}
 
-	public CommonTable getTable() {
+	public ICommonTable getTable() {
 		return mTable;
 	}
 

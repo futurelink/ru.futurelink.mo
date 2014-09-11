@@ -16,10 +16,10 @@ import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonComposite;
+import ru.futurelink.mo.web.composites.IDragDropDecorator;
 import ru.futurelink.mo.web.composites.SimpleListComposite;
 import ru.futurelink.mo.web.composites.CommonListComposite;
 import ru.futurelink.mo.web.composites.dialogs.CommonItemDialog;
-import ru.futurelink.mo.web.composites.table.CommonTable;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
 import ru.futurelink.mo.web.controller.iface.IListEditController;
 import ru.futurelink.mo.web.exceptions.InitException;
@@ -85,7 +85,7 @@ abstract public class SimpleListController
 	}
 	
 	public void addDragSupport(int operations, Transfer[] transferTypes, DragSourceListener listener) {
-		CommonTable tbl = ((SimpleListComposite)getComposite()).getTable();
+		IDragDropDecorator tbl = (IDragDropDecorator)((SimpleListComposite)getComposite()).getTable();
 		if (tbl != null)
 			tbl.addDragSupport(operations, transferTypes, listener);
 	}
