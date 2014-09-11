@@ -68,11 +68,11 @@ abstract public class CommonListController
 		
 		mDTO = null;
 		mFilter = null;
-		try {
+		/*try {
 			((CommonListComposite)getComposite()).refresh();
 		} catch (DTOException e) {
 			handleError("Ошибка деинициализации контроллера при уничтожении объекта DTO!", e);
-		}
+		}*/
 
 		super.uninit();
 	}

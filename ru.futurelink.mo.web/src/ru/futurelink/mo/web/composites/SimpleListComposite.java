@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
-import ru.futurelink.mo.web.composites.table.CommonTable;
 import ru.futurelink.mo.web.composites.table.CommonTableListener;
 import ru.futurelink.mo.web.composites.table.ICommonTable;
 import ru.futurelink.mo.web.composites.toolbar.CommonToolbar;

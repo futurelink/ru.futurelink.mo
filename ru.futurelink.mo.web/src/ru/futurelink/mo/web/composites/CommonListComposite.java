@@ -74,7 +74,8 @@ abstract public class CommonListComposite extends CommonDataComposite {
 			// Если у нас обработчик контроллера не кастуется в обработчик контроллера списка,
 			// то надо обработать это и вывалить эксепшн.
 			if (!(ListDTOAccessor.class.isAssignableFrom(getControllerListener().getClass()))) {
-				throw new DTOException("Неправильный обработчик списка на контроллере списка. Обработчик контроллера должен унаследовать "
+				throw new DTOException("Неправильный обработчик списка на контроллере списка. "
+						+ "Обработчик контроллера должен унаследовать "
 						+ "ListDTOAccessor и метод getControllerDTO()", null);
 			}
 

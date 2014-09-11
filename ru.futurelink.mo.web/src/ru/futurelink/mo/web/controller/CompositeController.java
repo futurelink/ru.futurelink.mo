@@ -357,7 +357,7 @@ public abstract class CompositeController
 	 * Сначала выполняется очистка окна, а потом логическое удаление субконтроллеров.
 	 */
 	@Override
-	public void clear() {
+	public void clear() {	
 		logger().info("Очистка композита...");
 		if (getComposite() != null && !getComposite().isDisposed()) {
 			Control[] controls = getComposite().getChildren();
@@ -367,12 +367,11 @@ public abstract class CompositeController
 				}
 			}
 		}
-
+		
 		logger().info("Удаление субконтроллеров...");
 		for (int i = 0; i < getSubControllerCount(); i++) {
 			removeSubController(i);
-		}
-
+		}		
 	}
 	
 	public CommonComposite createErrorComposite(String message) {
