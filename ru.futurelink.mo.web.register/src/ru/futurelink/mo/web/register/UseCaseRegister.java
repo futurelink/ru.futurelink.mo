@@ -32,14 +32,16 @@ public class UseCaseRegister {
 	}
 	
 	public void registerUsecase(String usecase, Class <?> controller, 
-			BundleContext bundleContext) {
-		registerUsecase(usecase, controller, null, bundleContext);
+			Class <?> dataClass, BundleContext bundleContext) {
+		registerUsecase(usecase, controller, dataClass, null, bundleContext);
 	}
 			
 	public void registerUsecase(String usecase, Class <?> controller, 
-			String navigationTag, BundleContext bundleContext) {
+			Class<?> dataClass, String navigationTag, BundleContext bundleContext) {
 		if ((usecase != null) && (controller != null)) {
-			UseCaseInfo info = new UseCaseInfo(usecase, controller, navigationTag,  bundleContext);
+			UseCaseInfo info = new UseCaseInfo(
+					usecase, controller, dataClass, navigationTag,  bundleContext
+				);
 			registerUsecase(info);
 		} else {
 			mLogger.error("Invalid usecase registration information");

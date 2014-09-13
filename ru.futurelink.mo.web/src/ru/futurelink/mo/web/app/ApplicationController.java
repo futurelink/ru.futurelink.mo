@@ -92,7 +92,7 @@ abstract public class ApplicationController extends CompositeController {
 								URLDecoder.decode((pairSplit.length > 1) ? pairSplit[1] : "", "UTF-8")
 							);
 					} catch (UnsupportedEncodingException ex) {
-						
+
 					}
 				}
 				

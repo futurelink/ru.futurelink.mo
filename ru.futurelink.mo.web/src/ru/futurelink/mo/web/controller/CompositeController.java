@@ -474,6 +474,7 @@ public abstract class CompositeController
 	 * @param dataClass класс данных, для работы этого юзкейса
 	 * @return объект контроллера запущенного юзкейса в случае удачи, в случае неудачи null.
 	 */
+	@Deprecated
 	@SuppressWarnings("unchecked")
 	public CompositeController handleRunUsecase(
 			String usecaseBundle, 
@@ -491,6 +492,22 @@ public abstract class CompositeController
 			return c;
 		}
 		
+		return null;
+	}
+
+	public CompositeController handleRunUsecase(String usecaseBundle) {
+		// Запустим контроллер юзкейса в работу
+		CompositeController c = getUsecaseController(
+				usecaseBundle, 
+				null, 
+				new CompositeParams()
+			);
+		if (c != null) {
+			// Добавляем субконтроллер для текущего контроллера
+			addSubController(c);			
+			return c;
+		}
+
 		return null;
 	}
 
@@ -514,7 +531,7 @@ public abstract class CompositeController
 			Class<? extends CompositeController> controller,
 			Class<?> dataClass,
 			CommonComposite container) {
-		CompositeController c = getUsecaseController(
+		CompositeController c = createUsecaseController(
 				controller, 
 				dataClass, 
 				container, 
@@ -526,7 +543,7 @@ public abstract class CompositeController
 			
 		return c;			
 	}
-	
+
 	/**
 	 * Get usecase bundle name by navigation tag.
 	 * 
@@ -587,6 +604,7 @@ public abstract class CompositeController
 		return usecaseController;
 	}
 	
+	@Deprecated
 	public final CompositeController getUsecaseController(
 			String usecaseBundle,
 			Class<? extends CommonObject> dataClass,
@@ -604,15 +622,50 @@ public abstract class CompositeController
 		if (usecaseControllerClass == null) return null;
 
 		CompositeController usecaseController = 
-				getUsecaseController(usecaseControllerClass, dataClass, container, params);
+				createUsecaseController(
+						usecaseControllerClass, 
+						dataClass, 
+						container, 
+						params
+					);
 		
 		// Set controller navigation tag
 		usecaseController.setNavigationTag(info.getNavigationTag());
 		
 		return usecaseController;
 	}
-	
+
 	public final CompositeController getUsecaseController(
+			String usecaseBundle,
+			Composite container,
+			CompositeParams params) {
+
+		// Retrieve usecase information
+		UseCaseInfo info = getUsecaseInfo(usecaseBundle);
+		if (info == null) return null;
+
+		// Get usecase controller from usecase register
+		@SuppressWarnings("unchecked")
+		Class<? extends CompositeController> usecaseControllerClass = 
+				(Class<? extends CompositeController>)info.getControllerClass();
+		if (usecaseControllerClass == null) return null;
+
+		CompositeController usecaseController = 
+				createUsecaseController(
+						usecaseControllerClass, 
+						info.getDataClass(), 
+						container, 
+						params
+					);
+
+		// Set controller navigation tag
+		if (usecaseController != null)
+			usecaseController.setNavigationTag(info.getNavigationTag());
+		
+		return usecaseController;
+	}
+
+	public final CompositeController createUsecaseController(
 			Class<? extends CompositeController> usecaseController,
 			Class<?> dataClass,
 			Composite container,
@@ -628,13 +681,13 @@ public abstract class CompositeController
 			Constructor<? extends CommonController> constr;
 			if (container == null) {
 				constr = usecaseController.getConstructor(
-					CompositeController.class,
+					ICompositeController.class,
 					Class.class,
 					CompositeParams.class
 					);
 			} else {
 				constr = usecaseController.getConstructor(
-					CompositeController.class,
+					ICompositeController.class,
 					Class.class,
 					Composite.class,
 					CompositeParams.class

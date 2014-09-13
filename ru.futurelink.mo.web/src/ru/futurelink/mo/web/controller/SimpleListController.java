@@ -46,12 +46,12 @@ abstract public class SimpleListController
 
 	public enum EditMode { DIALOG, CONTAINER };
 	
-	public SimpleListController(CompositeController parentController,
+	public SimpleListController(ICompositeController parentController,
 			Class<? extends CommonObject> dataClass, CompositeParams compositeParams) {
 		super(parentController, dataClass, compositeParams);
 	}
 
-	public SimpleListController(CompositeController parentController,
+	public SimpleListController(ICompositeController parentController,
 			Class<? extends CommonObject> dataClass, Composite container, CompositeParams compositeParams) { 
 		super(parentController, dataClass, container, compositeParams);
 	}
@@ -107,14 +107,6 @@ abstract public class SimpleListController
 			// юзкейс, а после закрытия этого контроллера запустить юзкейс,
 			// который был там раньше
 			openEdit(getParentController(), null);
-			/*if (result != null) {
-				// Обновить список, перечитать данные
-				try {
-					handleDataQuery();
-				} catch (DTOException ex) {
-					handleError("невозможно обновить список.", ex);
-				}				
-			}*/
 		}
 	}
 	
@@ -208,6 +200,13 @@ abstract public class SimpleListController
 		return new CommonItemDialog(getSession(), getComposite(), this, params()).open(data);
 	}
 	
+	/**
+	 * Open item edit or creation as subconroller.
+	 * 
+	 * @param parentController
+	 * @param data
+	 * @return
+	 */
 	private Object openEdit(ICompositeController parentController, EditorDTO data) {
 		Composite container = (Composite) params().get("itemEditContainer");
 		
@@ -311,5 +310,6 @@ abstract public class SimpleListController
 	 * 
 	 * @param column
 	 */
-	protected void onTableColumnAdded(TableColumn column, String columnField, String columnFieldGetter, String columnFieldSetter, Class<?> columnFieldType) {}
+	protected void onTableColumnAdded(TableColumn column, String columnField, 
+			String columnFieldGetter, String columnFieldSetter, Class<?> columnFieldType) {}
 }
