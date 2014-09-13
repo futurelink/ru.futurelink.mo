@@ -3,6 +3,10 @@ package ru.futurelink.mo.web.app;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.client.service.BrowserNavigation;
+import org.eclipse.rap.rwt.client.service.BrowserNavigationEvent;
+import org.eclipse.rap.rwt.client.service.BrowserNavigationListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
@@ -34,6 +38,7 @@ abstract public class ApplicationController extends CompositeController {
 
 	private Shell 				mShell;
 	private CommonController	mFeedbackButtonController;
+	private BrowserNavigationListener mNavigationListener;
 
 	protected ApplicationController(ApplicationSession session, Shell shell) {
 		super(session, null);
@@ -57,12 +62,49 @@ abstract public class ApplicationController extends CompositeController {
 
 	@Override
 	protected void doAfterInit() throws InitException {
-		startFeedback();
+		startFeedback();		
 	}
 
+	private void initNavigation() {
+		mNavigationListener = new BrowserNavigationListener() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void navigated(BrowserNavigationEvent arg0) {
+				logger().info("Navigated on {}", arg0.getState());
+				if (getControllerListener() != null)
+					((ApplicationControllerListener)getControllerListener()).navigate(arg0.getState());				
+			}
+		};
+		BrowserNavigation service = RWT.getClient().getService( BrowserNavigation.class );
+		service.addBrowserNavigationListener(mNavigationListener);		
+	}
+
+	private void uninitNavigation() {
+		BrowserNavigation service = RWT.getClient().getService( BrowserNavigation.class );
+		service.removeBrowserNavigationListener(mNavigationListener);
+		mNavigationListener = null;
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		uninitNavigation();
+
+		super.finalize();
+	}
+	
+	@Override
+	public synchronized void init() throws InitException {
+		initNavigation();
+
+		super.init();
+	}
+	
 	@Override
 	public synchronized void uninit() {
 		super.uninit();
+
+		uninitNavigation();
 
 		// Если есть привязанная кнопка фидбэка, надо
 		// ее убрать и очистить контроллер.

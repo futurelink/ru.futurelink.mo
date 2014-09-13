@@ -528,6 +528,25 @@ public abstract class CompositeController
 	}
 	
 	/**
+	 * Get usecase bundle name by navigation tag.
+	 * 
+	 * @param tag
+	 * @return
+	 */
+	public final String getUsecaseByNavigationTag(String tag) {
+		// Get usecase register service
+		UseCaseRegister register = (UseCaseRegister) mBundleContext.getService(
+				mBundleContext.getServiceReference(UseCaseRegister.class.getName()));
+
+		if (register == null) {
+			handleError("Cannot get usecase, register service is unavailable.", null);
+			return null;
+		}
+		
+		return register.getUsecaseByNavigationTag(tag);
+	}
+	
+	/**
 	 * 
 	 * @param usecaseBundle
 	 * @return
