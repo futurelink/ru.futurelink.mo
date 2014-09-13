@@ -165,12 +165,16 @@ abstract public class ApplicationController extends CompositeController {
 					public void feedbackButtonClicked() {
 						logger().debug("Application feedback button clicked!");
 						if (getSession().getMobileMode()) {
-							handleRunUsecase("ru.futurelink.mo.web.feedback", null);
+							handleRunUsecase("ru.futurelink.mo.web.feedback");
 						} else {
 							CommonDialog dlg = new CommonDialog(getSession(), mShell , SWT.BORDER);
 							dlg.setText("Feedback");
 							dlg.setSize(CommonDialog.LARGE);
-							CompositeController ctrl = getUsecaseController("ru.futurelink.mo.web.feedback", null, dlg.getShell(), new CompositeParams());
+							CompositeController ctrl = getUsecaseController(
+									"ru.futurelink.mo.web.feedback", 
+									dlg.getShell(), 
+									new CompositeParams()
+								);
 							if (ctrl != null) {
 								try {
 									ctrl.init();

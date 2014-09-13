@@ -209,36 +209,43 @@ abstract public class SimpleListController
 	 */
 	private Object openEdit(ICompositeController parentController, EditorDTO data) {
 		Composite container = (Composite) params().get("itemEditContainer");
+		String itemUsecaseBundle = (String) params().get("itemUsecase");
 		
 		if (parentController != null)
 			parentController.clear();
 
-		CommonItemController ctrl = createItemController(parentController, container, new CompositeParams());
+		CommonItemController ctrl;		
+		if (itemUsecaseBundle != null) {
+			logger().info("Running usecase {} to edit item", itemUsecaseBundle);
+			ctrl = (CommonItemController)((CompositeController)parentController).handleRunUsecase(itemUsecaseBundle);
+		} else {		
+			ctrl = createItemController(parentController, container, new CompositeParams());
 
-		try {
-			if (parentController != null)
-				parentController.addSubController(ctrl);
-		} catch (InitException ex) {
-			ctrl.handleError("Ошибка инициализации контроллера.", ex);
-			return null;
-		}
+			try {
+				if (parentController != null)
+					parentController.addSubController(ctrl);
+			} catch (InitException ex) {
+				ctrl.handleError("Ошибка инициализации контроллера.", ex);
+				return null;
+			}
 
-		// Initialize controller
-		try {
-			ctrl.init();
-		} catch (InitException ex1) {
-			ctrl.handleError("Ошибка инициализации контроллера.", ex1);
-			return null;
-		}
+			// Initialize controller
+			try {
+				ctrl.init();
+			} catch (InitException ex1) {
+				ctrl.handleError("Ошибка инициализации контроллера.", ex1);
+				return null;
+			}
 		
-		// Check composite is created right
-		if (ctrl.getComposite() == null) {			
-			ctrl.uninit();
-			ctrl.handleError("Композит для отображения в диалоговом окне не создан!", null);
-			return -1;
-		}
+			// Check composite is created right
+			if (ctrl.getComposite() == null) {			
+				ctrl.uninit();
+				ctrl.handleError("Композит для отображения в диалоговом окне не создан!", null);
+				return -1;
+			}
 		
-		ctrl.getComposite().layout(true, true);
+			ctrl.getComposite().layout(true, true);
+		}
 
 		// Create or open data
 		if (data == null) {

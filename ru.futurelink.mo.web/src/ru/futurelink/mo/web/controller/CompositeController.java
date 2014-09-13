@@ -3,6 +3,8 @@ package ru.futurelink.mo.web.controller;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.client.service.BrowserNavigation;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.Transfer;
@@ -470,6 +472,8 @@ public abstract class CompositeController
 	 * Для того, чтобы контроллер работал в режиме юзкейса нужно, чтобы он
 	 * имел соответствующий конструктор (режим субконтроллера).
 	 * 
+	 * DEPRECATED. Use handleRunUsecase(String usecaseBundle) instead.
+	 * 
 	 * @param usecaseBundle название юзкейса, зарегистрированного в реестре юзкейсов
 	 * @param dataClass класс данных, для работы этого юзкейса
 	 * @return объект контроллера запущенного юзкейса в случае удачи, в случае неудачи null.
@@ -495,16 +499,31 @@ public abstract class CompositeController
 		return null;
 	}
 
+	/**
+	 * Runs usecase bundle in current controller composite.
+	 * 
+	 * @param usecaseBundle
+	 * @return
+	 */
 	public CompositeController handleRunUsecase(String usecaseBundle) {
-		// Запустим контроллер юзкейса в работу
 		CompositeController c = getUsecaseController(
 				usecaseBundle, 
 				null, 
 				new CompositeParams()
 			);
 		if (c != null) {
-			// Добавляем субконтроллер для текущего контроллера
-			addSubController(c);			
+			addSubController(c);
+
+			// Save navigation state to browser
+			if (c.getNavigationTag() != null) {
+				try {
+					BrowserNavigation navigation = RWT.getClient().getService(BrowserNavigation.class);
+					navigation.pushState(c.getNavigationTag(), c.getNavigationTitle());
+				} catch (Exception ex) {
+					logger().warn("Не получилось сохранить состояние в браузере для {}", c.getNavigationTag());
+				}
+			}
+
 			return c;
 		}
 
