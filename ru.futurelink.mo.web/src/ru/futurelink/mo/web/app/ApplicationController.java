@@ -1,7 +1,11 @@
 package ru.futurelink.mo.web.app;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URLDecoder;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.client.service.BrowserNavigation;
@@ -72,8 +76,29 @@ abstract public class ApplicationController extends CompositeController {
 			@Override
 			public void navigated(BrowserNavigationEvent arg0) {
 				logger().info("Navigated on {}", arg0.getState());
+				
+				// Parse URL tag and params into Map
+				Map<String, String> params = new LinkedHashMap<String, String>();
+				String state = arg0.getState();
+				String[] parts = state.split("\\?");  
+				String tag = (parts.length > 0) ? parts[0] : "";
+				String paramsStr = (parts.length > 1) ? parts[1] : "";
+				String[] pairs = paramsStr.split("&");
+				for (String pair : pairs) {
+					String[] pairSplit = pair.split("=");
+					try {
+						params.put(
+								URLDecoder.decode(pairSplit[0], "UTF-8"), 
+								URLDecoder.decode((pairSplit.length > 1) ? pairSplit[1] : "", "UTF-8")
+							);
+					} catch (UnsupportedEncodingException ex) {
+						
+					}
+				}
+				
+				// Call navigation handler
 				if (getControllerListener() != null)
-					((ApplicationControllerListener)getControllerListener()).navigate(arg0.getState());				
+					((ApplicationControllerListener)getControllerListener()).navigate(tag, params);				
 			}
 		};
 		BrowserNavigation service = RWT.getClient().getService( BrowserNavigation.class );
