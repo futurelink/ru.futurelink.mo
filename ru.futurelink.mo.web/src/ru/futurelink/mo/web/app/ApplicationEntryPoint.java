@@ -28,7 +28,7 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 	private String						mDeferredUsecaseRun;
 	private BundleContext				mBundleContext;
 
-	private static String fontCSSJS = "resources/fontcss.js";
+	private static String fontCSSJS = "fontcss.js";
 
 	public ApplicationEntryPoint(BundleContext context) {
 		mSession = new ApplicationSession(context);

@@ -8,14 +8,27 @@ import org.osgi.framework.BundleContext;
 public class UseCaseInfo {	
 	private String	 							mUseCaseBundle;
 	private Class <?>							mUseCaseController;
+	private String								mNavigationTag;
 
 	private BundleContext						mBundleContext;
-		
+
 	public UseCaseInfo(String usecase, Class <?> controller, 
 			BundleContext context) {
 		mUseCaseBundle = usecase;
 		mUseCaseController = controller;
 		mBundleContext = context;
+	}
+
+	public UseCaseInfo(String usecase, Class <?> controller, 
+			String navigationTag, BundleContext context) {
+		mUseCaseBundle = usecase;
+		mUseCaseController = controller;
+		mBundleContext = context;
+		mNavigationTag = navigationTag;
+	}
+	
+	public String getNavigationTag() {
+		return mNavigationTag;
 	}
 	
 	public Class <?> getControllerClass() {

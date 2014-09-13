@@ -25,6 +25,7 @@ import ru.futurelink.mo.web.composites.fields.datapicker.SimpleDataPickerControl
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
 import ru.futurelink.mo.web.exceptions.CreationException;
 import ru.futurelink.mo.web.exceptions.InitException;
+import ru.futurelink.mo.web.register.UseCaseInfo;
 import ru.futurelink.mo.web.register.UseCaseRegister;
 
 /**
@@ -42,8 +43,8 @@ public abstract class CompositeController
 	private		CompositeParams			mCompositeParams;
 	private 	ICompositeController	mParentController;
 
-	private		String					mNavigationTag;
 	private		String					mNavigationTitle;
+	private		String					mNavigationTag;
 
 	/**
 	 * Конструктор, который может использоваться для создания, например, ApplicationController,
@@ -358,7 +359,7 @@ public abstract class CompositeController
 	 */
 	@Override
 	public void clear() {	
-		logger().info("Очистка композита...");
+		logger().info("Clear composite...");
 		if (getComposite() != null && !getComposite().isDisposed()) {
 			Control[] controls = getComposite().getChildren();
 			for (int i = 0; i < controls.length; i++) {
@@ -368,7 +369,7 @@ public abstract class CompositeController
 			}
 		}
 		
-		logger().info("Удаление субконтроллеров...");
+		logger().info("Remove subcontrollers...");
 		for (int i = 0; i < getSubControllerCount(); i++) {
 			removeSubController(i);
 		}		
@@ -473,19 +474,21 @@ public abstract class CompositeController
 	 * @param dataClass класс данных, для работы этого юзкейса
 	 * @return объект контроллера запущенного юзкейса в случае удачи, в случае неудачи null.
 	 */
-	public CompositeController handleRunUsecase(String usecaseBundle, Class<?> dataClass) {		
-		logger().debug("Контекст бандла для запуска юзкейса: {}", mBundleContext.toString());			
-		if (mBundleContext == null) {
-			handleError("Невозможно запустить юзкейс "+usecaseBundle+", неизвестен контекст бандла.", null);
-			return null;
-		}
-
-		Class<? extends CompositeController> usecaseController = 
-				getUsecaseControllerClass(usecaseBundle);
-
-		if (usecaseController != null) {
-			// Запустим контроллер юзкейса в работу
-			return handleRunControllerAsUsecase(usecaseController, dataClass, null);
+	@SuppressWarnings("unchecked")
+	public CompositeController handleRunUsecase(
+			String usecaseBundle, 
+			Class<?> dataClass) {
+		// Запустим контроллер юзкейса в работу
+		CompositeController c = getUsecaseController(
+				usecaseBundle, 
+				(Class<? extends CommonObject>)dataClass, 
+				null, 
+				new CompositeParams()
+			);
+		if (c != null) {
+			// Добавляем субконтроллер для текущего контроллера
+			addSubController(c);			
+			return c;
 		}
 		
 		return null;
@@ -511,8 +514,12 @@ public abstract class CompositeController
 			Class<? extends CompositeController> controller,
 			Class<?> dataClass,
 			CommonComposite container) {
-
-		CompositeController c = getUsecaseController(controller, dataClass, container, new CompositeParams());
+		CompositeController c = getUsecaseController(
+				controller, 
+				dataClass, 
+				container, 
+				new CompositeParams()
+			);
 
 		// Добавляем субконтроллер для текущего контроллера
 		addSubController(c);
@@ -520,22 +527,69 @@ public abstract class CompositeController
 		return c;			
 	}
 	
-	public final Class<? extends CompositeController> getUsecaseControllerClass(String usecaseBundle) {
-		logger().debug("Контекст бандла для запуска юзкейса: {}", mBundleContext.toString());
+	/**
+	 * 
+	 * @param usecaseBundle
+	 * @return
+	 */
+	public final UseCaseInfo getUsecaseInfo(String usecaseBundle) {
+		logger().debug("Bundle context for usecase is {}", mBundleContext.toString());
 		if (mBundleContext == null) {
-			handleError("Невозможно запустить юзкейс "+usecaseBundle+", неизвестен контекст бандла.", null);
+			handleError("Cannot get usecase info "+usecaseBundle+", bundle context is not set.", null);
 			return null;
 		}
 
-		// Получим экземпляр сервиса реестра юзкейсов
+		// Get usecase register service
 		UseCaseRegister register = (UseCaseRegister) mBundleContext.getService(
 				mBundleContext.getServiceReference(UseCaseRegister.class.getName()));
+		if (register == null) {
+			handleError("Cannot get usecase, register service is unavailable.", null);
+			return null;
+		}
 
-		// Получим контроллен юзкейса
+		// Get usecase info from usecase register
+		return register.getInfo(usecaseBundle);
+	}
+	
+	/**
+	 * 
+	 * @param usecaseBundle
+	 * @return
+	 */
+	public final Class<? extends CompositeController> getUsecaseControllerClass(String usecaseBundle) {
+		UseCaseInfo info = getUsecaseInfo(usecaseBundle);
+		if (info == null) return null;
+
+		// Get usecase controller from usecase register
 		@SuppressWarnings("unchecked")
 		Class<? extends CompositeController> usecaseController = 
-				(Class<? extends CompositeController>)register.getController(usecaseBundle);
+				(Class<? extends CompositeController>)info.getControllerClass();
 
+		return usecaseController;
+	}
+	
+	public final CompositeController getUsecaseController(
+			String usecaseBundle,
+			Class<? extends CommonObject> dataClass,
+			Composite container,
+			CompositeParams params) {
+
+		// Retrieve usecase information
+		UseCaseInfo info = getUsecaseInfo(usecaseBundle);
+		if (info == null) return null;
+
+		// Get usecase controller from usecase register
+		@SuppressWarnings("unchecked")
+		Class<? extends CompositeController> usecaseControllerClass = 
+				(Class<? extends CompositeController>)info.getControllerClass();
+		if (usecaseControllerClass == null) return null;
+
+		CompositeController usecaseController = 
+				getUsecaseController(usecaseControllerClass, dataClass, container, params);
+		
+		// Set controller navigation tag
+		usecaseController.setNavigationTag(info.getNavigationTag());
+		
 		return usecaseController;
 	}
 	
@@ -595,28 +649,6 @@ public abstract class CompositeController
 		return null;			
 	}
 	
-	public final CompositeController getUsecaseController(
-			String usecaseBundle,
-			Class<? extends CommonObject> dataClass,
-			Composite container,
-			CompositeParams params) {
-
-		Class<? extends CompositeController> usecaseController = 
-				getUsecaseControllerClass(usecaseBundle);
-
-		return getUsecaseController(usecaseController, dataClass, container, params);
-	}
-
-	/**
-	 * Установить навигационную метку. Метка будет отображаться как #tag в 
-	 * строке адреса браузера.
-	 * 
-	 * @param tag
-	 */
-	public void setNavigationTag(String tag) {
-		mNavigationTag = tag;
-	}
-	
 	/**
 	 * Установить навигационный заголовок. В купе с меткой он будет использоваться для
 	 * навигации кнопками браузера и отображаться в истории.
@@ -626,14 +658,18 @@ public abstract class CompositeController
 	public void setNavigationTitle(String title) {
 		mNavigationTitle = title;
 	}
-	
-	public String getNavigationTag() {
-		return mNavigationTag;
-	}
-	
+		
 	public String getNavigationTitle() {
 		if (mNavigationTitle != null)
 			return mNavigationTitle;
+		return "";
+	}
+	
+	private void setNavigationTag(String tag) {
+		mNavigationTag = tag;
+	}
+	
+	public String getNavigationTag() {
 		return mNavigationTag;
 	}
 	

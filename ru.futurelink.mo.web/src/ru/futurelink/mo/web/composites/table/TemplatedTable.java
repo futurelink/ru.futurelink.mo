@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.template.Template;
-import org.eclipse.rap.rwt.template.TextCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -20,7 +19,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import ru.futurelink.mo.orm.dto.CommonDTO;
@@ -34,7 +32,9 @@ import ru.futurelink.mo.web.controller.CompositeParams;
  * @author pavlov
  *
  */
-public class TemplatedTable extends CommonComposite implements ICommonTable {
+public abstract class TemplatedTable 
+	extends CommonComposite 
+	implements ICommonTable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -115,23 +115,10 @@ public class TemplatedTable extends CommonComposite implements ICommonTable {
 				}
 			}
 		});
-		
-		setRowHeight(48);
-	
-		Template template = new Template();
 
-		TextCell nameCell = new TextCell( template );
-		nameCell.setBindingIndex(0); // display text from column 1
-		nameCell.setTop(8).setLeft(16).setWidth(180).setHeight(16);
-		nameCell.setHorizontalAlignment( SWT.LEFT ); // left-align the text in this cell
-
-		TextCell nameCell2 = new TextCell( template );
-		nameCell2.setBindingIndex(1); // display text from column 1
-		nameCell2.setTop( 24 ).setLeft( 16 ).setWidth( 180 ).setHeight( 16 );
-		nameCell2.setHorizontalAlignment( SWT.LEFT ); // left-align the text in this cell
-		//nameCell.setFont( font );
-		
-		mTable.setData( RWT.ROW_TEMPLATE, template );
+		Template template = createTemplate();
+		if (template != null)
+			mTable.setData( RWT.ROW_TEMPLATE, template );		
 	}
 
 	@Override
@@ -168,14 +155,9 @@ public class TemplatedTable extends CommonComposite implements ICommonTable {
 			mTable.clearAll();		
 		}
 	}
-
-	private void displayItem(TableItem item, CommonDTO dto) {
-		item.setText(0, dto.getDataFieldAsString("mTitle", "getTitle", "NONE"));
-		item.setText(1, dto.getDataFieldAsString("mId", "getId", "-"));
-	}
 	
 	@Override
-	public Object getInput() {
+	final public Object getInput() {
 		return mData;
 	}
 
@@ -185,7 +167,7 @@ public class TemplatedTable extends CommonComposite implements ICommonTable {
 	}
 
 	@Override
-	public void setRowHeight(Integer height) {
+	final public void setRowHeight(Integer height) {
 		mTable.setData(RWT.CUSTOM_ITEM_HEIGHT, height);
 	}
 
@@ -200,19 +182,36 @@ public class TemplatedTable extends CommonComposite implements ICommonTable {
 	}
 
 	@Override
-	public void addTableListener(CommonTableListener listener) {
+	final public void addTableListener(CommonTableListener listener) {
 		mListener = listener;
 	}
 
 	@Override
-	public void initTable() {
+	final public void initTable() {
 		createTableColumns();
 	}
 
-	@Override
-	public void createTableColumns() {
-		new TableColumn(mTable, SWT.NONE);
-		new TableColumn(mTable, SWT.NONE);
-	}
+	/**
+	 * Implement this method to create row template object.
+	 * 
+	 * @return
+	 */
+	abstract protected Template createTemplate();
+	
+	/**
+	 * Implement this method to display DTO values onto TableItem.
+	 * 
+	 * @param item
+	 * @param dto
+	 */
+	abstract protected void displayItem(TableItem item, CommonDTO dto);
 
+	/**
+	 * Get table instance for internal use.
+	 *  
+	 * @return
+	 */
+	final protected Table getTable() {
+		return mTable;
+	}
 }

@@ -29,7 +29,7 @@ public class UseCaseActivator implements BundleActivator {
 		mLogger = LoggerFactory.getLogger(this.getClass());
 		mUsecaseList = new HashMap<String, UseCaseInfo>(); 
 	}
-	
+
 	public void addUsecase(UseCaseInfo info) {
 		mUsecaseList.put(info.getBundleName(), info);
 	}
@@ -40,15 +40,14 @@ public class UseCaseActivator implements BundleActivator {
 	    mServiceTracker = new ServiceTracker(context, UseCaseRegister.class.getName(), null);
 	    mServiceTracker.open();
 
-	    // Запускаем регистрацию юзкейса в фоне
-	    mActivationThread = new UseCaseActivationThread(context);
+	    // Run background usecase registration
+	    mActivationThread = new UseCaseActivationThread();
 	    mActivationThread.start();
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		
-		// Останавливаем попытки регистрации, если они есть
+		// Stop registration requests if there is any
 		if ((mActivationThread != null) && (mActivationThread.isAlive())) {
 			mActivationThread.interrupt();
 		}
@@ -70,13 +69,8 @@ public class UseCaseActivator implements BundleActivator {
 		return result;
 	}	
 	
-	class UseCaseActivationThread extends Thread {
-		
-		private BundleContext mContext = null;
-		
-		public UseCaseActivationThread(BundleContext context) {
-			mContext = context;
-		}
+	class UseCaseActivationThread extends Thread {		
+		public UseCaseActivationThread() {}
 		
 		@Override
 		public void run() {
@@ -90,7 +84,7 @@ public class UseCaseActivator implements BundleActivator {
 	    	// Отправляем сообщения об активации всех юзкейсов этого бандла
 	    	for (String mUsecaseName : mUsecaseList.keySet()) {
 	    		mLogger.info("Registering '{}' in UseCaseRegister...", mUsecaseName);
-	    		mUsecaseRegister.registerUsecase(mUsecaseName, mUsecaseList.get(mUsecaseName).getControllerClass(), mContext);
+	    		mUsecaseRegister.registerUsecase(mUsecaseList.get(mUsecaseName));
 	    	}
 		}
 	}
