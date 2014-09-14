@@ -1,8 +1,16 @@
 package ru.futurelink.mo.web.app;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URLDecoder;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.client.service.BrowserNavigation;
+import org.eclipse.rap.rwt.client.service.BrowserNavigationEvent;
+import org.eclipse.rap.rwt.client.service.BrowserNavigationListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
@@ -34,6 +42,7 @@ abstract public class ApplicationController extends CompositeController {
 
 	private Shell 				mShell;
 	private CommonController	mFeedbackButtonController;
+	private BrowserNavigationListener mNavigationListener;
 
 	protected ApplicationController(ApplicationSession session, Shell shell) {
 		super(session, null);
@@ -57,12 +66,70 @@ abstract public class ApplicationController extends CompositeController {
 
 	@Override
 	protected void doAfterInit() throws InitException {
-		startFeedback();
+		startFeedback();		
 	}
 
+	private void initNavigation() {
+		mNavigationListener = new BrowserNavigationListener() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void navigated(BrowserNavigationEvent arg0) {
+				logger().info("Navigated on {}", arg0.getState());
+				
+				// Parse URL tag and params into Map
+				Map<String, String> params = new LinkedHashMap<String, String>();
+				String state = arg0.getState();
+				String[] parts = state.split("\\?");  
+				String tag = (parts.length > 0) ? parts[0] : "";
+				String paramsStr = (parts.length > 1) ? parts[1] : "";
+				String[] pairs = paramsStr.split("&");
+				for (String pair : pairs) {
+					String[] pairSplit = pair.split("=");
+					try {
+						params.put(
+								URLDecoder.decode(pairSplit[0], "UTF-8"), 
+								URLDecoder.decode((pairSplit.length > 1) ? pairSplit[1] : "", "UTF-8")
+							);
+					} catch (UnsupportedEncodingException ex) {
+
+					}
+				}
+				
+				// Call navigation handler
+				if (getControllerListener() != null)
+					((ApplicationControllerListener)getControllerListener()).navigate(tag, params);				
+			}
+		};
+		BrowserNavigation service = RWT.getClient().getService( BrowserNavigation.class );
+		service.addBrowserNavigationListener(mNavigationListener);		
+	}
+
+	private void uninitNavigation() {
+		BrowserNavigation service = RWT.getClient().getService( BrowserNavigation.class );
+		service.removeBrowserNavigationListener(mNavigationListener);
+		mNavigationListener = null;
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		uninitNavigation();
+
+		super.finalize();
+	}
+	
+	@Override
+	public synchronized void init() throws InitException {
+		initNavigation();
+
+		super.init();
+	}
+	
 	@Override
 	public synchronized void uninit() {
 		super.uninit();
+
+		uninitNavigation();
 
 		// Если есть привязанная кнопка фидбэка, надо
 		// ее убрать и очистить контроллер.
@@ -98,12 +165,16 @@ abstract public class ApplicationController extends CompositeController {
 					public void feedbackButtonClicked() {
 						logger().debug("Application feedback button clicked!");
 						if (getSession().getMobileMode()) {
-							handleRunUsecase("ru.futurelink.mo.web.feedback", null);
+							handleRunUsecase("ru.futurelink.mo.web.feedback");
 						} else {
 							CommonDialog dlg = new CommonDialog(getSession(), mShell , SWT.BORDER);
 							dlg.setText("Feedback");
 							dlg.setSize(CommonDialog.LARGE);
-							CompositeController ctrl = getUsecaseController("ru.futurelink.mo.web.feedback", null, dlg.getShell(), new CompositeParams());
+							CompositeController ctrl = getUsecaseController(
+									"ru.futurelink.mo.web.feedback", 
+									dlg.getShell(), 
+									new CompositeParams()
+								);
 							if (ctrl != null) {
 								try {
 									ctrl.init();

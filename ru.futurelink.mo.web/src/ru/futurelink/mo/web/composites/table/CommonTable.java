@@ -43,7 +43,7 @@ import ru.futurelink.mo.orm.mongodb.objects.UserParams;
  */
 public abstract class CommonTable 
 	extends CommonComposite 
-	implements IDragDropDecorator 
+	implements IDragDropDecorator, ICommonTable 
 {
 	private static final long serialVersionUID = 1L;
 
@@ -51,8 +51,8 @@ public abstract class CommonTable
 	public		CommonComposite							mTableBottom;
 	protected 	TableViewer								mTableViewer;
 	private 	IContentProvider 						mContentProvider;
-	private 	CommonDTOList<? extends CommonDTO>		mData;
-	
+	private 	CommonDTOList<? extends CommonDTO>	mData;
+
 	private		CommonTableListener 					mListener;
 
 	// Пользовтельские параметры таблицы
@@ -348,12 +348,6 @@ public abstract class CommonTable
 	public void initTable() {
 		createTableColumns();
 	}
-	
-	/**
-	 * Создание колонок таблицы. Удобно использовать метод addColumn(..) для добавления
-	 * колонок.
-	 */
-	public abstract void createTableColumns();
 	
 	/**
 	 * Предоставление контента, создание провайдера. Переопределяется на реализациях таблицы.

@@ -20,18 +20,46 @@ public class UseCaseRegister {
 		mMainBundleContext = context;
 	}
 
+	public void registerUsecase(UseCaseInfo info) {
+			mRegister.put(info.getBundleName(), info);
+			mLogger.debug("Regiseted usecase with bundle context {}", 
+					info.getBundleContext().toString()
+				);
+			mLogger.info("Registered usecase {} with controller {}", 
+					info.getBundleName(),
+					info.getControllerClass().getName()
+				);
+	}
+	
 	public void registerUsecase(String usecase, Class <?> controller, 
-			BundleContext bundleContext) {
-		
+			Class <?> dataClass, BundleContext bundleContext) {
+		registerUsecase(usecase, controller, dataClass, null, bundleContext);
+	}
+			
+	public void registerUsecase(String usecase, Class <?> controller, 
+			Class<?> dataClass, String navigationTag, BundleContext bundleContext) {
 		if ((usecase != null) && (controller != null)) {
-			mRegister.put(usecase, new UseCaseInfo(usecase, controller, bundleContext));
-			mLogger.debug("Regiseted usecase with bundle context "+bundleContext.toString());
-			mLogger.info("Registered usecase {} with controller {}", usecase, controller.getName());
+			UseCaseInfo info = new UseCaseInfo(
+					usecase, controller, dataClass, navigationTag,  bundleContext
+				);
+			registerUsecase(info);
 		} else {
 			mLogger.error("Invalid usecase registration information");
 		}
 	}
 
+	public String getUsecaseByNavigationTag(String tag) {
+		if (tag == null) return null;
+
+		for (String usecase : mRegister.keySet()) {
+			if (tag.equals(mRegister.get(usecase).getNavigationTag())) {
+				return  mRegister.get(usecase).getBundleName();
+			}
+		}
+		
+		return null;
+	}
+	
 	public void unregisterUsecase(String usecase) {
 		if (mRegister.containsKey(usecase)) {
 			mRegister.remove(usecase);
@@ -66,5 +94,13 @@ public class UseCaseRegister {
 			mLogger.error("Usecase {} is not registered", usecase);
 			return null;
 		}
+	}
+
+	/**
+	 * @param usecaseBundle
+	 * @return
+	 */
+	public UseCaseInfo getInfo(String usecaseBundle) {
+		return mRegister.get(usecaseBundle);
 	}
 }

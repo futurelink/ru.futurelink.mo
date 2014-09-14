@@ -2,7 +2,10 @@ package ru.futurelink.mo.web.controller;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.client.service.BrowserNavigation;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.Transfer;
@@ -25,6 +28,7 @@ import ru.futurelink.mo.web.composites.fields.datapicker.SimpleDataPickerControl
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
 import ru.futurelink.mo.web.exceptions.CreationException;
 import ru.futurelink.mo.web.exceptions.InitException;
+import ru.futurelink.mo.web.register.UseCaseInfo;
 import ru.futurelink.mo.web.register.UseCaseRegister;
 
 /**
@@ -42,8 +46,8 @@ public abstract class CompositeController
 	private		CompositeParams			mCompositeParams;
 	private 	ICompositeController	mParentController;
 
-	private		String					mNavigationTag;
 	private		String					mNavigationTitle;
+	private		String					mNavigationTag;
 
 	/**
 	 * Конструктор, который может использоваться для создания, например, ApplicationController,
@@ -357,8 +361,8 @@ public abstract class CompositeController
 	 * Сначала выполняется очистка окна, а потом логическое удаление субконтроллеров.
 	 */
 	@Override
-	public void clear() {
-		logger().info("Очистка композита...");
+	public void clear() {	
+		logger().info("Clear composite...");
 		if (getComposite() != null && !getComposite().isDisposed()) {
 			Control[] controls = getComposite().getChildren();
 			for (int i = 0; i < controls.length; i++) {
@@ -367,12 +371,11 @@ public abstract class CompositeController
 				}
 			}
 		}
-
-		logger().info("Удаление субконтроллеров...");
+		
+		logger().info("Remove subcontrollers...");
 		for (int i = 0; i < getSubControllerCount(); i++) {
 			removeSubController(i);
-		}
-
+		}		
 	}
 	
 	public CommonComposite createErrorComposite(String message) {
@@ -411,7 +414,7 @@ public abstract class CompositeController
 			return;
 		}
 		
-		d.setText("Выбор элемента");				
+		d.setText(getComposite().getLocaleString("selection"));				
 		try {		
 			CommonDataPickerController c = (CommonDataPickerController) constr.newInstance(
 					(CompositeController) mThisController,
@@ -432,7 +435,13 @@ public abstract class CompositeController
 						);
 			c.init();
 			d.attachComposite(c.getComposite());
-			d.setSize(CommonDialog.LARGE);			
+			if (getSession().getMobileMode()) {
+				// In mobile mode we use fullscreen list sizing
+				d.setSize(CommonDialog.FULL);
+			} else {
+				// In desktop mode we use screen-relative list sizing
+				d.setSize(CommonDialog.LARGE);
+			}
 			d.open();
 			
 			// Пикеру просетили элемент DTO чтобы он уже отобразил данные на своем поле
@@ -464,26 +473,77 @@ public abstract class CompositeController
 	 * Для того, чтобы контроллер работал в режиме юзкейса нужно, чтобы он
 	 * имел соответствующий конструктор (режим субконтроллера).
 	 * 
+	 * DEPRECATED. Use handleRunUsecase(String usecaseBundle) instead.
+	 * 
 	 * @param usecaseBundle название юзкейса, зарегистрированного в реестре юзкейсов
 	 * @param dataClass класс данных, для работы этого юзкейса
 	 * @return объект контроллера запущенного юзкейса в случае удачи, в случае неудачи null.
 	 */
-	public CompositeController handleRunUsecase(String usecaseBundle, Class<?> dataClass) {		
-		logger().debug("Контекст бандла для запуска юзкейса: {}", mBundleContext.toString());			
-		if (mBundleContext == null) {
-			handleError("Невозможно запустить юзкейс "+usecaseBundle+", неизвестен контекст бандла.", null);
-			return null;
-		}
-
-		Class<? extends CompositeController> usecaseController = 
-				getUsecaseControllerClass(usecaseBundle);
-
-		if (usecaseController != null) {
-			// Запустим контроллер юзкейса в работу
-			return handleRunControllerAsUsecase(usecaseController, dataClass, null);
+	@Deprecated
+	@SuppressWarnings("unchecked")
+	public CompositeController handleRunUsecase(
+			String usecaseBundle, 
+			Class<?> dataClass) {
+		// Запустим контроллер юзкейса в работу
+		CompositeController c = getUsecaseController(
+				usecaseBundle, 
+				(Class<? extends CommonObject>)dataClass, 
+				null, 
+				new CompositeParams()
+			);
+		if (c != null) {
+			// Добавляем субконтроллер для текущего контроллера
+			addSubController(c);			
+			return c;
 		}
 		
 		return null;
+	}
+
+	/**
+	 * Runs usecase bundle in current controller composite using usecase parameters.
+	 * 
+	 * @param usecaseBundle
+	 * @param usecaseParams
+	 * @return
+	 */
+	public CompositeController handleRunUsecase(String usecaseBundle, 
+			Map<String, Object> usecaseParams) {
+		CompositeParams params = new CompositeParams();
+		params.add("usecaseParams", usecaseParams);
+
+		CompositeController c = getUsecaseController(
+				usecaseBundle, 
+				null, 
+				params
+			);
+		if (c != null) {
+			addSubController(c);
+
+			// Save navigation state to browser
+			if (c.getNavigationTag() != null) {
+				try {
+					BrowserNavigation navigation = RWT.getClient().getService(BrowserNavigation.class);
+					navigation.pushState(c.getNavigationTag(), c.getNavigationTitle());
+				} catch (Exception ex) {
+					logger().warn("Couldn't save navigation state for {}", c.getNavigationTag());
+				}
+			}
+
+			return c;
+		}
+
+		return null;		
+	}
+	
+	/**
+	 * Runs usecase bundle in current controller composite.
+	 * 
+	 * @param usecaseBundle
+	 * @return
+	 */
+	public CompositeController handleRunUsecase(String usecaseBundle) {
+		return handleRunUsecase(usecaseBundle, (Map<String,Object>)null);
 	}
 
 	/**
@@ -506,35 +566,141 @@ public abstract class CompositeController
 			Class<? extends CompositeController> controller,
 			Class<?> dataClass,
 			CommonComposite container) {
-
-		CompositeController c = getUsecaseController(controller, dataClass, container, new CompositeParams());
+		CompositeController c = createUsecaseController(
+				controller, 
+				dataClass, 
+				container, 
+				new CompositeParams()
+			);
 
 		// Добавляем субконтроллер для текущего контроллера
 		addSubController(c);
 			
 		return c;			
 	}
-	
-	public final Class<? extends CompositeController> getUsecaseControllerClass(String usecaseBundle) {
-		logger().debug("Контекст бандла для запуска юзкейса: {}", mBundleContext.toString());
-		if (mBundleContext == null) {
-			handleError("Невозможно запустить юзкейс "+usecaseBundle+", неизвестен контекст бандла.", null);
-			return null;
-		}
 
-		// Получим экземпляр сервиса реестра юзкейсов
+	/**
+	 * Get usecase bundle name by navigation tag.
+	 * 
+	 * @param tag
+	 * @return
+	 */
+	public final String getUsecaseByNavigationTag(String tag) {
+		// Get usecase register service
 		UseCaseRegister register = (UseCaseRegister) mBundleContext.getService(
 				mBundleContext.getServiceReference(UseCaseRegister.class.getName()));
 
-		// Получим контроллен юзкейса
+		if (register == null) {
+			handleError("Cannot get usecase, register service is unavailable.", null);
+			return null;
+		}
+		
+		return register.getUsecaseByNavigationTag(tag);
+	}
+	
+	/**
+	 * 
+	 * @param usecaseBundle
+	 * @return
+	 */
+	public final UseCaseInfo getUsecaseInfo(String usecaseBundle) {
+		logger().debug("Bundle context for usecase is {}", mBundleContext.toString());
+		if (mBundleContext == null) {
+			handleError("Cannot get usecase info "+usecaseBundle+", bundle context is not set.", null);
+			return null;
+		}
+
+		// Get usecase register service
+		UseCaseRegister register = (UseCaseRegister) mBundleContext.getService(
+				mBundleContext.getServiceReference(UseCaseRegister.class.getName()));
+		if (register == null) {
+			handleError("Cannot get usecase, register service is unavailable.", null);
+			return null;
+		}
+
+		// Get usecase info from usecase register
+		return register.getInfo(usecaseBundle);
+	}
+	
+	/**
+	 * 
+	 * @param usecaseBundle
+	 * @return
+	 */
+	public final Class<? extends CompositeController> getUsecaseControllerClass(String usecaseBundle) {
+		UseCaseInfo info = getUsecaseInfo(usecaseBundle);
+		if (info == null) return null;
+
+		// Get usecase controller from usecase register
 		@SuppressWarnings("unchecked")
 		Class<? extends CompositeController> usecaseController = 
-				(Class<? extends CompositeController>)register.getController(usecaseBundle);
+				(Class<? extends CompositeController>)info.getControllerClass();
 
 		return usecaseController;
 	}
 	
+	@Deprecated
 	public final CompositeController getUsecaseController(
+			String usecaseBundle,
+			Class<? extends CommonObject> dataClass,
+			Composite container,
+			CompositeParams params) {
+
+		// Retrieve usecase information
+		UseCaseInfo info = getUsecaseInfo(usecaseBundle);
+		if (info == null) return null;
+
+		// Get usecase controller from usecase register
+		@SuppressWarnings("unchecked")
+		Class<? extends CompositeController> usecaseControllerClass = 
+				(Class<? extends CompositeController>)info.getControllerClass();
+		if (usecaseControllerClass == null) return null;
+
+		CompositeController usecaseController = 
+				createUsecaseController(
+						usecaseControllerClass, 
+						dataClass, 
+						container, 
+						params
+					);
+		
+		// Set controller navigation tag
+		usecaseController.setNavigationTag(info.getNavigationTag());
+		
+		return usecaseController;
+	}
+
+	public final CompositeController getUsecaseController(
+			String usecaseBundle,
+			Composite container,
+			CompositeParams params) {
+
+		// Retrieve usecase information
+		UseCaseInfo info = getUsecaseInfo(usecaseBundle);
+		if (info == null) return null;
+
+		// Get usecase controller from usecase register
+		@SuppressWarnings("unchecked")
+		Class<? extends CompositeController> usecaseControllerClass = 
+				(Class<? extends CompositeController>)info.getControllerClass();
+		if (usecaseControllerClass == null) return null;
+
+		CompositeController usecaseController = 
+				createUsecaseController(
+						usecaseControllerClass, 
+						info.getDataClass(), 
+						container, 
+						params
+					);
+
+		// Set controller navigation tag
+		if (usecaseController != null)
+			usecaseController.setNavigationTag(info.getNavigationTag());
+		
+		return usecaseController;
+	}
+
+	public final CompositeController createUsecaseController(
 			Class<? extends CompositeController> usecaseController,
 			Class<?> dataClass,
 			Composite container,
@@ -550,13 +716,13 @@ public abstract class CompositeController
 			Constructor<? extends CommonController> constr;
 			if (container == null) {
 				constr = usecaseController.getConstructor(
-					CompositeController.class,
+					ICompositeController.class,
 					Class.class,
 					CompositeParams.class
 					);
 			} else {
 				constr = usecaseController.getConstructor(
-					CompositeController.class,
+					ICompositeController.class,
 					Class.class,
 					Composite.class,
 					CompositeParams.class
@@ -590,28 +756,6 @@ public abstract class CompositeController
 		return null;			
 	}
 	
-	public final CompositeController getUsecaseController(
-			String usecaseBundle,
-			Class<? extends CommonObject> dataClass,
-			Composite container,
-			CompositeParams params) {
-
-		Class<? extends CompositeController> usecaseController = 
-				getUsecaseControllerClass(usecaseBundle);
-
-		return getUsecaseController(usecaseController, dataClass, container, params);
-	}
-
-	/**
-	 * Установить навигационную метку. Метка будет отображаться как #tag в 
-	 * строке адреса браузера.
-	 * 
-	 * @param tag
-	 */
-	public void setNavigationTag(String tag) {
-		mNavigationTag = tag;
-	}
-	
 	/**
 	 * Установить навигационный заголовок. В купе с меткой он будет использоваться для
 	 * навигации кнопками браузера и отображаться в истории.
@@ -621,14 +765,18 @@ public abstract class CompositeController
 	public void setNavigationTitle(String title) {
 		mNavigationTitle = title;
 	}
-	
-	public String getNavigationTag() {
-		return mNavigationTag;
-	}
-	
+		
 	public String getNavigationTitle() {
 		if (mNavigationTitle != null)
 			return mNavigationTitle;
+		return "";
+	}
+	
+	private void setNavigationTag(String tag) {
+		mNavigationTag = tag;
+	}
+	
+	public String getNavigationTag() {
 		return mNavigationTag;
 	}
 	

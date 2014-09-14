@@ -61,7 +61,7 @@ final public class ApplicationSession {
 
 		mLogger = LoggerFactory.getLogger(ApplicationSession.class);
 		
-		logger().debug("Локаль пользователя {}", RWT.getLocale().toString());
+		logger().debug("User locale is {}", RWT.getLocale().toString());
 		if ((RWT.getLocale() != null) && (mLocale == null))
 			mLocale = RWT.getLocale(); 
 	}
@@ -80,7 +80,7 @@ final public class ApplicationSession {
 		leo.setTime(c.getTime());
 		leo.save();
 
-		logger().debug("Начата сессия пользователя {}", mLogin);		
+		logger().debug("User {} began session", mLogin);		
 	}
 
 	/**
@@ -199,7 +199,7 @@ final public class ApplicationSession {
 	 * Terminate user session.
 	 */
 	final public void logout() {
-		logger().debug("Завершена сессия пользователя {}", mLogin);
+		logger().debug("User {} session ended", mLogin);
 		
 		mLogin = null;
 		mPersistentSession.setUser(null);

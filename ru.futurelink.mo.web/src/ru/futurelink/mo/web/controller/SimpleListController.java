@@ -16,10 +16,10 @@ import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonComposite;
+import ru.futurelink.mo.web.composites.IDragDropDecorator;
 import ru.futurelink.mo.web.composites.SimpleListComposite;
 import ru.futurelink.mo.web.composites.CommonListComposite;
 import ru.futurelink.mo.web.composites.dialogs.CommonItemDialog;
-import ru.futurelink.mo.web.composites.table.CommonTable;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
 import ru.futurelink.mo.web.controller.iface.IListEditController;
 import ru.futurelink.mo.web.exceptions.InitException;
@@ -46,12 +46,12 @@ abstract public class SimpleListController
 
 	public enum EditMode { DIALOG, CONTAINER };
 	
-	public SimpleListController(CompositeController parentController,
+	public SimpleListController(ICompositeController parentController,
 			Class<? extends CommonObject> dataClass, CompositeParams compositeParams) {
 		super(parentController, dataClass, compositeParams);
 	}
 
-	public SimpleListController(CompositeController parentController,
+	public SimpleListController(ICompositeController parentController,
 			Class<? extends CommonObject> dataClass, Composite container, CompositeParams compositeParams) { 
 		super(parentController, dataClass, container, compositeParams);
 	}
@@ -85,7 +85,7 @@ abstract public class SimpleListController
 	}
 	
 	public void addDragSupport(int operations, Transfer[] transferTypes, DragSourceListener listener) {
-		CommonTable tbl = ((SimpleListComposite)getComposite()).getTable();
+		IDragDropDecorator tbl = (IDragDropDecorator)((SimpleListComposite)getComposite()).getTable();
 		if (tbl != null)
 			tbl.addDragSupport(operations, transferTypes, listener);
 	}
@@ -107,14 +107,6 @@ abstract public class SimpleListController
 			// юзкейс, а после закрытия этого контроллера запустить юзкейс,
 			// который был там раньше
 			openEdit(getParentController(), null);
-			/*if (result != null) {
-				// Обновить список, перечитать данные
-				try {
-					handleDataQuery();
-				} catch (DTOException ex) {
-					handleError("невозможно обновить список.", ex);
-				}				
-			}*/
 		}
 	}
 	
@@ -208,38 +200,53 @@ abstract public class SimpleListController
 		return new CommonItemDialog(getSession(), getComposite(), this, params()).open(data);
 	}
 	
+	/**
+	 * Open item edit or creation as subconroller.
+	 * 
+	 * @param parentController
+	 * @param data
+	 * @return
+	 */
 	private Object openEdit(ICompositeController parentController, EditorDTO data) {
 		Composite container = (Composite) params().get("itemEditContainer");
+		String itemUsecaseBundle = (String) params().get("itemUsecase");
 		
 		if (parentController != null)
 			parentController.clear();
 
-		CommonItemController ctrl = createItemController(parentController, container, new CompositeParams());
+		CommonItemController ctrl;		
+		if (itemUsecaseBundle != null) {
+			logger().info("Running usecase {} to edit item", itemUsecaseBundle);
+			ctrl = (CommonItemController)((CompositeController)parentController).
+					handleRunUsecase(itemUsecaseBundle);
+		} else {		
+			ctrl = createItemController(parentController, container, new CompositeParams());
 
-		try {
-			if (parentController != null)
-				parentController.addSubController(ctrl);
-		} catch (InitException ex) {
-			ctrl.handleError("Ошибка инициализации контроллера.", ex);
-			return null;
-		}
+			try {
+				if (parentController != null)
+					parentController.addSubController(ctrl);
+			} catch (InitException ex) {
+				ctrl.handleError("Ошибка инициализации контроллера.", ex);
+				return null;
+			}
 
-		// Initialize controller
-		try {
-			ctrl.init();
-		} catch (InitException ex1) {
-			ctrl.handleError("Ошибка инициализации контроллера.", ex1);
-			return null;
-		}
+			// Initialize controller
+			try {
+				ctrl.init();
+			} catch (InitException ex1) {
+				ctrl.handleError("Ошибка инициализации контроллера.", ex1);
+				return null;
+			}
 		
-		// Check composite is created right
-		if (ctrl.getComposite() == null) {			
-			ctrl.uninit();
-			ctrl.handleError("Композит для отображения в диалоговом окне не создан!", null);
-			return -1;
-		}
+			// Check composite is created right
+			if (ctrl.getComposite() == null) {			
+				ctrl.uninit();
+				ctrl.handleError("Композит для отображения в диалоговом окне не создан!", null);
+				return -1;
+			}
 		
-		ctrl.getComposite().layout(true, true);
+			ctrl.getComposite().layout(true, true);
+		}
 
 		// Create or open data
 		if (data == null) {
@@ -311,5 +318,6 @@ abstract public class SimpleListController
 	 * 
 	 * @param column
 	 */
-	protected void onTableColumnAdded(TableColumn column, String columnField, String columnFieldGetter, String columnFieldSetter, Class<?> columnFieldType) {}
+	protected void onTableColumnAdded(TableColumn column, String columnField, 
+			String columnFieldGetter, String columnFieldSetter, Class<?> columnFieldType) {}
 }

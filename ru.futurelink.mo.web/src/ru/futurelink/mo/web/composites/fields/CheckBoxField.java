@@ -36,7 +36,7 @@ public class CheckBoxField extends CommonField {
 		((Button)mControl).addSelectionListener(new SelectionListener() {
 			
 			private static final long serialVersionUID = 1L;
-
+			
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				try {
