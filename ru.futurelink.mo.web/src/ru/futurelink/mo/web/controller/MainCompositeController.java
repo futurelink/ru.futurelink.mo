@@ -69,6 +69,9 @@ public class MainCompositeController extends CompositeController {
 	public void refresh(boolean refreshSubcontrollers) throws Exception {
 		logger().debug("Вызвано обновление MainCompositeController, обновляем...");
 		super.refresh(refreshSubcontrollers);
-	}	
+	}
+
+	@Override
+	public void processUsecaseParams() {}	
 	
 }

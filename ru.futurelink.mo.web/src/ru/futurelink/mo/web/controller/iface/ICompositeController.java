@@ -17,6 +17,8 @@ public interface ICompositeController
 	public Composite getComposite();
 	public Composite getContainer();
 	
+	public void processUsecaseParams();
+	
 	public void reparentComposite(Composite newParent);
 
 	public void clear();	

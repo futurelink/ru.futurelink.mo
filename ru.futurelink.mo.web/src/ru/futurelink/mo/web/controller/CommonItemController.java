@@ -3,6 +3,7 @@ package ru.futurelink.mo.web.controller;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -47,7 +48,6 @@ public abstract class CommonItemController
 		mRelatedControllers = new ArrayList<RelatedController>();
 		mPersistentSession = getSession().persistent();
 
-		// Проверялка прав доступа
 		mChecker = createAccessChecker();
 	}
 
@@ -68,6 +68,10 @@ public abstract class CommonItemController
 	 */
 	public IDTOAccessChecker createAccessChecker() {
 		return new AllowOwnChecker(getSession().getUser());		
+	}
+
+	@Override
+	protected void doAfterCreateComposite() {
 	}
 	
 	/**
@@ -110,7 +114,32 @@ public abstract class CommonItemController
 		dto.addAccessChecker(mChecker);
 		return dto;
 	}
-	
+
+	/**
+	 * Process data passed as usecase parameters.
+	 */
+	@Override
+	public void processUsecaseParams() {
+		// Get if the controller was run as usecase and has usecase params,
+		// then get an ID of data item and open it. If there is no ID set (empty ID)
+		// then create new DTO.
+		if (getUsecaseParams() != null) {
+			String id = (String)getUsecaseParams().get("id");
+			logger().info("Passed ID of element {} in usecase params", id);
+			try {
+				if (id != null) {
+					if (!"".equals(id)) {
+						openById(id);
+					} else {
+						create();
+					}
+				}
+			} catch (OpenException | DTOException ex) {
+				ex.printStackTrace();
+			}		
+		}		
+	}
+
 	/**
 	 * Создание нового объекта данных через контроллер.
 	 * 
@@ -190,6 +219,8 @@ public abstract class CommonItemController
 		CommonObject data = (CommonObject) mPersistentSession.open(mDataClass, id);
 		if (data != null) {
 			open(data);
+		} else {
+			throw new OpenException(id, "No "+mDataClass.getSimpleName()+" with such ID found", null);
 		}
 	}
 
@@ -210,7 +241,7 @@ public abstract class CommonItemController
 				// использовать данные композита - надо, чтобы DTO на композите уже был.
 				doAfterOpen();
 			} catch (DTOException ex) {				
-				throw new OpenException(data.getId(), "Невозможно получить данные "+data.getClass().getSimpleName()+": "+ex.getMessage(), ex);
+				throw new OpenException(data.getId(), "Cannot get data of "+data.getClass().getSimpleName()+": "+ex.getMessage(), ex);
 			}
 		}
 	}
@@ -234,7 +265,7 @@ public abstract class CommonItemController
 		try {
 			super.refresh(refreshSubcontrollers);
 		} catch (Exception ex) {
-			throw new DTOException("Ошибка обновления субконтроллеров", ex);
+			throw new DTOException("Exception on subcontrollers refresh", ex);
 		}
 	}
 	
@@ -270,7 +301,7 @@ public abstract class CommonItemController
 					ctrl.save();
 			}
 			
-			logger().debug("Сохранение объекта...");
+			logger().debug("Object saving...");
 			getDTO().save();
 
 			logger().debug("Сохранение данныех из связанных контроллеров, после сохранения объекта...");
@@ -279,12 +310,12 @@ public abstract class CommonItemController
 					ctrl.save();
 			}
 
-			logger().debug("Объект сохранен: ID: {}", getDTO().getId());
+			logger().debug("Object saved ID: {}", getDTO().getId());
 
 			// Все что выполняется после сохранения
 			doAfterSave();
 
-			logger().debug("Все сохранено!");
+			logger().debug("Saved everything!");
 		} else {
 			throw new SaveException("No data object to save!", null);
 		}
@@ -316,7 +347,7 @@ public abstract class CommonItemController
 	@Override
 	public ArrayList<String> getDataChanged() throws DTOException {
 		if ((getDTO() != null) && (getDTO().getChangedData() != null)) {
-			logger().info("getDataChanged: состав измененных данных : {}", getDTO().getChangedData());
+			logger().info("getDataChanged: changed data is : {}", getDTO().getChangedData());
 			return getDTO().getChangedData();
 		} else {
 			return null;
@@ -405,7 +436,22 @@ public abstract class CommonItemController
 			if (getDTO().getId() != null) return true;
 			return false;
 		} else {
-			throw new DTOException("Нет объекта DTO.",  null);
-		}		
+			throw new DTOException("No DTO object here",  null);
+		}
+	}
+
+	@Override
+	public String getNavigationString() {
+		String tag = getNavigationTag();
+
+		// Add ID of data item to navigation string if it was passed
+		// on usecase run.
+		@SuppressWarnings("unchecked")
+		Map<String, Object> params = (Map<String, Object>)params().get("usecaseParams");
+		if ((params != null) && (params.get("id") != null)) {
+			tag += "?id="+params.get("id");
+		}
+		
+		return tag;
 	}
 }

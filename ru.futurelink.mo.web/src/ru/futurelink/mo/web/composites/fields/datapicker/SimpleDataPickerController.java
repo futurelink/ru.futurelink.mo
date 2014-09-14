@@ -176,5 +176,6 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 	@Override
 	public void handleRecover() throws DTOException {
 		
-	};
+	}
+
 }

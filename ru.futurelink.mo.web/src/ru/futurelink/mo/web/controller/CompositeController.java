@@ -479,7 +479,7 @@ public abstract class CompositeController
 	 * @param dataClass класс данных, для работы этого юзкейса
 	 * @return объект контроллера запущенного юзкейса в случае удачи, в случае неудачи null.
 	 */
-	@Deprecated
+	/*@Deprecated
 	@SuppressWarnings("unchecked")
 	public CompositeController handleRunUsecase(
 			String usecaseBundle, 
@@ -498,7 +498,7 @@ public abstract class CompositeController
 		}
 		
 		return null;
-	}
+	}*/
 
 	/**
 	 * Runs usecase bundle in current controller composite using usecase parameters.
@@ -511,6 +511,8 @@ public abstract class CompositeController
 			Map<String, Object> usecaseParams) {
 		CompositeParams params = new CompositeParams();
 		params.add("usecaseParams", usecaseParams);
+		
+		logger().info("Usecase {} starting with params {}", usecaseBundle, usecaseParams);
 
 		CompositeController c = getUsecaseController(
 				usecaseBundle, 
@@ -524,18 +526,20 @@ public abstract class CompositeController
 			if (c.getNavigationTag() != null) {
 				try {
 					BrowserNavigation navigation = RWT.getClient().getService(BrowserNavigation.class);
-					navigation.pushState(c.getNavigationTag(), c.getNavigationTitle());
+					navigation.pushState(c.getNavigationString(), c.getNavigationTitle());
 				} catch (Exception ex) {
 					logger().warn("Couldn't save navigation state for {}", c.getNavigationTag());
 				}
 			}
+
+			c.processUsecaseParams();
 
 			return c;
 		}
 
 		return null;		
 	}
-	
+
 	/**
 	 * Runs usecase bundle in current controller composite.
 	 * 
@@ -765,7 +769,12 @@ public abstract class CompositeController
 	public void setNavigationTitle(String title) {
 		mNavigationTitle = title;
 	}
-		
+	
+	/**
+	 * Returns navigation title (browser title) for controller ran as usecase.
+	 * 
+	 * @return
+	 */
 	public String getNavigationTitle() {
 		if (mNavigationTitle != null)
 			return mNavigationTitle;
@@ -776,8 +785,22 @@ public abstract class CompositeController
 		mNavigationTag = tag;
 	}
 	
+	/**
+	 * Returns navigation tag for controller ran as usecase.
+	 * 
+	 * @return
+	 */
 	public String getNavigationTag() {
 		return mNavigationTag;
+	}
+	
+	/**
+	 * Reimplement this to generate navigation string (combine necessary tag and parameters).
+	 * 
+	 * @return
+	 */
+	public String getNavigationString() {
+		return getNavigationTag();
 	}
 	
 	public void close() {
@@ -787,5 +810,18 @@ public abstract class CompositeController
 	}
 	
 	public void doAfterClose() {}
+	
+	/**
+	 * Get usecase params.
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getUsecaseParams() {		
+		return (Map<String, Object>)params().get("usecaseParams"); 
+	}
+	
+	@Override
+	public void processUsecaseParams() {}
 }
 
