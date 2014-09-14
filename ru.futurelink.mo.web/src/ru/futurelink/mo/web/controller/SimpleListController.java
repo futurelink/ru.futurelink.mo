@@ -1,6 +1,7 @@
 package ru.futurelink.mo.web.controller;
 
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DragSourceListener;
@@ -217,9 +218,26 @@ abstract public class SimpleListController
 		CommonItemController ctrl;		
 		if (itemUsecaseBundle != null) {
 			logger().info("Running usecase {} to edit item", itemUsecaseBundle);
+			
+			/*
+			 * Fill usecase params struct with ID of data item to edit.
+			 */
+			HashMap<String, Object> params = new HashMap<String, Object>();
+			if (data != null) {
+				try {
+					params.put("id", data.getId());
+				} catch (DTOException ex) {}
+			} else {
+				params.put("id", "");
+			}
+			
+			/*
+			 * Run usecase to edit item
+			 */
 			ctrl = (CommonItemController)((CompositeController)parentController).
-					handleRunUsecase(itemUsecaseBundle);
-		} else {		
+					handleRunUsecase(itemUsecaseBundle, params);			
+		} else {
+			logger().info("Not running usecase to edit item but create item controller");
 			ctrl = createItemController(parentController, container, new CompositeParams());
 
 			try {
@@ -246,36 +264,36 @@ abstract public class SimpleListController
 			}
 		
 			ctrl.getComposite().layout(true, true);
-		}
 
-		// Create or open data
-		if (data == null) {
-			// Создание нового элемента
-			try {
-				ctrl.create();
-			} catch (DTOException ex) {
-				ctrl.handleError("Ошибка создания нового элемента.", ex);
-				ctrl.uninit();
-				return null;
-			}
-		} else {
-			// Открыть на редактирование существующий элемент
-			try {
-				String id = data.getDataField("id", "getId", "setId").toString();
-				ctrl.getSession().logger().debug("Открытие окна редакитрования для элмента с ID: {}", id);
-				ctrl.openById(id);
-			} catch (NumberFormatException ex) {
-				handleError("Неверный формат ID.", ex);
-				ctrl.uninit();
-				return null;
-			} catch (OpenException ex) {
-				handleError("Ошибка открытия элемента.", ex);				
-				ctrl.uninit();
-				return null;
-			} catch (DTOException ex) {
-				handleError("Ошибка доступа в DTO.", ex);
-				ctrl.uninit();
-				return null;
+			// Create or open data
+			if (data == null) {
+				// Создание нового элемента
+				try {
+					ctrl.create();
+				} catch (DTOException ex) {
+					ctrl.handleError("Ошибка создания нового элемента.", ex);
+					ctrl.uninit();
+					return null;
+				}
+			} else {
+				// Открыть на редактирование существующий элемент
+				try {
+					String id = data.getDataField("id", "getId", "setId").toString();
+					ctrl.getSession().logger().debug("Открытие окна редакитрования для элмента с ID: {}", id);
+					ctrl.openById(id);
+				} catch (NumberFormatException ex) {
+					handleError("Неверный формат ID.", ex);
+					ctrl.uninit();
+					return null;
+				} catch (OpenException ex) {
+					handleError("Ошибка открытия элемента.", ex);				
+					ctrl.uninit();
+					return null;
+				} catch (DTOException ex) {
+					handleError("Ошибка доступа в DTO.", ex);
+					ctrl.uninit();
+					return null;
+				}
 			}
 		}
 
@@ -305,7 +323,10 @@ abstract public class SimpleListController
 
 		((CommonListComposite)getComposite()).refresh();		
 	}
-	
+
+	@Override
+	public void processUsecaseParams() {}
+
 	/**
 	 * Метод обработки изменения размера колонки таблицы.
 	 * 
@@ -320,4 +341,5 @@ abstract public class SimpleListController
 	 */
 	protected void onTableColumnAdded(TableColumn column, String columnField, 
 			String columnFieldGetter, String columnFieldSetter, Class<?> columnFieldType) {}
+	
 }

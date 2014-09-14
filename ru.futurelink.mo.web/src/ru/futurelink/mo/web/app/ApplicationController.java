@@ -78,24 +78,25 @@ abstract public class ApplicationController extends CompositeController {
 				logger().info("Navigated on {}", arg0.getState());
 				
 				// Parse URL tag and params into Map
-				Map<String, String> params = new LinkedHashMap<String, String>();
+				Map<String, Object> params = new LinkedHashMap<String, Object>();
 				String state = arg0.getState();
 				String[] parts = state.split("\\?");  
 				String tag = (parts.length > 0) ? parts[0] : "";
-				String paramsStr = (parts.length > 1) ? parts[1] : "";
-				String[] pairs = paramsStr.split("&");
-				for (String pair : pairs) {
-					String[] pairSplit = pair.split("=");
-					try {
-						params.put(
-								URLDecoder.decode(pairSplit[0], "UTF-8"), 
-								URLDecoder.decode((pairSplit.length > 1) ? pairSplit[1] : "", "UTF-8")
-							);
-					} catch (UnsupportedEncodingException ex) {
-
+				if (parts.length > 1) {
+					String[] pairs = parts[1].split("&");
+					for (String pair : pairs) {
+						String[] pairSplit = pair.split("=");
+						try {
+							params.put(
+									URLDecoder.decode(pairSplit[0], "UTF-8"), 
+									URLDecoder.decode((pairSplit.length > 1) ? pairSplit[1] : "", "UTF-8")
+								);
+						} catch (UnsupportedEncodingException ex) {
+						
+						}
 					}
 				}
-				
+
 				// Call navigation handler
 				if (getControllerListener() != null)
 					((ApplicationControllerListener)getControllerListener()).navigate(tag, params);				
@@ -198,5 +199,10 @@ abstract public class ApplicationController extends CompositeController {
 				ex.printStackTrace();
 			}
 		}
+	}
+	
+	@Override
+	public void processUsecaseParams() {
+		
 	}
 }

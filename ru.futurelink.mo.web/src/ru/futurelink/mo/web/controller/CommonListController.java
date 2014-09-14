@@ -246,4 +246,7 @@ abstract public class CommonListController
 			throw new DTOException("Ошибка обноелния данных", e);
 		}
 	}
+	
+	@Override
+	public void processUsecaseParams() {}
 }

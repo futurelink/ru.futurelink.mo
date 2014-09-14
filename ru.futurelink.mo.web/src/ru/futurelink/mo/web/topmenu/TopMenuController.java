@@ -41,4 +41,7 @@ abstract public class TopMenuController extends CompositeController {
 	protected void doAfterInit() {	
 	}
 
+	@Override
+	public void processUsecaseParams() {
+	}
 }

@@ -215,4 +215,5 @@ public class LinkedListController extends CompositeController {
 			return ((LinkedListComposite)getComposite()).getSelected();
 		return null;
 	}
+
 }
