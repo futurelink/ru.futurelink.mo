@@ -217,7 +217,8 @@ abstract public class SimpleListController
 		CommonItemController ctrl;		
 		if (itemUsecaseBundle != null) {
 			logger().info("Running usecase {} to edit item", itemUsecaseBundle);
-			ctrl = (CommonItemController)((CompositeController)parentController).handleRunUsecase(itemUsecaseBundle);
+			ctrl = (CommonItemController)((CompositeController)parentController).
+					handleRunUsecase(itemUsecaseBundle);
 		} else {		
 			ctrl = createItemController(parentController, container, new CompositeParams());
 

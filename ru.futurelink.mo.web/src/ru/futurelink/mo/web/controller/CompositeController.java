@@ -2,6 +2,7 @@ package ru.futurelink.mo.web.controller;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.client.service.BrowserNavigation;
@@ -500,16 +501,21 @@ public abstract class CompositeController
 	}
 
 	/**
-	 * Runs usecase bundle in current controller composite.
+	 * Runs usecase bundle in current controller composite using usecase parameters.
 	 * 
 	 * @param usecaseBundle
+	 * @param usecaseParams
 	 * @return
 	 */
-	public CompositeController handleRunUsecase(String usecaseBundle) {
+	public CompositeController handleRunUsecase(String usecaseBundle, 
+			Map<String, Object> usecaseParams) {
+		CompositeParams params = new CompositeParams();
+		params.add("usecaseParams", usecaseParams);
+
 		CompositeController c = getUsecaseController(
 				usecaseBundle, 
 				null, 
-				new CompositeParams()
+				params
 			);
 		if (c != null) {
 			addSubController(c);
@@ -520,14 +526,24 @@ public abstract class CompositeController
 					BrowserNavigation navigation = RWT.getClient().getService(BrowserNavigation.class);
 					navigation.pushState(c.getNavigationTag(), c.getNavigationTitle());
 				} catch (Exception ex) {
-					logger().warn("Не получилось сохранить состояние в браузере для {}", c.getNavigationTag());
+					logger().warn("Couldn't save navigation state for {}", c.getNavigationTag());
 				}
 			}
 
 			return c;
 		}
 
-		return null;
+		return null;		
+	}
+	
+	/**
+	 * Runs usecase bundle in current controller composite.
+	 * 
+	 * @param usecaseBundle
+	 * @return
+	 */
+	public CompositeController handleRunUsecase(String usecaseBundle) {
+		return handleRunUsecase(usecaseBundle, (Map<String,Object>)null);
 	}
 
 	/**
