@@ -21,5 +21,11 @@
 			configuration specific classes used in JPA
 		-->
 		<mapping-file>META-INF/entites.xml</mapping-file>
+
+		<properties>
+            <property
+                name="eclipselink.weaving"
+                value="static"/>
+        </properties>
   </persistence-unit>
 </persistence>
