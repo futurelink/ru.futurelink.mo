@@ -24,6 +24,32 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
+			
+			<plugin>
+               <groupId>de.empulse.eclipselink</groupId>
+               <artifactId>staticweave-maven-plugin</artifactId>
+               <version>1.0.0</version>
+               <executions>
+                   <execution>
+                       <phase>package</phase>
+                       <goals>
+                           <goal>weave</goal>
+                       </goals>
+                       <configuration>
+                           <persistenceXMLLocation>../../META-INF/persistence.xml</persistenceXMLLocation>
+                           <logLevel>FINE</logLevel>
+                       </configuration>
+                   </execution>
+               </executions>
+               <dependencies>
+                   <dependency>
+                       <groupId>org.eclipse.persistence</groupId>
+                       <artifactId>org.eclipse.persistence.jpa</artifactId>
+                       <version>2.5.1</version>
+                   </dependency>
+               </dependencies>
+           </plugin>
+           			
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 		 		<artifactId>maven-bundle-plugin</artifactId>
@@ -35,7 +61,17 @@
 					<instructions>
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId};singleton:=true</Bundle-SymbolicName>
 						<Bundle-Version>${project.version}</Bundle-Version>
-						<Export-Package>ru.futurelink.mo.orm.*</Export-Package>
+						<Export-Package>
+							ru.futurelink.mo.orm,
+							ru.futurelink.mo.orm.annotations,
+							ru.futurelink.mo.orm.aspects,
+							ru.futurelink.mo.orm.dto.*,
+							ru.futurelink.mo.orm.exceptions,
+							ru.futurelink.mo.orm.mailer,
+							ru.futurelink.mo.orm.migration,
+							ru.futurelink.mo.orm.security,
+							ru.futurelink.mo.orm.types
+						</Export-Package>
 						<Bundle-Activator>ru.futurelink.mo.orm.Activator</Bundle-Activator>
 						<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 						<Bundle-ClassPath>.</Bundle-ClassPath>
