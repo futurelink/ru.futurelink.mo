@@ -31,7 +31,7 @@ public class EntryPointRegister {
 
 	protected EntryPointRegister(ApplicationConfig applicationConfig) {
 		mApplicationConfig = applicationConfig;	
-		mApplicationContext = "mo";
+		mApplicationContext = "";
 	}
 	
 	public void setApplicationContext(String appContext) {
@@ -63,7 +63,9 @@ public class EntryPointRegister {
 	private void registerAppConfig() {
 		// Регистрируем приложение обратно
 		Dictionary<String, Object> props = new Hashtable<String, Object>();
-		props.put("contextName", mApplicationContext);
+		if ((mApplicationContext != null) && !("".equals(mApplicationContext))) {
+			props.put("contextName", mApplicationContext);
+		}
 		
 		mApplicationConfig.setRegistration(
 				mContext.registerService(ApplicationConfiguration.class.getName(), 
