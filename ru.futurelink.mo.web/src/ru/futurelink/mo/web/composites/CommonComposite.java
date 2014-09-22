@@ -42,7 +42,7 @@ public class CommonComposite extends Composite {
 
 	private CommonControllerListener	mListener;
 	private Logger				mLogger;
-
+	
 	public CommonComposite(ApplicationSession session, Composite parent, int style, CompositeParams params) {
 		super(parent, style  | SWT.NO_FOCUS );
 
