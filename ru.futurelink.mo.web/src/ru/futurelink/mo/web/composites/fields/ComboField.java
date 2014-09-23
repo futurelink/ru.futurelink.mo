@@ -131,12 +131,15 @@ public class ComboField extends CommonField {
 	 */
 	private void fillList() {
 		for (String s : mSource.keySet()) {
-			((Combo)mControl).add(mSource.get(s));
+			if (mSource.get(s) != null)
+				((Combo)mControl).add(mSource.get(s));
 		}		
 	}
 	
 	private String getSelection() {
 		int index = ((Combo)mControl).getSelectionIndex();
+		if (index < 0) return null;
+
 		String value = ((Combo)mControl).getItem(index);
 
 		// найдем значение в источнике
