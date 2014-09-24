@@ -10,6 +10,7 @@ import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.controller.CompositeParams;
+import ru.futurelink.mo.web.controller.iface.IListComposite;
 import ru.futurelink.mo.web.controller.iface.ListDTOAccessor;
 
 /**
@@ -23,7 +24,9 @@ import ru.futurelink.mo.web.controller.iface.ListDTOAccessor;
  * @param <T>
  *
  */
-abstract public class CommonListComposite extends CommonDataComposite {
+abstract public class CommonListComposite 
+	extends CommonDataComposite
+	implements IListComposite {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -68,6 +71,7 @@ abstract public class CommonListComposite extends CommonDataComposite {
 	 * 
 	 * @return - коллекция CommonDTO
 	 */
+	@Override
 	public CommonDTOList<? extends CommonDTO> getDTO() throws DTOException {
 		if (getControllerListener() != null) {
 			
@@ -93,6 +97,7 @@ abstract public class CommonListComposite extends CommonDataComposite {
 	 * @return объект FilterDTO
 	 * @throws DTOException
 	 */
+	@Override
 	public FilterDTO getFilter() throws DTOException {
 		if (getParam("filter") != null)
 			return (FilterDTO)getParam("filter");
@@ -105,6 +110,7 @@ abstract public class CommonListComposite extends CommonDataComposite {
 	 * 
 	 * @param data элемент CommonDTO, желательно, чтобы он присутствовал данных модели
 	 */
+	@Override
 	public void setActiveData(CommonDTO data) {
 		mActiveData = data;
 	}
@@ -114,31 +120,9 @@ abstract public class CommonListComposite extends CommonDataComposite {
 	 * 
 	 * @return выбранный элемент из модели (коллекции CommonDTO), привязанной к списку
 	 */
+	@Override
 	public CommonDTO getActiveData() {
 		return mActiveData;
 	}
-
-	/**
-	 * Необходимо определить метод обновления отображения списка в реализации класса.
-	 * Этот метод вызывается из контроллера, кототый управляет списочным композитом.
-	 * @throws DTOException 
-	 */	
-	abstract public void refresh() throws DTOException;
-	
-	/**
-	 * Необходимо определить метод выбора элемента по ID в отображении (например CommonTable),
-	 * метод вызывается из контроллера, который управляет списочных композитом.
-	 * 
-	 * @param id
-	 * @throws DTOException
-	 */
-	abstract public void selectById(String id) throws DTOException;
-
-	/**
-	 * Необходимо определить метод выбора элмента в отображении.
-	 * 
-	 * @param dto
-	 */
-	abstract public void selectByDTO(CommonDTO dto);
 
 }
