@@ -26,6 +26,13 @@ public interface ICommonTable {
 	public void addTableListener(CommonTableListener listener);
 	public void initTable();
 	
+	public void setLayoutData(Object gridData);
+	
+	/**
+	 * Refresh table contents, implement if needed.
+	 */
+	public void refresh();
+	
 	/**
 	 * Создание колонок таблицы. Удобно использовать метод addColumn(..) для добавления
 	 * колонок.

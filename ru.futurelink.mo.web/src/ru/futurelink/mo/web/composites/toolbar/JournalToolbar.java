@@ -23,10 +23,13 @@ public class JournalToolbar extends CommonToolbar {
 	public JournalToolbar(ApplicationSession session, Composite parent, int style, FilterDTO filterDTO) {
 		super(session, parent, style);
 		
+		boolean mobileMode = getSession().getMobileMode();
+		
 		toolButton1 = addButton("create");
 		Image image1 = new Image(getDisplay(), JournalToolbar.class.getResourceAsStream("/images/32/document_add.png"));
 		toolButton1.setImage(image1);
-		toolButton1.setText(getLocaleString("create"));
+		if (!mobileMode)
+			toolButton1.setText(getLocaleString("create"));
 		toolButton1.addSelectionListener(new SelectionAdapter() {
 			private static final long serialVersionUID = 1L;
 
@@ -39,7 +42,8 @@ public class JournalToolbar extends CommonToolbar {
 		toolButton2 = addButton("edit");
 		Image image2 = new Image(getDisplay(), JournalToolbar.class.getResourceAsStream("/images/32/document_edit.png"));
 		toolButton2.setImage(image2);
-		toolButton2.setText(getLocaleString("edit"));
+		if (!mobileMode)
+			toolButton2.setText(getLocaleString("edit"));
 		toolButton2.addSelectionListener(new SelectionAdapter() {		
 			private static final long serialVersionUID = 1L;
 
@@ -52,7 +56,8 @@ public class JournalToolbar extends CommonToolbar {
 		toolButton3 = addButton("delete");
 		Image image3 = new Image(getDisplay(), JournalToolbar.class.getResourceAsStream("/images/32/document_delete.png"));
 		toolButton3.setImage(image3);
-		toolButton3.setText(getLocaleString("delete"));
+		if (!mobileMode)
+			toolButton3.setText(getLocaleString("delete"));
 		toolButton3.addSelectionListener(new SelectionAdapter() {		
 			private static final long serialVersionUID = 1L;
 

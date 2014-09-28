@@ -203,7 +203,7 @@ public abstract class CompositeController
 	 * @see addControllerListener()
 	 */
 	protected abstract CommonComposite createComposite(CompositeParams params);
-	
+
 	/**
 	 * Метод нужно переопределить, процедуры выполнающиеся ДО создания композита.
 	 */

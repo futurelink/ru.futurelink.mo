@@ -78,6 +78,20 @@ public class DataPicker extends CommonField implements IField {
 	public DataPicker(ApplicationSession session, 
 			CommonComposite parent, 
 			int style, 
+			CompositeParams params, 
+			CommonItemComposite dataComposite,
+			Class<? extends CommonDataPickerController> pickerController
+			) {
+		super(session, parent, style, params, dataComposite);
+		
+		mPickerController = pickerController;
+		
+		createControls(style);
+	}
+
+	public DataPicker(ApplicationSession session, 
+			CommonComposite parent, 
+			int style, 
 			CompositeParams params,
 			CommonDTO dto,
 			Class<? extends CommonDataPickerController> pickerController
@@ -86,19 +100,6 @@ public class DataPicker extends CommonField implements IField {
 		
 		mPickerController = pickerController;
 
-		createControls(style);
-	}
-	
-	public DataPicker(ApplicationSession session, 
-			CommonComposite parent, 
-			int style, 
-			CompositeParams params, 
-			CommonItemComposite dataComposite,
-			Class<? extends CommonDataPickerController> pickerController) {
-		super(session, parent, style, params, dataComposite);
-		
-		mPickerController = pickerController;
-		
 		createControls(style);
 	}
 

@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableColumn;
 
 import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.table.CommonTableListener;
@@ -46,8 +47,8 @@ public class SimpleListComposite extends CommonListComposite {
 
 	@Override
 	public void refresh() throws DTOException {
-		if (mTable != null && (getDTO() != null))
-			mTable.setInput(getDTO());
+		if (getDTO() != null)
+			setInput(getDTO());
 	}
 
 	@Override
@@ -148,6 +149,12 @@ public class SimpleListComposite extends CommonListComposite {
 
 	public ICommonTable getTable() {
 		return mTable;
+	}
+
+	@Override
+	public void setInput(CommonDTOList<? extends CommonDTO> input) {
+		if (mTable != null)
+			mTable.setInput(input);		
 	}
 
 }

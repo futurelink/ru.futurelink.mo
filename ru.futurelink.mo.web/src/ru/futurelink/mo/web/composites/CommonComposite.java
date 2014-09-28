@@ -14,6 +14,7 @@ import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.dialogs.CommonDialog;
 import ru.futurelink.mo.web.controller.CommonControllerListener;
 import ru.futurelink.mo.web.controller.CompositeParams;
+import ru.futurelink.mo.web.controller.iface.IComposite;
 import ru.futurelink.mo.web.exceptions.InitException;
 import ru.futurelink.mo.web.utils.UTF8Control;
 
@@ -30,7 +31,9 @@ import ru.futurelink.mo.web.utils.UTF8Control;
  * @author pavlov
  *
  */
-public class CommonComposite extends Composite {
+public class CommonComposite 
+	extends Composite
+	implements IComposite {
 
 	private static final long serialVersionUID = 1L;
 
@@ -42,7 +45,7 @@ public class CommonComposite extends Composite {
 
 	private CommonControllerListener	mListener;
 	private Logger				mLogger;
-
+	
 	public CommonComposite(ApplicationSession session, Composite parent, int style, CompositeParams params) {
 		super(parent, style  | SWT.NO_FOCUS );
 
@@ -75,6 +78,7 @@ public class CommonComposite extends Composite {
 	 * 
 	 * @throws InitException 
 	 */
+	@Override
 	public synchronized void init() throws InitException {}
 	
 	/**
@@ -82,6 +86,7 @@ public class CommonComposite extends Composite {
 	 * 
 	 * @return объект локали типа Locale
 	 */
+	@Override
 	final public Locale getLocale() {
 		if (mSession != null) {
 			return mSession.getLocale();
@@ -94,6 +99,7 @@ public class CommonComposite extends Composite {
 	 * 
 	 * @return объект сессии пользователя ApplicationSession.
 	 */
+	@Override
 	final public ApplicationSession getSession() {
 		return mSession;
 	}
@@ -112,6 +118,7 @@ public class CommonComposite extends Composite {
 		return mStrings;
 	}
 
+	@Override
 	final public String getLocaleString(String stringName) {
 		if (mLocalStrings != null) {
 			try {
@@ -128,6 +135,7 @@ public class CommonComposite extends Composite {
 		}
 	}
 	
+	@Override
 	final public String getLocaleNumeric(Integer value, String single, String multiple) {
 		if (value > 1) {
 			return String.format(getLocaleString(multiple), value);
@@ -136,6 +144,7 @@ public class CommonComposite extends Composite {
 		}
 	}
 	
+	@Override
 	final public void setStrings(ResourceBundle bundle) {
 		mStrings = bundle;
 	}
@@ -153,6 +162,7 @@ public class CommonComposite extends Composite {
 	 * 
 	 * @param listener
 	 */
+	@Override
 	final public void addControllerListener(CommonControllerListener listener) {
 		mListener = listener;
 	}
@@ -163,6 +173,7 @@ public class CommonComposite extends Composite {
 	 * 
 	 * @return объект CommonControllerListener или любой от него унаследованный
 	 */
+	@Override
 	public CommonControllerListener getControllerListener() {
 		if (mListener == null) {
 			if (CommonComposite.class.isInstance(getParent())) {
@@ -182,6 +193,7 @@ public class CommonComposite extends Composite {
 	 * 
 	 * @param dialog - диалог, который надо сделать владельцем композита.
 	 */
+	@Override
 	public final void setOwnerDialog(CommonDialog dialog) {
 		mOwnerDialog = dialog;
 	}

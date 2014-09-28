@@ -214,4 +214,9 @@ public abstract class TemplatedTable
 	final protected Table getTable() {
 		return mTable;
 	}
+	
+	@Override
+	public void refresh() {
+
+	}
 }
