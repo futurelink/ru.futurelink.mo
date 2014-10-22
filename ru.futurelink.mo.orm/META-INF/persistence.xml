@@ -2,7 +2,7 @@
 <persistence xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
   version="2.0" xmlns="http://java.sun.com/xml/ns/persistence">
-  <persistence-unit name="mo" transaction-type="RESOURCE_LOCAL">		
+  <persistence-unit name="mo" transaction-type="RESOURCE_LOCAL">
 		<class>ru.futurelink.mo.orm.CodeSupport</class>
 		<class>ru.futurelink.mo.orm.WorkLogSupport</class>
 		<class>ru.futurelink.mo.orm.CommonObject</class>
@@ -10,10 +10,10 @@
 		<class>ru.futurelink.mo.orm.security.UserLock</class>
 		<class>ru.futurelink.mo.orm.security.User</class>
 		<class>ru.futurelink.mo.orm.security.Client</class>
-		<class>ru.futurelink.mo.orm.security.Access</class>		        
+		<class>ru.futurelink.mo.orm.security.Access</class>	
 		<class>ru.futurelink.mo.orm.mailer.MailServer</class>
 		<class>ru.futurelink.mo.orm.mailer.MailQueue</class>
-		<class>ru.futurelink.mo.orm.mailer.MailTemplate</class>		        
+		<class>ru.futurelink.mo.orm.mailer.MailTemplate</class> 
 		<class>ru.futurelink.mo.orm.migration.MigrationVersion</class>
 
 		<!--  
@@ -23,9 +23,7 @@
 		<mapping-file>META-INF/entites.xml</mapping-file>
 
 		<properties>
-            <property
-                name="eclipselink.weaving"
-                value="static"/>
+			<property name="eclipselink.weaving" value="static"/>
         </properties>
   </persistence-unit>
 </persistence>

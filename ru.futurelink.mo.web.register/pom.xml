@@ -54,20 +54,30 @@
 
 	<dependencies>
 	<dependency>
+		<groupId>org.osgi</groupId>
+		<artifactId>org.osgi.core</artifactId>
+		<version>4.3.1</version>
+	</dependency>
+	<dependency>
+		<groupId>org.osgi</groupId>
+		<artifactId>org.osgi.compendium</artifactId>
+		<version>4.3.1</version>
+	</dependency>
+	<!--<dependency>
 		<groupId>equinox</groupId>
 		<artifactId>org.eclipse.osgi.services</artifactId>
 		<version>3.4.0.v20131120-1328</version>
-	</dependency>
+	</dependency>-->
 	<dependency>
 		<groupId>equinox</groupId>
 		<artifactId>org.eclipse.core.commands</artifactId>
 		<version>3.6.1.v20120521-2329</version>
 	</dependency>
-	<dependency>
+	<!--<dependency>
 		<groupId>equinox</groupId>
 		<artifactId>org.eclipse.osgi</artifactId>
 		<version>3.10.0.v20140305-1523</version>
-	</dependency>	    
+	</dependency>-->
 	<dependency>
 		<groupId>org.eclipse.rap</groupId>
 		<artifactId>org.eclipse.rap.rwt.osgi</artifactId>

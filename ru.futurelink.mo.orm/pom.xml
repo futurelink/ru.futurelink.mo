@@ -24,7 +24,7 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
                <groupId>de.empulse.eclipselink</groupId>
                <artifactId>staticweave-maven-plugin</artifactId>
@@ -48,8 +48,57 @@
                        <version>2.5.1</version>
                    </dependency>
                </dependencies>
-           </plugin>
-           			
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.4.3</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/resources</directory>
+									<includes>
+										<include>features.xml</include>
+									</includes>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+<plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>build-helper-maven-plugin</artifactId>
+    <executions>
+        <execution>
+            <id>attach-artifacts</id>
+            <phase>package</phase>
+            <goals>
+                <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+                <artifacts>
+                    <artifact>
+                        <file>target/features.xml</file>
+                        <type>xml</type>
+                        <classifier>features</classifier>
+                    </artifact>
+                </artifacts>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 		 		<artifactId>maven-bundle-plugin</artifactId>
@@ -105,9 +154,14 @@
 			<version>2.1.0.v201304241213</version>
 		</dependency>
 		<dependency>
-			<groupId>equinox</groupId>
-			<artifactId>org.eclipse.osgi</artifactId>
-			<version>3.10.0.v20140305-1523</version>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>4.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>eclipselink</groupId>
