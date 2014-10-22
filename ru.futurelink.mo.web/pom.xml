@@ -62,6 +62,16 @@
 
 	<dependencies>
 	<dependency>
+		<groupId>org.osgi</groupId>
+		<artifactId>org.osgi.core</artifactId>
+		<version>4.3.1</version>
+	</dependency>
+	<dependency>
+		<groupId>org.osgi</groupId>
+		<artifactId>org.osgi.compendium</artifactId>
+		<version>4.3.1</version>
+	</dependency>
+	<dependency>
 		<groupId>ru.futurelink.mo</groupId>
 		<artifactId>web.register</artifactId>
 		<version>1.0.0.0</version>
@@ -69,7 +79,7 @@
 	<dependency>
 		<groupId>ru.futurelink.mo</groupId>
 		<artifactId>orm</artifactId>
-		<version>0.0.1.7</version>
+		<version>0.0.1.8</version>
 	</dependency>
 	<dependency>
 		<groupId>ru.futurelink.mo</groupId>
@@ -98,18 +108,8 @@
 	</dependency>
 	<dependency>
 		<groupId>equinox</groupId>
-		<artifactId>org.eclipse.osgi.services</artifactId>
-		<version>3.4.0.v20131120-1328</version>
-	</dependency>
-	<dependency>
-		<groupId>equinox</groupId>
 		<artifactId>org.eclipse.core.commands</artifactId>
 		<version>3.6.1.v20120521-2329</version>
-	</dependency>
-	<dependency>
-		<groupId>equinox</groupId>
-		<artifactId>org.eclipse.osgi</artifactId>
-		<version>3.10.0.v20140305-1523</version>
 	</dependency>
 	<dependency>
 		<groupId>org.eclipse.rap</groupId>
