@@ -10,6 +10,7 @@ import javax.persistence.Table;
 
 import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.annotations.DontCreateHistory;
+import ru.futurelink.mo.orm.exceptions.SaveException;
 
 @Entity(name = "MailQueue")
 @Table(name = "MAIL_QUEUE")
@@ -58,5 +59,18 @@ public class MailQueue extends ModelObject {
 	@Column(name = "attachments")
 	private		String[]	mAttachments;
 	public 		void 		setAttachments(String[] attachments) { mAttachments = attachments; }
-	public		String[] 	getAttachments() { return mAttachments; }  
+	public		String[] 	getAttachments() { return mAttachments; }
+
+	@Override
+	public Boolean getDeleteFlag() {
+		return false;
+	}
+
+	@Override
+	public void setDeleteFlag(Boolean deleteFlag) {}
+	
+	@Override
+	public Object save() throws SaveException {
+		throw new SaveException("Save for mail queue messages is not allowed!", null);
+	}  
 }
