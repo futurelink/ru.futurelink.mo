@@ -56,15 +56,20 @@ public class Activator implements BundleActivator {
 
 	@Override
 	public void stop(BundleContext context) {
-		config = null;
-
+		config = null;		
+		
 		if (mEventHandlerRegistration != null)
 			mEventHandlerRegistration.unregister();
 
 		try {
 			ServiceReference<UseCaseRegister> ref = context.getServiceReference(UseCaseRegister.class);
-			if (ref != null)
-				context.ungetService(ref);			
+			if (ref != null) {
+				// TODO Send notification to registered use cases to maketheir state
+				// as not registered.
+
+				// And remove UseCaseRegister service
+				context.ungetService(ref);
+			}
 		} catch (IllegalStateException ex) {
 			
 		}

@@ -3,19 +3,45 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                           http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>ru.futurelink</groupId>
-    <artifactId>fluvio</artifactId>
-    <version>0.0.1.11-SNAPSHOT</version>
+    <groupId>ru.futurelink.mo</groupId>
+    <artifactId>framework</artifactId>
+    <version>0.0.1.11</version>
     <name>ru.futurelink.mo build</name>
     <packaging>pom</packaging>
 
-    <modules>
-	<module>ru.futurelink.mo.orm</module>
-	<module>ru.futurelink.mo.web</module>
-	<module>ru.futurelink.mo.web.graphics</module>
-	<module>ru.futurelink.mo.web.register</module>
-    </modules>
+<!--	<modules>
+		<module>ru.futurelink.mo.orm</module>
+		<module>ru.futurelink.mo.web</module>
+		<module>ru.futurelink.mo.web.graphics</module>
+		<module>ru.futurelink.mo.web.register</module>
+    </modules>-->
 
+	<build>	
+	<plugins>
+	<plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>build-helper-maven-plugin</artifactId>
+    <executions>
+        <execution>
+            <id>attach-artifacts</id>
+            <phase>package</phase>
+            <goals>
+                <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+                <artifacts>
+                    <artifact>
+                        <file>features.xml</file>
+                        <type>xml</type>
+                        <classifier>features</classifier>
+                    </artifact>
+                </artifacts>
+            </configuration>
+        </execution>
+    </executions>
+	</plugin>
+	</plugins>
+	</build>
     <distributionManagement>
 	<repository>
 		<id>fluvio-maven-repo</id>
