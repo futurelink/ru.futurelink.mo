@@ -21,6 +21,8 @@ public interface ICompositeController
 	
 	public void reparentComposite(Composite newParent);
 
-	public void clear();	
+	public void clear();
+	public void refreshBySender(String sender, boolean refreshSubcontrollers) throws Exception;
 	public void addDropSupport(int operations, Transfer[] transferTypes, DropTargetListener listener);
+	public ICompositeController getParentController();
 }
