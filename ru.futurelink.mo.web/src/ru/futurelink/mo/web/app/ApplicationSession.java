@@ -1,7 +1,9 @@
 package ru.futurelink.mo.web.app;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -250,4 +252,11 @@ final public class ApplicationSession {
 		params.save();
 	}
 
+	public Date userTime(Date dateTime) {
+		Calendar c = Calendar.getInstance();	// In server time
+		c.setTimeInMillis(dateTime.getTime() - TimeZone.getDefault().getRawOffset()
+				+ getUser().getTimeZone().getRawOffset());
+		
+		return c.getTime();
+	}
 }

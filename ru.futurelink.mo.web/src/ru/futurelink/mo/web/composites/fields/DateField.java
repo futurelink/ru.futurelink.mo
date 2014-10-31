@@ -60,9 +60,9 @@ public class DateField extends CommonField {
 	}
 	
 	public void setDate(Date date) throws DTOException {
-		if (date != null) {
-			Calendar c = Calendar.getInstance(mParent.getSession().getUser().getTimeZone());
-			c.setTime(date);
+		if (date != null) {			
+			Calendar c = Calendar.getInstance();	// In server time
+			c.setTime(date);			
 			((DateTime)mControl).setDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
 		}
 		if (getControllerListener() != null)
