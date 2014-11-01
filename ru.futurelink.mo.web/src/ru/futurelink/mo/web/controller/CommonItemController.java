@@ -72,6 +72,16 @@ public abstract class CommonItemController
 
 	@Override
 	protected void doAfterCreateComposite() {
+		if ((getComposite() != null) &&
+			(getComposite().getControllerListener() != null) &&
+			CommonItemEditControllerListener.class.isAssignableFrom((getComposite().getControllerListener().getClass()))
+			) {
+			try {
+				((CommonItemEditControllerListener)getComposite().getControllerListener()).dataChangeFinished(null);
+			} catch (DTOException e) {
+				logger().error("Cannot update save button after composite was created.");
+			}
+		}
 	}
 	
 	/**
