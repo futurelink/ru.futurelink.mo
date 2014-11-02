@@ -72,7 +72,7 @@ abstract public class SimpleListController
 		if (data != null) {
 			if (params().get("itemEditMode") != EditMode.CONTAINER) {
 				if (openEditDialog((EditorDTO)getActiveData()) != null) {
-					// Обновить список, перечитать данные
+					// Re-read data into list
 					try {
 						handleDataQuery();
 					} catch (DTOException ex) {
@@ -212,9 +212,6 @@ abstract public class SimpleListController
 		Composite container = (Composite) params().get("itemEditContainer");
 		String itemUsecaseBundle = (String) params().get("itemUsecase");
 		
-		if (parentController != null)
-			parentController.clear();
-
 		CommonItemController ctrl;		
 		if (itemUsecaseBundle != null) {
 			logger().info("Running usecase {} to edit item", itemUsecaseBundle);
@@ -235,7 +232,7 @@ abstract public class SimpleListController
 			 * Run usecase to edit item
 			 */
 			ctrl = (CommonItemController)((CompositeController)parentController).
-					handleRunUsecase(itemUsecaseBundle, params);			
+					handleRunUsecase(itemUsecaseBundle, params, true);			
 		} else {
 			logger().info("Not running usecase to edit item but create item controller");
 			ctrl = createItemController(parentController, container, new CompositeParams());
