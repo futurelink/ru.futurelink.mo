@@ -81,6 +81,11 @@ public class EditorDTO extends CommonDTO {
 		((ModelObject)mData).save();
 	}
 
+	@Override
+	public void saveCommit() throws SaveException {
+		((ModelObject)mData).saveCommit();
+	}
+	
 	/**
 	 * Метод создает список DTO из списка элементов типа CommonObject. Если список
 	 * результата запроса пустой, то возвращается пустой список DTO.
@@ -508,6 +513,6 @@ public class EditorDTO extends CommonDTO {
 	
 	@Override
 	public void refresh() {
-		getPersistenceManagerSession().getPersistent().getEm().refresh(mData);
+		getPersistenceManagerSession().getPersistentManager().getEm().refresh(mData);
 	}
 }

@@ -69,9 +69,8 @@ abstract public class SimpleListController
 	public void handleItemDoubleClicked(CommonDTO data) {
 		if (data != null) {
 			if (params().get("itemEditMode") != CommonItemController.EditMode.CONTAINER) {
-				CommonItemDialog dlg = openEditDialog((EditorDTO)getActiveData());
+				Object dlg = openEditDialog((EditorDTO)getActiveData());
 				if (dlg != null) {
-					dlg.getConntoller().setEditMode((CommonItemController.EditMode)params().get("itemEditMode"));
 					try {
 						// Re-read data into list
 						handleDataQuery();
@@ -198,8 +197,9 @@ abstract public class SimpleListController
 	 * @param data
 	 * @return
 	 */
-	protected CommonItemDialog openEditDialog(EditorDTO data) {
-		return (CommonItemDialog) new CommonItemDialog(getSession(), getComposite(), this, params()).open(data);
+	protected Object openEditDialog(EditorDTO data) {
+		CommonItemDialog dlg = new CommonItemDialog(getSession(), getComposite(), this, params());		
+		return dlg.open(data);
 	}
 
 	/**

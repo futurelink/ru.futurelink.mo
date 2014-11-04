@@ -12,6 +12,7 @@ import org.eclipse.rap.rwt.RWT;
 
 import ru.futurelink.mo.orm.PersistentManager;
 import ru.futurelink.mo.orm.PersistentManagerSession;
+import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.mongodb.MongoDBProvider;
 import ru.futurelink.mo.orm.mongodb.objects.LoginEventObject;
 import ru.futurelink.mo.orm.mongodb.objects.UserParams;
@@ -68,7 +69,7 @@ final public class ApplicationSession {
 			mLocale = RWT.getLocale(); 
 	}
 
-	final public void login(User user, String login) {
+	final public void login(User user, String login) throws SaveException {
 		mLogin = login;
 		mPersistentSession.setUser(user);
 
@@ -248,7 +249,7 @@ final public class ApplicationSession {
 		return paramsQuery;
 	}
 	
-	public void setUserParams(UserParams params) {
+	public void setUserParams(UserParams params) throws SaveException {
 		params.save();
 	}
 

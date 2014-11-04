@@ -18,4 +18,5 @@ public abstract class ModelObject implements Serializable {
 	
 	// Abstract method to save model
 	abstract public Object save() throws SaveException;
+	abstract public void saveCommit() throws SaveException;
 }

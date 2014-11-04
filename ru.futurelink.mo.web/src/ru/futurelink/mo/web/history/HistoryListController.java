@@ -51,12 +51,12 @@ public class HistoryListController extends SimpleListController {
 				"where d.mCreator = :creator and d.mCode.mId = :code " +
 				"order by d.mModifyDate desc";
 
-			q2 = mSession.persistent().getPersistent().getEm().createQuery(query, getDataClass());
+			q2 = mSession.persistent().getPersistentManager().getEm().createQuery(query, getDataClass());
 			q2.setParameter("creator", getSession().getDatabaseUser());
 			q2.setParameter("code", mCode);
 		} else {
 			// Найдем ID того объекта, для которого будем выбирать историю из лога
-			TypedQuery<String> q1 = mSession.persistent().getPersistent().getEm().createQuery(
+			TypedQuery<String> q1 = mSession.persistent().getPersistentManager().getEm().createQuery(
 					"SELECT d.mId FROM " +
 					getDataClass().getSimpleName()+" d "+
 					"WHERE d.mCreator = :creator AND d.mCode.mId = :code", String.class);
@@ -69,7 +69,7 @@ public class HistoryListController extends SimpleListController {
 						"d.mObjectId = :objectId "+
 						"order by d.mModifyDate desc";
 
-				q2 = mSession.persistent().getPersistent().getEm().createQuery(query, getDataClass());
+				q2 = mSession.persistent().getPersistentManager().getEm().createQuery(query, getDataClass());
 				q2.setParameter("objectClassName", getDataClass().getName());
 				q2.setParameter("objectId", objectId);
 			}

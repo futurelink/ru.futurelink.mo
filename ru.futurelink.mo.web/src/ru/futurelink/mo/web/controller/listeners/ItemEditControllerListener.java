@@ -51,11 +51,12 @@ public class ItemEditControllerListener implements
 	public void saveButtonClicked() {
 		try {
 			mController.save();
+			mController.saveCommit();
 			mController.close();					
 		} catch (SaveException | DTOException e) {
 			mController.handleError("Ошибка сохранения карты!", e);
 			return;
-		}				
+		}
 	}			
 
 	@Override

@@ -344,6 +344,14 @@ public abstract class CommonItemController
 		}
 	}
 
+	@Override
+	public void saveCommit() throws SaveException {
+		if (getDTO() != null) {
+			logger().debug("Committing transaction to store changes.");
+			getDTO().saveCommit();
+		}
+	}
+
 	/**
 	 * При редактировании элемента данных на форме, они не
 	 * сохраняются сразу в элемент данных, а записываются

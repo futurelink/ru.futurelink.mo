@@ -72,5 +72,9 @@ public class MailQueue extends ModelObject {
 	@Override
 	public Object save() throws SaveException {
 		throw new SaveException("Save for mail queue messages is not allowed!", null);
+	}
+	@Override
+	public void saveCommit() throws SaveException {
+		throw new SaveException("Save for mail queue messages is not allowed!", null);		
 	}  
 }

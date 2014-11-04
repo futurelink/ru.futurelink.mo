@@ -50,4 +50,9 @@ final public class HistoryResult extends ModelObject {
 	public Object save() throws SaveException {
 		throw new SaveException("Saving history object is not allowed!", null);
 	}
+
+	@Override
+	public void saveCommit() throws SaveException {
+		throw new SaveException("Saving history object is not allowed!", null);
+	}
 }
