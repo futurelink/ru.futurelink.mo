@@ -44,8 +44,6 @@ import ru.futurelink.mo.web.exceptions.InitException;
 abstract public class SimpleListController 
 	extends CommonListController
 	implements IListEditController {
-
-	public enum EditMode { DIALOG, CONTAINER };
 	
 	public SimpleListController(ICompositeController parentController,
 			Class<? extends CommonObject> dataClass, CompositeParams compositeParams) {
@@ -70,17 +68,19 @@ abstract public class SimpleListController
 	 */
 	public void handleItemDoubleClicked(CommonDTO data) {
 		if (data != null) {
-			if (params().get("itemEditMode") != EditMode.CONTAINER) {
-				if (openEditDialog((EditorDTO)getActiveData()) != null) {
-					// Обновить список, перечитать данные
+			if (params().get("itemEditMode") != CommonItemController.EditMode.CONTAINER) {
+				Object dlg = openEditDialog((EditorDTO)getActiveData());
+				if (dlg != null) {
 					try {
+						// Re-read data into list
 						handleDataQuery();
 					} catch (DTOException ex) {
 						handleError("невозможно обновить список.", ex);
 					}
 				}
 			} else {
-				openEdit(getParentController(), (EditorDTO)data);
+				CommonItemController ctrl = openEdit(getParentController(), (EditorDTO)data);
+				ctrl.setEditMode((CommonItemController.EditMode)params().get("itemEditMode"));
 			}
 		}
 	}
@@ -94,7 +94,7 @@ abstract public class SimpleListController
 	// Обработка создания новго элемента
 	@Override
 	public void handleCreate() {
-		if (params().get("itemEditMode") != EditMode.CONTAINER) {
+		if (params().get("itemEditMode") != CommonItemController.EditMode.CONTAINER) {
 			if (openEditDialog(null) != null) {	
 				// Обновить список, перечитать данные
 				try {
@@ -198,9 +198,10 @@ abstract public class SimpleListController
 	 * @return
 	 */
 	protected Object openEditDialog(EditorDTO data) {
-		return new CommonItemDialog(getSession(), getComposite(), this, params()).open(data);
+		CommonItemDialog dlg = new CommonItemDialog(getSession(), getComposite(), this, params());		
+		return dlg.open(data);
 	}
-	
+
 	/**
 	 * Open item edit or creation as subconroller.
 	 * 
@@ -208,13 +209,10 @@ abstract public class SimpleListController
 	 * @param data
 	 * @return
 	 */
-	private Object openEdit(ICompositeController parentController, EditorDTO data) {
+	private CommonItemController openEdit(ICompositeController parentController, EditorDTO data) {
 		Composite container = (Composite) params().get("itemEditContainer");
 		String itemUsecaseBundle = (String) params().get("itemUsecase");
 		
-		if (parentController != null)
-			parentController.clear();
-
 		CommonItemController ctrl;		
 		if (itemUsecaseBundle != null) {
 			logger().info("Running usecase {} to edit item", itemUsecaseBundle);
@@ -235,7 +233,7 @@ abstract public class SimpleListController
 			 * Run usecase to edit item
 			 */
 			ctrl = (CommonItemController)((CompositeController)parentController).
-					handleRunUsecase(itemUsecaseBundle, params);			
+					handleRunUsecase(itemUsecaseBundle, params, true);
 		} else {
 			logger().info("Not running usecase to edit item but create item controller");
 			ctrl = createItemController(parentController, container, new CompositeParams());
@@ -260,7 +258,7 @@ abstract public class SimpleListController
 			if (ctrl.getComposite() == null) {			
 				ctrl.uninit();
 				ctrl.handleError("Композит для отображения в диалоговом окне не создан!", null);
-				return -1;
+				return null;
 			}
 		
 			ctrl.getComposite().layout(true, true);

@@ -155,8 +155,15 @@ public class PersistentManager {
 			if (object.getCreator() == null) object.setCreator(session.getAccessUser());
 			if (object.getAuthor() == null) object.setAuthor(session.getUser());
 
-			object.onBeforeSave(saveFlag);			// Вызов перед сохранением объекта			
-			getEm().getTransaction().begin();			// Сохранение объекта
+			object.onBeforeSave(saveFlag);			// Вызов перед сохранением объекта
+			
+			// If couldn't begin new transaction or get existing we
+			// throw SaveException to be correctly handled by controllers etc.
+			try {
+				session.transactionBegin();
+			} catch (IllegalStateException ex) {
+				throw new SaveException("Transaction begin exception", ex);
+			}
 		
 			// Добавляем в ворклог данные о том, что элменет был изменен
 			// у добавим ссылку на элемент ворклога в элемент данных.
@@ -180,7 +187,6 @@ public class PersistentManager {
 			getEm().persist(object);					// ...
 
 			object.onAfterSave(saveFlag);			// Вызов после сохранения объекта
-			onSave();								// Вызов после сохранения менеджера
 			
 			// После сохранения пересохраняем элемент ворклога,
 			// добавляем туда имя класса и ИД объекта, к которому он
@@ -195,7 +201,8 @@ public class PersistentManager {
 			// то откатываем установку изначального объекта, он
 			// нам не нужен.
 			object.setUnmodifiedObject(null);
-			onSaveError(ex.toString());				// Если что-то пошло не так, вызов обработки ошибки
+			if (session.transactionIsOpened())
+				session.transactionRollback();
 			throw ex;								// Передаем наш ексепшн дальше
 		}
 		return null;
@@ -220,7 +227,7 @@ public class PersistentManager {
 			try {
 				object.onBeforeSave(saveFlag);					// Вызов перед сохранением объекта
 			
-				getEm().getTransaction().begin();
+				session.transactionBegin();
 				getEm().detach(object);							// Отдетачиваем элемент от базы
 
 				String newId = UUID.randomUUID().toString().toUpperCase();
@@ -258,8 +265,6 @@ public class PersistentManager {
 				getEm().persist(oldObj);
 				
 				object.onAfterSave(saveFlag);			// Вызов после сохранения объекта
-								
-				onSave();
 				
 				// Открываем объект заново, чтобы был доступен,
 				// потому что после detach-merge он слетает с управления
@@ -279,7 +284,8 @@ public class PersistentManager {
 				// то откатываем установку изначального объекта, он
 				// нам не нужен.
 				object.setUnmodifiedObject(null);
-				onSaveError(ex.toString());				// Если что-то пошло не так, вызов обработки ошибки
+				if (session.transactionIsOpened())
+					session.transactionRollback();
 				throw ex;								// Передаем наш ексепшн дальше
 			}			
 			return null;
@@ -303,25 +309,6 @@ public class PersistentManager {
 	}
 
 	protected	Object delete(CommonObject object) {
-		return null;
-	}
-	
-	/**
-	 * Обработчик успешного сохранения.
-	 * @return
-	 */
-	protected	Object onSave() {
-		getEm().getTransaction().commit();
-		return null;
-	}
-	
-	/**
-	 * Обработчик неуспешного сохранения
-	 * @return
-	 */
-	protected	Object onSaveError(String errorText) {
-		if(getEm().getTransaction().isActive())
-			getEm().getTransaction().rollback();
 		return null;
 	}
 	

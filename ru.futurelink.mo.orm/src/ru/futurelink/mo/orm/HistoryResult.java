@@ -2,6 +2,8 @@ package ru.futurelink.mo.orm;
 
 import java.util.Date;
 
+import ru.futurelink.mo.orm.exceptions.SaveException;
+
 /**
  * Результирующий класс модели для отображения списка истории
  * элемента данных.
@@ -40,4 +42,17 @@ final public class HistoryResult extends ModelObject {
 	public		void setObjectId(String objectId) { mObjectId = objectId; }
 	
 	public		Boolean	getDeleteFlag() { return false; }
+
+	@Override
+	public void setDeleteFlag(Boolean deleteFlag) {}
+
+	@Override
+	public Object save() throws SaveException {
+		throw new SaveException("Saving history object is not allowed!", null);
+	}
+
+	@Override
+	public void saveCommit() throws SaveException {
+		throw new SaveException("Saving history object is not allowed!", null);
+	}
 }

@@ -35,11 +35,16 @@ public abstract class CommonItemController
 	extends CompositeController
 	implements IItemController
 {
+	
+	public enum EditMode { DIALOG, CONTAINER };
+
 	private 	PersistentManagerSession	mPersistentSession;
 	private		ArrayList<RelatedController> mRelatedControllers;
 
 	private		CommonDTO					mDTO;
 	private		IDTOAccessChecker			mChecker;
+	
+	private		EditMode					editMode;
 	
 	public CommonItemController(ICompositeController parentController, Class<? extends CommonObject> dataClass,
 			CompositeParams compositeParams) {
@@ -61,6 +66,14 @@ public abstract class CommonItemController
 		mChecker = createAccessChecker();
 	}
 
+	public void setEditMode(EditMode mode) {
+		editMode = mode;
+	}
+	
+	public EditMode getEditMode() {
+		return editMode;
+	}
+	
 	/**
 	 * Метод создающий проверялку прав доступа.
 	 * Можно переопределить на дочернем классе, если нужно
@@ -72,6 +85,16 @@ public abstract class CommonItemController
 
 	@Override
 	protected void doAfterCreateComposite() {
+		if ((getComposite() != null) &&
+			(getComposite().getControllerListener() != null) &&
+			CommonItemEditControllerListener.class.isAssignableFrom((getComposite().getControllerListener().getClass()))
+			) {
+			try {
+				((CommonItemEditControllerListener)getComposite().getControllerListener()).dataChangeFinished(null);
+			} catch (DTOException e) {
+				logger().error("Cannot update save button after composite was created.");
+			}
+		}
 	}
 	
 	/**
@@ -318,6 +341,14 @@ public abstract class CommonItemController
 			logger().debug("Saved everything!");
 		} else {
 			throw new SaveException("No data object to save!", null);
+		}
+	}
+
+	@Override
+	public void saveCommit() throws SaveException {
+		if (getDTO() != null) {
+			logger().debug("Committing transaction to store changes.");
+			getDTO().saveCommit();
 		}
 	}
 

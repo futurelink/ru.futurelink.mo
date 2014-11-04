@@ -88,7 +88,7 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 		// Запустить отложенный юзкейс
 		if (mDeferredUsecaseRun != null) {
 			if (mController != null)
-				mController.handleRunUsecase(mDeferredUsecaseRun);
+				mController.handleRunUsecase(mDeferredUsecaseRun, false);
 		}
 	}
 	

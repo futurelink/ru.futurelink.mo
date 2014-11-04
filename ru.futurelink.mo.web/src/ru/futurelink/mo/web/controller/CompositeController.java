@@ -510,10 +510,13 @@ public abstract class CompositeController
 	 * @return
 	 */
 	public CompositeController handleRunUsecase(String usecaseBundle, 
-			Map<String, Object> usecaseParams) {
+			Map<String, Object> usecaseParams, boolean clearBeforeRun) {
 		CompositeParams params = new CompositeParams();
 		params.add("usecaseParams", usecaseParams);
 		
+		if (clearBeforeRun)
+			clear();
+
 		logger().info("Usecase {} starting with params {}", usecaseBundle, usecaseParams);
 
 		CompositeController c = getUsecaseController(
@@ -548,8 +551,8 @@ public abstract class CompositeController
 	 * @param usecaseBundle
 	 * @return
 	 */
-	public CompositeController handleRunUsecase(String usecaseBundle) {
-		return handleRunUsecase(usecaseBundle, (Map<String,Object>)null);
+	public CompositeController handleRunUsecase(String usecaseBundle, boolean clearBeforeRun) {
+		return handleRunUsecase(usecaseBundle, (Map<String,Object>)null, clearBeforeRun);
 	}
 
 	/**
@@ -838,7 +841,7 @@ public abstract class CompositeController
 		
 		// Propagate executuion on subcontrollers if needed
 		if (refreshSubcontrollers) {
-			logger().debug("Refreshing subcontrollers by sender...");
+			logger().info("Refreshing subcontrollers by sender...");
 			for (int i = 0; i < getSubControllerCount(); i++) {
 				if (CompositeController.class.isAssignableFrom(getSubController(i).getClass()))
 					((CompositeController)getSubController(i)).

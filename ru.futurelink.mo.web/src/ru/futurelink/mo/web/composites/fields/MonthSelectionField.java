@@ -1,6 +1,7 @@
 package ru.futurelink.mo.web.composites.fields;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -144,20 +145,33 @@ public class MonthSelectionField extends CommonField {
 	/**
 	 * Сформировать DateRange из двух дат - первого дня месяца и последнего дня месяца.
 	 * 
+	 * Date range is formed from dates calculated on local server timezone and user timezone.
+	 * 
+	 * <b>For example:</b> 
+	 * 1) When user selects october and sever has GMT+10 time zone and user has GMT+12 time zone 
+	 * the result will be 01 Oct 02:00:00 till 01 Nov 01:59:59.
+	 * 2) If server is on UTC and user is GMT-2 the result will be 30 Sep 22:00:00 till 30 Oct 21:59:59.
+	 * 
 	 * @return
 	 */
 	private DateRange formatDateRange() {
 		DateRange range = new DateRange();
 		
-		Calendar c = Calendar.getInstance(mParent.getSession().getUser().getTimeZone());
+		Calendar c = Calendar.getInstance();
 		c.set(getYear(), getMonth()-1, 1, 0, 0, 0);
+		c.add(Calendar.MILLISECOND, 
+				TimeZone.getDefault().getRawOffset() - 
+				mParent.getSession().getUser().getTimeZone().getRawOffset());
 		range.setBeginDate(c.getTime());
 
 		Integer lastDay = c.getActualMaximum(Calendar.DAY_OF_MONTH);
-		
+
 		c.set(getYear(), getMonth()-1, lastDay, 23, 59, 59);
+		c.add(Calendar.MILLISECOND, 
+				TimeZone.getDefault().getRawOffset() - 
+				mParent.getSession().getUser().getTimeZone().getRawOffset());
 		range.setEndDate(c.getTime());
-		
+
 		System.out.println("DateRange set to "+range.getBeginDate().toString()+" to "+range.getEndDate().toString());
 		
 		return range;

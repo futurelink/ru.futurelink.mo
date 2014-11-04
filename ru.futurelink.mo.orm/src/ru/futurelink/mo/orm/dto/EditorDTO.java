@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import ru.futurelink.mo.orm.CommonObject;
+import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
@@ -39,7 +40,7 @@ public class EditorDTO extends CommonDTO {
 
 	protected HashMap<String, Object[]> 	mChangesBuffer;
 
-	public EditorDTO(CommonObject dataItem) {
+	public EditorDTO(ModelObject dataItem) {
 		super(dataItem);
 
 		// Структура буфера изменений: "название поля": [ геттер, сеттер, значение ]
@@ -77,9 +78,14 @@ public class EditorDTO extends CommonDTO {
 		if (!mAccessChecker.checkSave(this)) {
 			throw new DTOAccessException("У вас нет права на сохранение этого элемента.", null);
 		}
-		((CommonObject)mData).save();
+		((ModelObject)mData).save();
 	}
 
+	@Override
+	public void saveCommit() throws SaveException {
+		((ModelObject)mData).saveCommit();
+	}
+	
 	/**
 	 * Метод создает список DTO из списка элементов типа CommonObject. Если список
 	 * результата запроса пустой, то возвращается пустой список DTO.
@@ -507,6 +513,6 @@ public class EditorDTO extends CommonDTO {
 	
 	@Override
 	public void refresh() {
-		getPersistenceManagerSession().getPersistent().getEm().refresh(mData);
+		getPersistenceManagerSession().getPersistentManager().getEm().refresh(mData);
 	}
 }

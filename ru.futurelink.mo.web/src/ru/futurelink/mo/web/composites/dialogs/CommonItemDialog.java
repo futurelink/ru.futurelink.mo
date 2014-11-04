@@ -59,6 +59,8 @@ public class CommonItemDialog {
 			return -1;
 		}
 		
+		mController.setEditMode(CommonItemController.EditMode.DIALOG);
+		
 		try {
 			mController.init();
 		} catch (InitException ex1) {
@@ -129,6 +131,10 @@ public class CommonItemDialog {
 		mController.uninit();
 		
 		return mDialog.getResult();
+	}
+	
+	public CommonItemController getConntoller() {
+		return mController;
 	}
 
 }

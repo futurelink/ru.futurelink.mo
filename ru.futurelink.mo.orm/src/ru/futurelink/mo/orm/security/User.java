@@ -85,7 +85,7 @@ public class User extends CommonObject {
 	}
 	
 	public String getGrantedUsersCount() {
-		Query q = getPersistenceManagerSession().getPersistent().getEm().createQuery("select count(d) from Access d where d.mCreator = :creator and d.mDeleteFlag = 0");
+		Query q = getPersistenceManagerSession().getPersistentManager().getEm().createQuery("select count(d) from Access d where d.mCreator = :creator and d.mDeleteFlag = 0");
 		q.setParameter("creator", this);
 		if (q.getResultList().size() > 0) {
 			logger().debug("Количество: {}", q.getSingleResult());
@@ -96,7 +96,7 @@ public class User extends CommonObject {
 	}
 
 	public User getSystemUser() {
-		TypedQuery<User> q = getPersistenceManagerSession().getPersistent().getEm().createNamedQuery("User.findUserByLogin", User.class);
+		TypedQuery<User> q = getPersistenceManagerSession().getPersistentManager().getEm().createNamedQuery("User.findUserByLogin", User.class);
 		q.setParameter("login", "futurelink.vl@gmail.com");
 		if (q.getResultList().size() > 0) {
 			return q.getSingleResult();

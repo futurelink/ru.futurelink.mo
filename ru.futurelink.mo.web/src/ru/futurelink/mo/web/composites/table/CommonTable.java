@@ -32,6 +32,7 @@ import ru.futurelink.mo.web.controller.CompositeParams;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.mongodb.objects.UserParams;
 
 /**
@@ -230,7 +231,9 @@ public abstract class CommonTable
 					mListener.onColumnResized(column);
 
 				mUserParams.setParam(column.getText()+"_size", column.getWidth());
-				mUserParams.save();
+				try {
+					mUserParams.save();
+				} catch (SaveException ex) {}
 			}
 			
 			@Override

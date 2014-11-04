@@ -46,12 +46,7 @@ public class EditorDTOList<T extends CommonDTO>
 					((CommonObject)object).setPersistentManagerSession(getPersistentManagerSession());
 				}
 				try {
-					Constructor<T> ctr = null;				
-					if (CommonObject.class.isAssignableFrom(object.getClass())) {
-						ctr = getDTOClass().getConstructor(CommonObject.class);
-					} else {
-						ctr = getDTOClass().getConstructor(ModelObject.class);
-					}
+					Constructor<T> ctr = getDTOClass().getConstructor(ModelObject.class);
 					T dto = ctr.newInstance(object);
 					if (dto != null) {
 						if (dto.getAccessChecker() == null) dto.addAccessChecker(getAccessChecker());

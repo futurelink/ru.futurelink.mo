@@ -31,6 +31,7 @@ public interface IItemController
 	public void openById(String id) throws OpenException;
 	public void open(CommonObject data) throws OpenException;
 	public void save() throws SaveException, DTOException, ValidationException;
+	public void saveCommit() throws SaveException;
 	public void close();
 
 	public void revertChanges() throws DTOException;

@@ -56,7 +56,11 @@ public abstract class CommonDTO implements Serializable, IDTO {
 	
 	@Override
 	public void save() throws DTOException, SaveException {
-		throw new DTOException("Сохранение невозможно, не реализовано на CommonDTO.", null);
+		throw new SaveException("Saving is not implemented on CommonDTO.", null);
+	}
+	
+	public void saveCommit() throws SaveException {
+		throw new SaveException("Saving is not implemented on CommonDTO.", null);
 	}
 	
 	@Override
