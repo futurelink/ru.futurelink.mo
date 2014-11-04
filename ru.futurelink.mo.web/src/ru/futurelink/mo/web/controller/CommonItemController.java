@@ -35,11 +35,16 @@ public abstract class CommonItemController
 	extends CompositeController
 	implements IItemController
 {
+	
+	public enum EditMode { DIALOG, CONTAINER };
+
 	private 	PersistentManagerSession	mPersistentSession;
 	private		ArrayList<RelatedController> mRelatedControllers;
 
 	private		CommonDTO					mDTO;
 	private		IDTOAccessChecker			mChecker;
+	
+	private		EditMode					editMode;
 	
 	public CommonItemController(ICompositeController parentController, Class<? extends CommonObject> dataClass,
 			CompositeParams compositeParams) {
@@ -61,6 +66,14 @@ public abstract class CommonItemController
 		mChecker = createAccessChecker();
 	}
 
+	public void setEditMode(EditMode mode) {
+		editMode = mode;
+	}
+	
+	public EditMode getEditMode() {
+		return editMode;
+	}
+	
 	/**
 	 * Метод создающий проверялку прав доступа.
 	 * Можно переопределить на дочернем классе, если нужно

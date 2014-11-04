@@ -130,5 +130,9 @@ public class CommonItemDialog {
 		
 		return mDialog.getResult();
 	}
+	
+	public CommonItemController getConntoller() {
+		return mController;
+	}
 
 }
