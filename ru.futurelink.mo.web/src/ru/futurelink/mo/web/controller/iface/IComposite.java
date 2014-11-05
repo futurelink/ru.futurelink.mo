@@ -35,6 +35,7 @@ public interface IComposite {
 	public Locale getLocale();
 	public String getLocaleString(String stringName);
 	public String getLocaleNumeric(Integer value, String single, String multiple);
+	public String getErrorString(String stringName);
 	
 	public ApplicationSession getSession();	
 }

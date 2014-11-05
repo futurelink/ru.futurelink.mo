@@ -51,6 +51,8 @@ public class CommonComposite
 	private ApplicationSession mSession;
 	private ResourceBundle	mStrings;
 	private ResourceBundle	mLocalStrings;
+	private ResourceBundle	mLocalErrorStrings;
+	private ResourceBundle	mErrorStrings;
 	private CommonDialog		mOwnerDialog;	// Диалоговое окно - если открыто в диалоге
 	private CompositeParams		mParams;
 
@@ -67,11 +69,20 @@ public class CommonComposite
 		mSession = session;
 		mParams	 = params;	
 		mStrings = ResourceBundle.getBundle("locale/main", getLocale(), new UTF8Control());
+		mErrorStrings = ResourceBundle.getBundle("locale/errors", getLocale(), new UTF8Control());
 
 		try {
-			mLocalStrings = ResourceBundle.getBundle("locale/main", getLocale(), getClass().getClassLoader(), new UTF8Control());
+			mLocalStrings = ResourceBundle.getBundle("locale/main", getLocale(), 
+				getClass().getClassLoader(), new UTF8Control());
 		} catch(Exception e) {
-			mLogger.warn("Нет строк locale/main для выбранной локали {} в пути класса", getLocale().getLanguage());
+			mLogger.warn(getErrorString("noLocaleStrings"), getLocale().getLanguage());
+		}
+
+		try {
+			mLocalErrorStrings = ResourceBundle.getBundle("locale/errors", 
+				getLocale(), getClass().getClassLoader(), new UTF8Control());
+		} catch (Exception e) {
+			// Ignore that exception
 		}
 	}
 
@@ -152,7 +163,7 @@ public class CommonComposite
      * @return ResourceBundle loaded for user session
      */
     @Override
-	final public String getLocaleString(String stringName) {
+	final public String getLocaleString(String stringName) {    	
 		if (mLocalStrings != null) {
 			try {
 				return mLocalStrings.getString(stringName);
@@ -164,10 +175,42 @@ public class CommonComposite
 				}
 			}
 		} else {
-			return mStrings.getString(stringName);
+			try {
+				return mStrings.getString(stringName);
+			} catch (MissingResourceException e2) {
+				return stringName;
+			}
 		}
 	}
 
+    /**
+     * Get error string from resources/locale/errors_xx.properties resource bundle
+     * to localize errors.
+     * 
+     * @param stringName
+     * @return
+     */
+    @Override
+    final public String getErrorString(String stringName) {
+    	if (mLocalErrorStrings != null) {
+			try {
+				return mLocalErrorStrings.getString(stringName);
+			} catch (MissingResourceException e) {
+				try {
+					return mErrorStrings.getString(stringName);
+				} catch (MissingResourceException e2) {
+					return stringName;
+				}
+			}
+		} else {
+			try {
+				return mErrorStrings.getString(stringName);
+			} catch (MissingResourceException e2) {
+				return stringName;
+			}
+		}
+    }
+    
     /**
      * <p>The ResourceBundle to localize strings in composite is loaded from
      * resources/locale/main_xx.properties in bundle classpath which lists application
