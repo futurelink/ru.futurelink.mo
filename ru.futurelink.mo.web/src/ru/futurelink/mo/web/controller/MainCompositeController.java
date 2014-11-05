@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.controller;
 
 import org.eclipse.swt.SWT;
@@ -8,7 +19,7 @@ import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.web.composites.CommonComposite;
 
 /**
- * Контроллер главного фрейма для отображения всех данных программы.
+ * Main application window controller.
  * 
  * @author Futurelink
  * @since 1.2
@@ -17,8 +28,6 @@ import ru.futurelink.mo.web.composites.CommonComposite;
 public class MainCompositeController extends CompositeController {
 	
 	/**
-	 * Стандартный конструктор для работы в режиме субконтроллера.
-	 * 
 	 * @param parentController
 	 * @param dataClass
 	 * @param container

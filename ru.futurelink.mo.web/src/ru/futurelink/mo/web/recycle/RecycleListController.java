@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.recycle;
 
 import java.util.List;
@@ -42,7 +53,7 @@ public class RecycleListController extends SimpleListController {
 		
 		// Выполняем именованый запрос всех затратных документов нашего пользователя
 		logger().debug("Запрос данных корзины...");
-		TypedQuery<?> q2 = mSession.persistent().getPersistent().getEm().createQuery(
+		TypedQuery<?> q2 = mSession.persistent().getPersistentManager().getEm().createQuery(
 				"SELECT d FROM "+getDataClass().getSimpleName()+" d " +
 				"where d.mCreator = :creator and d.mDeleteFlag = 1 and d.mOutdated in (0, null) order by d.mId desc", 
 				getDataClass());

@@ -1,6 +1,14 @@
-/**
- * 
- */
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.composites.fields.linked;
 
 import java.util.ArrayList;
@@ -119,7 +127,7 @@ public class LinkedListController extends CompositeController {
 		
 		// Задача - выбрать все места, точки которых находятся ближе всего к заданной,
 		// отсортированными по расстоянию до заданной точки. Если точек нет - они в конце выборки.
-		TypedQuery<String> q = getSession().persistent().getPersistent().getEm().createQuery(
+		TypedQuery<String> q = getSession().persistent().getPersistentManager().getEm().createQuery(
 				"select DISTINCT p.mPlace.mTitle "
 				+ "from CommonGeoPoint p where p.mPlace.mTitle like :text and "
 				+ "p.mAbsoluteLongtitude > :absLon1 and p.mAbsoluteLongtitude < :absLon2 and "

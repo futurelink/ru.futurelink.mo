@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.app;
 
 import java.io.UnsupportedEncodingException;
@@ -132,8 +143,8 @@ abstract public class ApplicationController extends CompositeController {
 
 		uninitNavigation();
 
-		// Если есть привязанная кнопка фидбэка, надо
-		// ее убрать и очистить контроллер.
+		// If this application has a feedback button
+		// remove it and clear controller.
 		if (mFeedbackButtonController != null) {
 			mFeedbackButtonController.uninit();
 			mFeedbackButtonController = null;
@@ -141,9 +152,8 @@ abstract public class ApplicationController extends CompositeController {
 	}
 	
     /** 
-     * Тут смотрим, если у нас зарегистирован юзкейс обратной связи, то
-     * надо вызвать у него execute('feedbackButton'), чтобы создать кнопку
-     * обратной связи.
+     * Look if feedback usecase is registered, and then call execute('feedbackButton')
+     * to activate feedback button action.
      */
 	private void startFeedback() {
 		UseCaseRegister register = (UseCaseRegister) mBundleContext.getService(
@@ -166,7 +176,7 @@ abstract public class ApplicationController extends CompositeController {
 					public void feedbackButtonClicked() {
 						logger().debug("Application feedback button clicked!");
 						if (getSession().getMobileMode()) {
-							handleRunUsecase("ru.futurelink.mo.web.feedback");
+							handleRunUsecase("ru.futurelink.mo.web.feedback", true);
 						} else {
 							CommonDialog dlg = new CommonDialog(getSession(), mShell , SWT.BORDER);
 							dlg.setText("Feedback");

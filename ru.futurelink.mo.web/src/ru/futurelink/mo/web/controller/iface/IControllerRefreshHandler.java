@@ -9,17 +9,12 @@
  *    Pavlov Denis - initial API and implementation
  ******************************************************************************/
 
-package ru.futurelink.mo.web.composites.fields.linked;
-
-import ru.futurelink.mo.web.controller.CommonControllerListener;
+package ru.futurelink.mo.web.controller.iface;
 
 /**
  * @author pavlov
  *
  */
-public interface LinkedListControllerListener extends CommonControllerListener {
-	public void autoCompleteSelected(String selectionText);
-	public void autoCompleteEntered();
-	public void selectNext();
-	public void selectPrev();
+public interface IControllerRefreshHandler {
+	public String	getRefreshBySenderFilters();
 }

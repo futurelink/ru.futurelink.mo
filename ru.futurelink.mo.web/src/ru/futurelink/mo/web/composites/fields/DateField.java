@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.composites.fields;
 
 import java.util.Calendar;
@@ -60,9 +71,9 @@ public class DateField extends CommonField {
 	}
 	
 	public void setDate(Date date) throws DTOException {
-		if (date != null) {
-			Calendar c = Calendar.getInstance(mParent.getSession().getUser().getTimeZone());
-			c.setTime(date);
+		if (date != null) {			
+			Calendar c = Calendar.getInstance();	// In server time
+			c.setTime(date);			
 			((DateTime)mControl).setDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
 		}
 		if (getControllerListener() != null)

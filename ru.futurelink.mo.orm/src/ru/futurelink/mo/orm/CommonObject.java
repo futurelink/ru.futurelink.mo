@@ -1,8 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.orm;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 import javax.persistence.*;
 
@@ -193,7 +203,7 @@ public class CommonObject extends ModelObject {
 		if (mPersistentManagerSession == null) { throw new SaveException("No persistent manager on CommonObject!", null); }
 		
 		// Дата создания и модификации - во временной зоне GMT.
-		if (mCreateDate == null) setCreateDate(Calendar.getInstance(TimeZone.getTimeZone("GMT")).getTime());
+		if (mCreateDate == null) setCreateDate(Calendar.getInstance().getTime());
 		if (getCreator() == null) setCreator(mPersistentManagerSession.getAccessUser());
 		if (getAuthor() == null) setAuthor(mPersistentManagerSession.getUser());
 		if (getCode() == null) { 
@@ -203,8 +213,8 @@ public class CommonObject extends ModelObject {
 		}
 		
 		// Дата изменения тоже во временной зоне GMT.
-		mModifyDate = Calendar.getInstance(TimeZone.getTimeZone("GMT")).getTime();
-		
+		mModifyDate = Calendar.getInstance().getTime();
+
 		Object result;
 		try {
 			 result = mPersistentManagerSession.save(this);
@@ -214,13 +224,20 @@ public class CommonObject extends ModelObject {
 		
 		return result;
 	}
+
+	@Override
+	public void saveCommit() throws SaveException {
+		if (mPersistentManagerSession.transactionIsOpened()) {
+			mPersistentManagerSession.transactionCommit();
+		}
+	}
 	
 	public void refresh() {
-		mPersistentManagerSession.getPersistent().getEm().refresh(this);
+		mPersistentManagerSession.getPersistentManager().getEm().refresh(this);
 	}
 	
 	public Logger logger() {
-		return mPersistentManagerSession.getPersistent().logger();
+		return mPersistentManagerSession.getPersistentManager().logger();
 	}
 	
 	/**
@@ -241,7 +258,7 @@ public class CommonObject extends ModelObject {
 	 * @throws LockException 
 	 */
 	public		Object edit() throws LockException {
-		UserLock.acquireLock(mPersistentManagerSession.getPersistent(), getClass().getSimpleName(), getId());
+		UserLock.acquireLock(mPersistentManagerSession.getPersistentManager(), getClass().getSimpleName(), getId());
 		mEditFlag = true;		
 		return null;
 	}
@@ -251,7 +268,7 @@ public class CommonObject extends ModelObject {
 	 * @throws LockException 
 	 */
 	public		void close() throws LockException {		
-		UserLock.releaseLock(mPersistentManagerSession.getPersistent(), getClass().getSimpleName(), getId());
+		UserLock.releaseLock(mPersistentManagerSession.getPersistentManager(), getClass().getSimpleName(), getId());
 		mUnmodifiedObject = null;
 		mEditFlag = false;
 	}
@@ -273,13 +290,12 @@ public class CommonObject extends ModelObject {
 	 * @param dataItem
 	 */
 	public void forceUpdateField(String field, CommonObject dataItem) {
-		Query q = mPersistentManagerSession.getPersistent().getEm().createQuery("update "+getClass().getSimpleName()+" set "+field+" = :param where mId = :id");
+		Query q = mPersistentManagerSession.getPersistentManager().getEm().createQuery(
+			"update "+getClass().getSimpleName()+" set "+field+" = :param where mId = :id"
+		);
 		q.setParameter("param", dataItem);
-		q.setParameter("id", getId());
-		
-		mPersistentManagerSession.getPersistent().getEm().getTransaction().begin();
+		q.setParameter("id", getId());	
 		q.executeUpdate();
-		mPersistentManagerSession.getPersistent().getEm().getTransaction().commit();
 	}
 	
 	/**

@@ -1,6 +1,14 @@
-/**
- * 
- */
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.composites.dialogs;
 
 import org.eclipse.swt.SWT;
@@ -55,6 +63,11 @@ public class CommonItemDialog {
 	
 	public Object open(CommonDTO data) {
 		mController = mListController.createItemController(mListController, mDialog.getShell(), new CompositeParams());
+		if (mController == null) {
+			return -1;
+		}
+		
+		mController.setEditMode(CommonItemController.EditMode.DIALOG);
 		
 		try {
 			mController.init();
@@ -69,7 +82,7 @@ public class CommonItemDialog {
 			return -1;
 		}
 
-		// Установим тайтл диалогового окна
+		// Set dialog window title
 		if (mItemDialogTitle != null)
 			mDialog.setText(mController.getComposite().getLocaleString(mItemDialogTitle));
 		
@@ -81,45 +94,55 @@ public class CommonItemDialog {
 		}
 
 		if (data == null) {
-			// Создание нового элемента
+			// Create new data item
 			try {
 				mController.create();
 			} catch (DTOException ex) {
-				mController.handleError("Ошибка создания нового элемента.", ex);
+				mController.handleError("Error creating data item.", ex);
 				mDialog = null;
 				mController.uninit();
 				return 0;
 			}
 		} else {
-			// Открыть на редактирование существующий элемент
+			// Open and edit existing data
+			boolean err = false;
 			try {
 				String id = data.getDataField("id", "getId", "setId").toString();
-				mController.getSession().logger().debug("Открытие окна редакитрования для элмента с ID: {}", id);
+				if (id == null) {
+					mController.handleError("ID is null. It's impossible but real.", null);
+					err = true;
+				} 
+				mController.getSession().logger().debug("Opening edit dialog for ID: {}", id);
 				mController.openById(id);
 			} catch (NumberFormatException ex) {
-				mController.handleError("Неверный формат ID.", ex);
-				mDialog = null;
-				mController.uninit();
-				return 0;
+				mController.handleError("ID invalid format exception.", ex);
+				err = true;
 			} catch (OpenException ex) {
-				mController.handleError("Ошибка открытия элемента.", ex);
-				mDialog = null;
-				mController.uninit();
-				return 0;
+				mController.handleError("Data element open error.", ex);
+				err = true;
 			} catch (DTOException ex) {
-				mController.handleError("Ошибка доступа в DTO.", ex);
+				mController.handleError("DTO access exception.", ex);
+				err = true;
+			}
+		
+			// If there was an error, don't open dialog and return
+			if (err) {
 				mDialog = null;
 				mController.uninit();
 				return 0;
 			}
 		}
-		
+				
 		mDialog.open();
 
-		// Чистим контроллер того окна, которое было создано
+		// Clear and uninit controller
 		mController.uninit();
 		
 		return mDialog.getResult();
+	}
+	
+	public CommonItemController getConntoller() {
+		return mController;
 	}
 
 }

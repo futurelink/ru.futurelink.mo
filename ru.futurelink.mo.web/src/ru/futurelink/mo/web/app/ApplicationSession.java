@@ -1,7 +1,20 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.app;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -10,13 +23,14 @@ import org.eclipse.rap.rwt.RWT;
 
 import ru.futurelink.mo.orm.PersistentManager;
 import ru.futurelink.mo.orm.PersistentManagerSession;
+import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.mongodb.MongoDBProvider;
 import ru.futurelink.mo.orm.mongodb.objects.LoginEventObject;
 import ru.futurelink.mo.orm.mongodb.objects.UserParams;
 import ru.futurelink.mo.orm.security.User;
 
 /**
- * HttpSession wrapper for MO application sessions.
+ * HttpSession wrapper for MO user application sessions.
  * 
  * @author pavlov
  *
@@ -45,10 +59,11 @@ final public class ApplicationSession {
 		RWT.getUISession().getHttpSession().setMaxInactiveInterval(8640000);
 
 		// Создаем подключение к MongoDB, база "fluvio"
+        // TODO Remove mongoDB direct connection
 		mMongoDB = new MongoDBProvider("fluvio");
 		
 		/*
-		 * Восстанавливаем данные из сессии в объект.
+		 * Get logged in user object from HTTP session.
 		 */
 		if (RWT.getUISession().getHttpSession().getAttribute("user") != null) {
 			// Если у нас есть пользователь, залогиненый в сессии, его
@@ -59,6 +74,7 @@ final public class ApplicationSession {
 				mLogin = (String) RWT.getUISession().getHttpSession().getAttribute("login");
 		}
 
+        // Create logger available with logger() method.
 		mLogger = LoggerFactory.getLogger(ApplicationSession.class);
 		
 		logger().debug("User locale is {}", RWT.getLocale().toString());
@@ -66,7 +82,16 @@ final public class ApplicationSession {
 			mLocale = RWT.getLocale(); 
 	}
 
-	final public void login(User user, String login) {
+    /**
+     * Log in as user with specified login.
+     *
+     * TODO Refactor it. Don't know whether login is needed here.
+     *
+     * @param user
+     * @param login
+     * @throws SaveException
+     */
+	final public void login(User user, String login) throws SaveException {
 		mLogin = login;
 		mPersistentSession.setUser(user);
 
@@ -79,6 +104,7 @@ final public class ApplicationSession {
 		leo.setLogin(mLogin);
 		leo.setTime(c.getTime());
 		leo.save();
+        leo.saveCommit();
 
 		logger().debug("User {} began session", mLogin);		
 	}
@@ -117,12 +143,22 @@ final public class ApplicationSession {
 		return (User) RWT.getUISession().getHttpSession().getAttribute("user");
 	}
 
+    /**
+     * Set access user for common access to database.
+     *
+     * @param user
+     */
 	final public void setDatabaseUser(User user) {
 		mDatabaseUser = user;
 		mPersistentSession.setAccessUser(user);
 		logger().debug("Application access user set to: "+user.getUserName());
 	}
-	
+
+    /**
+     * Get user which has common access to database.
+     *
+     * @return
+     */
 	final public User getDatabaseUser() {
 		if (mDatabaseUser != null) {
 			return mDatabaseUser;
@@ -153,6 +189,13 @@ final public class ApplicationSession {
 		return mPersistentSession;
 	}
 
+    /**
+     * Get mongoDb provider.
+     *
+     * TODO refactor it - remove direct mongodb access.
+     *
+     * @return
+     */
 	final public MongoDBProvider mongo() {
 		return mMongoDB;
 	}
@@ -227,10 +270,9 @@ final public class ApplicationSession {
 	}
 	
 	/**
-	 * Получить параметры пользователя. Или пользовательские параметры - кому как больше нравится.
-	 * Суть в том, что это пользователь может менят какие-то параметры интерфейса, а они будут
-	 * сохраняться в сессии, а потом и в профиле пользователя. 
-	 * 
+     * Get user parameters. When user changes some UI properties or values they can be stored
+     * in user parameters structure in user session and profile and then loaded when they are needed.
+     *
 	 * @return
 	 */
 	public UserParams getUserParams(String usecaseName, String paramName) {		
@@ -245,9 +287,28 @@ final public class ApplicationSession {
 		
 		return paramsQuery;
 	}
-	
-	public void setUserParams(UserParams params) {
+
+    /**
+     * Save user parameters.
+     *
+     * @param params
+     * @throws SaveException
+     */
+	public void setUserParams(UserParams params) throws SaveException {
 		params.save();
 	}
 
+    /**
+     * Translate given date and time into user's time zone.
+     *
+     * @param dateTime
+     * @return
+     */
+	public Date userTime(Date dateTime) {
+		Calendar c = Calendar.getInstance();	// In server time
+		c.setTimeInMillis(dateTime.getTime() - TimeZone.getDefault().getRawOffset()
+				+ getUser().getTimeZone().getRawOffset());
+		
+		return c.getTime();
+	}
 }

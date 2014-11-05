@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.orm.security;
 
 import java.util.TimeZone;
@@ -85,7 +96,7 @@ public class User extends CommonObject {
 	}
 	
 	public String getGrantedUsersCount() {
-		Query q = getPersistenceManagerSession().getPersistent().getEm().createQuery("select count(d) from Access d where d.mCreator = :creator and d.mDeleteFlag = 0");
+		Query q = getPersistenceManagerSession().getPersistentManager().getEm().createQuery("select count(d) from Access d where d.mCreator = :creator and d.mDeleteFlag = 0");
 		q.setParameter("creator", this);
 		if (q.getResultList().size() > 0) {
 			logger().debug("Количество: {}", q.getSingleResult());
@@ -96,7 +107,7 @@ public class User extends CommonObject {
 	}
 
 	public User getSystemUser() {
-		TypedQuery<User> q = getPersistenceManagerSession().getPersistent().getEm().createNamedQuery("User.findUserByLogin", User.class);
+		TypedQuery<User> q = getPersistenceManagerSession().getPersistentManager().getEm().createNamedQuery("User.findUserByLogin", User.class);
 		q.setParameter("login", "futurelink.vl@gmail.com");
 		if (q.getResultList().size() > 0) {
 			return q.getSingleResult();

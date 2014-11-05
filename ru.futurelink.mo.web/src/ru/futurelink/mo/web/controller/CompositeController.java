@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.controller;
 
 import java.lang.reflect.Constructor;
@@ -26,6 +37,7 @@ import ru.futurelink.mo.web.composites.fields.datapicker.CommonDataPickerControl
 import ru.futurelink.mo.web.composites.fields.datapicker.DataPicker;
 import ru.futurelink.mo.web.composites.fields.datapicker.SimpleDataPickerController;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
+import ru.futurelink.mo.web.controller.iface.IControllerRefreshHandler;
 import ru.futurelink.mo.web.exceptions.CreationException;
 import ru.futurelink.mo.web.exceptions.InitException;
 import ru.futurelink.mo.web.register.UseCaseInfo;
@@ -264,6 +276,7 @@ public abstract class CompositeController
 	 * 
 	 * @return объект родительского CompositeController
 	 */
+	@Override
 	public final ICompositeController getParentController() {
 		return mParentController;
 	}
@@ -508,10 +521,13 @@ public abstract class CompositeController
 	 * @return
 	 */
 	public CompositeController handleRunUsecase(String usecaseBundle, 
-			Map<String, Object> usecaseParams) {
+			Map<String, Object> usecaseParams, boolean clearBeforeRun) {
 		CompositeParams params = new CompositeParams();
 		params.add("usecaseParams", usecaseParams);
 		
+		if (clearBeforeRun)
+			clear();
+
 		logger().info("Usecase {} starting with params {}", usecaseBundle, usecaseParams);
 
 		CompositeController c = getUsecaseController(
@@ -546,8 +562,8 @@ public abstract class CompositeController
 	 * @param usecaseBundle
 	 * @return
 	 */
-	public CompositeController handleRunUsecase(String usecaseBundle) {
-		return handleRunUsecase(usecaseBundle, (Map<String,Object>)null);
+	public CompositeController handleRunUsecase(String usecaseBundle, boolean clearBeforeRun) {
+		return handleRunUsecase(usecaseBundle, (Map<String,Object>)null, clearBeforeRun);
 	}
 
 	/**
@@ -823,5 +839,26 @@ public abstract class CompositeController
 	
 	@Override
 	public void processUsecaseParams() {}
+	
+	@Override
+	public void refreshBySender(String sender, boolean refreshSubcontrollers) throws Exception {
+		// If this controller is filtered refreshable and refresh filter is valid,
+		// refresh it.
+		if (IControllerRefreshHandler.class.isAssignableFrom(getClass())) {
+			if (((IControllerRefreshHandler)this).getRefreshBySenderFilters().equals(sender)) {
+				refresh(false);
+			}
+		}
+		
+		// Propagate executuion on subcontrollers if needed
+		if (refreshSubcontrollers) {
+			logger().info("Refreshing subcontrollers by sender...");
+			for (int i = 0; i < getSubControllerCount(); i++) {
+				if (CompositeController.class.isAssignableFrom(getSubController(i).getClass()))
+					((CompositeController)getSubController(i)).
+						refreshBySender(sender, refreshSubcontrollers);
+			}
+		}
+	}
 }
 
