@@ -93,9 +93,7 @@ abstract public class CommonListComposite
 			// Если у нас обработчик контроллера не кастуется в обработчик контроллера списка,
 			// то надо обработать это и вывалить эксепшн.
 			if (!(ListDTOAccessor.class.isAssignableFrom(getControllerListener().getClass()))) {
-				throw new DTOException("Неправильный обработчик списка на контроллере списка. "
-						+ "Обработчик контроллера должен унаследовать "
-						+ "ListDTOAccessor и метод getControllerDTO()", null);
+				throw new DTOException(getErrorString("invalidHandlerOnListController"), null);
 			}
 
 			if (((ListDTOAccessor)getControllerListener()).getControllerDTO() != null) {
@@ -117,7 +115,7 @@ abstract public class CommonListComposite
 		if (getParam("filter") != null)
 			return (FilterDTO)getParam("filter");
 		else
-			throw new DTOException("Нет объекта фильтра переданного из контроллера!", null);
+			throw new DTOException(getErrorString("noFilterObject"), null);
 	}
 
 	/**

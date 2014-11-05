@@ -82,7 +82,7 @@ public class SimpleListComposite extends CommonListComposite {
 	protected CommonComposite createWorkspace() throws CreationException {
 		mTableClass = (Class<?>) getParam("tableClass");
 		if (mTableClass == null) {
-			throw new CreationException("SimpleListComposite: no 'tableClass' in CompositeParams passed");
+			throw new CreationException(getErrorString("noTableClassInSimpleList"));
 		}
 
 		try {
@@ -128,7 +128,7 @@ public class SimpleListComposite extends CommonListComposite {
 				}
 			});
 		} catch (Exception ex) {
-			getControllerListener().sendError("SimpleListComposite: creation error", ex);
+			getControllerListener().sendError(getErrorString("creationErrorInSimpleList"), ex);
 		}		
 
 		return (CommonComposite)mTable;
@@ -156,7 +156,7 @@ public class SimpleListComposite extends CommonListComposite {
 						((CommonListControllerListener)getControllerListener()).delete();
 					}
 				} catch (DTOException | InitException ex) {
-					getControllerListener().sendError("DTO operation error", ex);
+					getControllerListener().sendError(getErrorString("dtoException"), ex);
 					return;
 				}
 			}

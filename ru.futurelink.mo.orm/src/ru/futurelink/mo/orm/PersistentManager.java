@@ -51,8 +51,6 @@ public class PersistentManager {
 	private String					mPersistenceUnitName;
 	private Dictionary<String, Object>	mProperties;
 	
-	// Делаем конструктор по умолчанию приватным,
-	// чтобы нельзя было вызвать его.
 	@SuppressWarnings("unused")
 	private PersistentManager() {}
 
@@ -105,7 +103,7 @@ public class PersistentManager {
     			}
     		}
 	    } catch (InvalidSyntaxException e) {
-	        throw new RuntimeException("Filter error", e);
+	        throw new RuntimeException("Services filtering syntax error", e);
 	    } catch (InterruptedException e) {
 			e.printStackTrace();
 		}

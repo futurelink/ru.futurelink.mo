@@ -13,7 +13,9 @@ package ru.futurelink.mo.web.register;
 
 import java.util.HashMap;
 
+import org.eclipse.rap.rwt.application.ApplicationConfiguration;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +27,15 @@ public class UseCaseRegister {
 	private Logger							mLogger;
 	private	 BundleContext					mMainBundleContext;
 	
-	public UseCaseRegister(BundleContext context) {
+	static private UseCaseRegister			Instance = new UseCaseRegister(
+		FrameworkUtil.getBundle(ApplicationConfiguration.class).getBundleContext()
+	);
+	
+	public static UseCaseRegister getInstance() {
+		return Instance;
+	}
+	
+	private UseCaseRegister(BundleContext context) {
 		mRegister = new HashMap<String, UseCaseInfo>();
 		mLogger = LoggerFactory.getLogger(this.getClass());
 		mMainBundleContext = context;

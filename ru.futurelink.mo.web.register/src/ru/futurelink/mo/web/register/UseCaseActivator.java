@@ -85,14 +85,14 @@ public class UseCaseActivator implements BundleActivator {
 		
 		@Override
 		public void run() {
-			// Ждем пока наш сервис регистрации не станет вновь доступным
+			// Wait while service is unavailable
 			do {
 				mUsecaseRegister = (UseCaseRegister) mServiceTracker.getService();
 				try { Thread.sleep(3000); } catch (InterruptedException ex) {}
 				mLogger.info("Usecase register is not available at moment, retrying in 3 secs...");
 			} while(mUsecaseRegister == null);
 
-	    	// Отправляем сообщения об активации всех юзкейсов этого бандла
+	    	// Register all usecases on this bundle
 	    	for (String mUsecaseName : mUsecaseList.keySet()) {
 	    		mLogger.info("Registering '{}' in UseCaseRegister...", mUsecaseName);
 	    		mUsecaseRegister.registerUsecase(mUsecaseList.get(mUsecaseName));
