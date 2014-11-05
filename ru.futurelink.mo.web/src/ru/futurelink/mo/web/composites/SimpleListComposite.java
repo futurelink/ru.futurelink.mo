@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.composites;
 
 import java.lang.reflect.Constructor;
@@ -23,13 +34,29 @@ import ru.futurelink.mo.web.exceptions.CreationException;
 import ru.futurelink.mo.web.exceptions.InitException;
 
 /**
- * <p>Упрощенный композит списка. Позволяет реализовать стандартный список путем
- * передачи параметров и простого конфигурирования. Позволяет создавать, править,
- * удалять элементы кнопками на тулбаре. По двойному клику в таблице - операция 
- * редактирования.</p>
- * 
- * <p>В compositeParams передается "tableClass" - класс реализации CommonTable.</p>
- *  
+ * <p><b>Simplified list composite.</b></p>
+ *
+ * <p>This class is provided for most common lists and operation on lists.
+ * SimpleListComposite is created by SimpleListController and configured by
+ * CompositeParams set on controller from which it's created.</p>
+ *
+ * <p>This list implementation handles by default:
+ * <ul>
+ *     <li>creation of items</li>
+ *     <li>edit of items (doubleclick on item or by toolbar button)</li>
+ *     <li>deletion of items</li>
+ * </ul>
+ * It also supports view filtering by FilterDTO.
+ * </p>
+ *
+ * <p>The only thing you need to implement it is an ICommonTable defining your table view
+ * (columns, style etc.) and visual component.</p>
+ *
+ * <p>CompositeParams parameter set which handled by SimpleListComposite:
+ * <ul>
+ *     <li><b>tableClass</b> is your ICommonTable implementation</li>
+ * </ul></p>
+ *
  * @author pavlov
  * @since 1.2
  *
@@ -55,7 +82,7 @@ public class SimpleListComposite extends CommonListComposite {
 	protected CommonComposite createWorkspace() throws CreationException {
 		mTableClass = (Class<?>) getParam("tableClass");
 		if (mTableClass == null) {
-			throw new CreationException("SimpleListComposite: не указан параметр tableClass в CompositeParams.");
+			throw new CreationException("SimpleListComposite: no 'tableClass' in CompositeParams passed");
 		}
 
 		try {
@@ -101,7 +128,7 @@ public class SimpleListComposite extends CommonListComposite {
 				}
 			});
 		} catch (Exception ex) {
-			getControllerListener().sendError("SimpleListComposite: Ошибка создания.", ex);
+			getControllerListener().sendError("SimpleListComposite: creation error", ex);
 		}		
 
 		return (CommonComposite)mTable;
@@ -129,7 +156,7 @@ public class SimpleListComposite extends CommonListComposite {
 						((CommonListControllerListener)getControllerListener()).delete();
 					}
 				} catch (DTOException | InitException ex) {
-					getControllerListener().sendError("Ошибка операции.", ex);
+					getControllerListener().sendError("DTO operation error", ex);
 					return;
 				}
 			}
