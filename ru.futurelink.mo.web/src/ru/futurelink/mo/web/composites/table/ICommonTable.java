@@ -1,6 +1,14 @@
-/**
- * 
- */
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.composites.table;
 
 import org.eclipse.jface.viewers.IContentProvider;
@@ -10,11 +18,24 @@ import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 
 /**
+ * Interface for all table implementation to use with this framework.
+ *
  * @author pavlov
  *
  */
 public interface ICommonTable {
+    /**
+     * Set input data set.
+     *
+     * @param data
+     */
 	public void setInput(CommonDTOList<? extends CommonDTO> data);
+
+    /**
+     * Get input data set.
+     *
+     * @return
+     */
 	public Object getInput();
 	
 	public void setContentProvider(IContentProvider provider);
@@ -29,13 +50,12 @@ public interface ICommonTable {
 	public void setLayoutData(Object gridData);
 	
 	/**
-	 * Refresh table contents, implement if needed.
+	 * Refresh table contents.
 	 */
 	public void refresh();
 	
 	/**
-	 * Создание колонок таблицы. Удобно использовать метод addColumn(..) для добавления
-	 * колонок.
+     * Inner method to create table columns. For JFace TableViewer it calls addColumn().
 	 */
 	public void createTableColumns();	
 }

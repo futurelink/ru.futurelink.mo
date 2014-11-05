@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.controller;
 
 import java.lang.reflect.Constructor;
@@ -26,17 +37,22 @@ import ru.futurelink.mo.web.controller.iface.IListEditController;
 import ru.futurelink.mo.web.exceptions.InitException;
 
 /**
- * Простой контроллер для композита SimpleListComposite. Он по-умолчанию использует
- * SimpleListComposite для отображения данных и его поведение определяется именно
- * этим композитом.
- * 
- * Нужно переопределить его, переопределить handleDataQuery для получения данных,
- * в методе doBeforeCreateComposite:
- * 
- * 		params().add("tableClass", ...); // Класс таблицы для отображения
- *		params().add("itemControllerClass", ...); // Класс контроллера для отображения элемента
- *		params().add("itemDialogTitle", ...); // Заголовок окна редактирования элемента
- * 
+ * <p>Simmplified list controller for SimpleListComposite. It's easy to configure and use.</p>
+ * <p>Subclass it and implement handleDataQuery() to retrieve data from data source and call
+ * handleDataQueryExecuted() after.</p>
+ *
+ * <p>CompositeParams parameter set which handled by SimpleListComposite:
+ * <ul>
+ *     <li><b>listComposite</b> custom list composite to use with this controller inherited from SimpleListComposite</li>
+ *     <li><b>itemEditMode</b> item edit mode (CONTAINER or DIALOG)</li>
+ *     <li><b>itemEditContainer</b> if mode is CONTAINER it may be specified to pack edit form into, if not specified
+ *         the main window workspace is used to pack item composite into</li>
+ *     <li><b>itemUsecase</b> if mode is CONTAINER it must be specified to run this item edit usecase</li>
+ *     <li><b>filter</b> filter DTO to apply to list view</li>
+ *     <li>b<b>itemControllerClass</b> is CommonItemController subclass for item handling</li>
+ *     <li>b<b>itemDialogTitle</b> is item dialog title</li>
+ * </ul></p>
+ *
  * @author pavlov
  * @since 1.2
  *
@@ -56,13 +72,13 @@ abstract public class SimpleListController
 	}
 	
 	/**
-	 * Handler for item double click event.<be/>
-	 * <br/>
-	 * This handler works with data item got by getActiveData(),
+	 * <p>Handler for item double click event.</p>
+	 *
+	 * <p>This handler works with data item got by getActiveData(),
 	 * note the @data parameter is not the same as getActiveData(),
 	 * the method can be overridden in child classes to work with other
 	 * data item then selected in list, but @data always contains selected
-	 * data item DTO. 
+	 * data item DTO.</p>
 	 * 
 	 * @param data
 	 */
@@ -75,7 +91,7 @@ abstract public class SimpleListController
 						// Re-read data into list
 						handleDataQuery();
 					} catch (DTOException ex) {
-						handleError("невозможно обновить список.", ex);
+						handleError("Unable to refresh list", ex);
 					}
 				}
 			} else {
@@ -91,27 +107,21 @@ abstract public class SimpleListController
 			tbl.addDragSupport(operations, transferTypes, listener);
 	}
 	
-	// Обработка создания новго элемента
 	@Override
 	public void handleCreate() {
 		if (params().get("itemEditMode") != CommonItemController.EditMode.CONTAINER) {
 			if (openEditDialog(null) != null) {	
-				// Обновить список, перечитать данные
 				try {
 					handleDataQuery();
 				} catch (DTOException ex) {
-					handleError("невозможно обновить список.", ex);
+					handleError("Can not refresh list", ex);
 				}
 			}
 		} else {
-			// Запустить контроллер редактирования в главном контейнере, как
-			// юзкейс, а после закрытия этого контроллера запустить юзкейс,
-			// который был там раньше
 			openEdit(getParentController(), null);
 		}
 	}
 	
-	// Обработка удаления элемента
 	@Override
 	public void handleDelete() {
 		String id = "";
@@ -123,25 +133,24 @@ abstract public class SimpleListController
 				CommonObject obj = getSession().persistent().open(getDataClass(), id);
 				obj.delete();
 				obj.save();
-				logger().debug("Удален элемент ID: ", id);
+				logger().debug("Item deleted, ID=", id);
 			} catch (DTOException ex) {
-				handleError("Ошибка доступа DTO при удалении элемента.", ex);
+				handleError("DTO exception on delete item", ex);
 			} catch (OpenException ex) {
-				handleError("Ошибка открытия при удалении элемента.", ex);
+				handleError("Open exception on delete item", ex);
 			} catch (SaveException ex) {
-				handleError("Ошибка сохранения при удалении элемента.", ex);
+				handleError("Save exception on delete item", ex);
 			}
 
 			// Обновить список, перечитать данные
 			try {
 				handleDataQuery();
 			} catch (DTOException ex) {
-				handleError("невозможно обновить список.", ex);
+				handleError("Can not refresh list", ex);
 			}			
 		}
 	}
 
-	// Обработка редактирования элемента
 	@Override
 	public void handleEdit() {
 		handleItemDoubleClicked(getActiveData());
@@ -149,7 +158,7 @@ abstract public class SimpleListController
 
 	@Override
 	protected CommonComposite createComposite(CompositeParams compositeParams) {
-		// Добавлем в параметры объект FilterDTO
+		// Add FilterDTO object to composite params
 		params().add("filter", getFilter());
 		
 		@SuppressWarnings("unchecked")
@@ -178,21 +187,18 @@ abstract public class SimpleListController
 
 	@Override
 	protected void doAfterCreateComposite() {
-		// Зацепляем обработчик контроллера на композит
 		getComposite().addControllerListener(createControllerListener());
-		
-		// Запускаем создание колонок таблицы на композите
 		((SimpleListComposite)getComposite()).createTableColumns();
 		
 		try {
 			handleDataQuery();
 		} catch (DTOException ex) {
-			handleError("невозможно обновить список. "+ex.getMessage(), ex);
+			handleError("Can not refresh list: " + ex.getMessage(), ex);
 		}
 	}
 	
 	/**
-	 * Открывает окно редактирования выбранного элмента данных.
+	 * Opens item edit dialog and returns dialog result.
 	 * 
 	 * @param data
 	 * @return
@@ -304,14 +310,10 @@ abstract public class SimpleListController
 	}
 	
 	@Override
-	protected void doBeforeInit() throws InitException {
-		
-	}
+	protected void doBeforeInit() throws InitException {}
 	
 	@Override
-	protected void doAfterInit() throws InitException {
-
-	}
+	protected void doAfterInit() throws InitException {}
 	
 	@Override
 	public void handleDataQueryExecuted() throws DTOException {
@@ -326,14 +328,14 @@ abstract public class SimpleListController
 	public void processUsecaseParams() {}
 
 	/**
-	 * Метод обработки изменения размера колонки таблицы.
+	 * Column resize event handler.
 	 * 
 	 * @param column
 	 */
 	protected void onTableColumnResized(TableColumn column) {}
 	
 	/**
-	 * Метод обрабаотки создания колонки в таблице.
+	 * Column creation event handler.
 	 * 
 	 * @param column
 	 */

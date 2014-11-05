@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.composites;
 
 import org.eclipse.swt.SWT;
@@ -16,14 +27,16 @@ import ru.futurelink.mo.web.exceptions.CreationException;
 import ru.futurelink.mo.web.exceptions.InitException;
 
 /**
- * <p>Класс композита имеющий доступ к модели данных через CommonDTO. Этот вид композитов включает в
- * себя Layout, а также содержимое представленное рабочей областью и тулбаром. При этом положение
- * рабочей области и турбара определяется в методе createContents().</p>
- * 
- * <p>Создание рабочей области происходит в createWorkspace, а создание тулбара в createToolbar.
- * Также такой копозит содержит в себе caption.</p>
- * 
- * <p><i>Этот класс необходимо переопределить и реализвать абстрактные методы.</i></p>
+ * <p>This class is a first layer of composites that have an access to data model through CommonDTO
+ * objects.</p>
+ *
+ * <p>The composite contains pre-created layout with toolbar and workspace compsites. To complete
+ * UI creation two methods must be implemented: createToolbar() and createWorkspace().</p>
+ *
+ * <p>Toolbar can be placed on top of workspace (default) or below the workspace. This position
+ * can be switched passing parameter "toolbarPosition" to composite constructor via CompositeParams.</p>
+ *
+ * <p><i>This class is to be overridden and abstract methods are to be implemented.</i></p>
  * 
  * @author pavlov
  *
@@ -31,6 +44,8 @@ import ru.futurelink.mo.web.exceptions.InitException;
 public abstract class CommonDataComposite extends CommonComposite
 {
 	private static final long serialVersionUID = 1L;
+
+    enum        ToolBarPosition    { TOP, BOTTOM };
 
 	private		Label 				mCaptionLabel;
 	protected 	CommonToolbar 		mToolbar;
@@ -46,7 +61,6 @@ public abstract class CommonDataComposite extends CommonComposite
 	public void init() throws InitException {
 		super.init();
 
-		// В этом методе должен быть создан интерфейс композита.
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 1;
 		layout.marginWidth = 0;
@@ -54,8 +68,7 @@ public abstract class CommonDataComposite extends CommonComposite
 		layout.verticalSpacing = 8;
 		setLayout(layout);
 
-		// Создаем содержимое окна. Если не получилось -
-		// выбрасываем исключение и выходим.
+		// Create composite contents
 		try {			
 			createContents();
 		} catch(CreationException ex) {
@@ -81,7 +94,7 @@ public abstract class CommonDataComposite extends CommonComposite
 	}
 	
 	/**
-	 * Задает текст заголовка композита.
+	 * Sets composite caption label text.
 	 * 
 	 * @param caption
 	 */
@@ -93,7 +106,12 @@ public abstract class CommonDataComposite extends CommonComposite
 			setCaptionLabelVisible(false);
 		}
 	}
-	
+
+    /**
+     * Show or hide composite caption label.
+     *
+     * @param visible
+     */
 	final private void setCaptionLabelVisible(boolean visible) {
 		GridData gd = new GridData();
 		gd.grabExcessHorizontalSpace = true;
@@ -107,8 +125,7 @@ public abstract class CommonDataComposite extends CommonComposite
 	}
 	
 	/**
-	 * Метод создание заголовка композита. Нужно переопределить, чтобы создать
-	 * собственный заголовок или изменить стиль заголовка.
+	 * Creates composite caption label. Reimplement to create custom label or change its style.
 	 */
 	final protected void createCaptionLabel() {
 		GridData gd = new GridData();
@@ -137,15 +154,17 @@ public abstract class CommonDataComposite extends CommonComposite
 		setCaptionLabelVisible(false);
 	}
 
-	/**
-	 * Метод создает содержимое композита. По-умолчанию тулбар сверху рабочей области окна.
-	 * Метод переопределн в CommonDataItemComposite, чтобы тулбар был внизу и содержах кнопки,
-	 * характерные для элемента данных или диалогового окна.
-	 */
 	protected void createContents() throws CreationException {
 		//createCaptionLabel();
-		mToolbar = createToolbar();
-		mWorkspace = createWorkspace();
+
+        // Default toolbar location is on top of workspace
+        if (getParam("toolbarPosition") != ToolBarPosition.BOTTOM)
+            mToolbar = createToolbar();
+
+        mWorkspace = createWorkspace();
+
+        if (getParam("toolbarPosition") == ToolBarPosition.BOTTOM)
+            mToolbar = createToolbar();
 
 		// Если не получилось создать рабочее пространство
 		// отменяем создание всего.
@@ -158,7 +177,7 @@ public abstract class CommonDataComposite extends CommonComposite
 	}
 	
 	/**
-	 * Возвращает объект тулбара композита.
+	 * Get toolbar instance.
 	 * 
 	 * @return
 	 */
@@ -166,32 +185,47 @@ public abstract class CommonDataComposite extends CommonComposite
 		return mToolbar;
 	}
 
+    /**
+     * Get workspace instance.
+     *
+     * @return
+     */
 	public CommonComposite getWorkspace() {
 		return mWorkspace;
 	}
 	
 	/**
-	 * Запретить все кнопки на панели инструментов.
+	 * Disable whole toolbar by disabling all of its controls.
 	 */
 	public void disableToolbar() {
 		if (mToolbar != null)
 			mToolbar.setControlsEnabled(false);		
 	}
 
+    /**
+     * Enable or disable single toolbar tool by its name.
+     *
+     * @param toolName
+     * @param enabled
+     */
 	public void setToolEnabled(String toolName, boolean enabled) {
 		if (mToolbar != null)
 			mToolbar.setControlEnabled(toolName, enabled);
 	}
 	
 	/**
-	 * Создает основную область окна, переопределить в
-	 * дочерних классах.
+	 * Create composite workspace.
+     *
+     * <i>Implement it in subclasses.</i>
+     *
 	 * @throws CreationException 
 	 */
 	protected abstract CommonComposite createWorkspace() throws CreationException;
 	
 	/**
-	 * Создает тулбар окна, переопределить в дочерних классах. 
+	 * Creates composite toolbar.
+     *
+     * <i>Implement it in subclasses.</i>
 	 */
 	protected abstract CommonToolbar createToolbar();
 }

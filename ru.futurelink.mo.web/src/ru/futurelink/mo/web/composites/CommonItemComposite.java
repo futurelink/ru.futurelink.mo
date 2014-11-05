@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.composites;
 
 import org.eclipse.swt.widgets.Composite;
@@ -10,8 +21,7 @@ import ru.futurelink.mo.web.composites.toolbar.CommonToolbar;
 import ru.futurelink.mo.web.controller.CompositeParams;
 
 /**
- * Класс комопзита, имеюзий доступ к одному элементу через EditorDTO. Реализует все,
- * что доступно в родительском классе CommonDataComposite.
+ * Composite to work with single data item via EditorDTO.
  * 
  * @author pavlov
  *
@@ -30,7 +40,7 @@ public class CommonItemComposite extends CommonDataComposite {
 	public void refresh() throws DTOException {}
 	
 	/**
-	 * Привязать объект EditorDTO к композиту.
+	 * Link EditorDTO object to composite.
 	 * 
 	 * @param data
 	 */
@@ -41,7 +51,7 @@ public class CommonItemComposite extends CommonDataComposite {
 	}
 
 	/**
-	 * Отвязать и удалить объект DTO от композита.
+	 * Unlink and clear linked EditorDTO.
 	 */
 	public void removeDTO() {
 		if (mDTO != null)
@@ -50,25 +60,24 @@ public class CommonItemComposite extends CommonDataComposite {
 	}
 
 	/**
-	 * Чтобы получить для контроллера элемент данных правильного типа,
-	 * и не приводить его везде где можно, мы переопределяем
-	 * этот геттер.
+	 * Convinience method to make possible not to cast DTO to
+     * CommonDTO.
 	 */
 	public CommonDTO getDTO() {
 		return mDTO;
 	}
 
 	/**
-	 * Сделать доступной кнопку сохранения. Метод необходимо переопределить,
-	 * для конкретной реализации композита с кнопкой "Сохранить".
-	 * 
+     * Make "Save" button enabled or disable it. Needs to be reimplemented
+     * on composite with this button.
+     *
 	 * @param enabled
 	 */
 	public void setSaveEnabled(boolean enabled) {}
 	
 	/**
-	 * Сделать доступной кнопку отката изменений. Метод необходимо переопределить
-	 * для конкретной реализации композита с кнопкой "Очистить".
+     * Make "Revert" button enabled or disable it. Needs to be reimplemented
+     * on composite with this button.
 	 * 
 	 * @param enabled
 	 */
@@ -81,18 +90,30 @@ public class CommonItemComposite extends CommonDataComposite {
 		mToolbar = createToolbar();
 	}
 
+    /**
+     * Workspace creation method. Reimplement in subclasses, to workspace
+     * is created by default.
+     *
+     * @return
+     */
 	@Override
 	protected CommonComposite createWorkspace() {
 		return null;
 	}
 
+    /**
+     * Toolbar creation method. Reimplement in subclasses, no toolbar
+     * is created by default.
+     *
+     * @return
+     */
 	@Override
 	protected CommonToolbar createToolbar() {
 		return null;
 	}
 
 	/**
-	 * Проверить, заполнены ли обязательные поля?
+	 * Check if all mandatory fields are filled with values.
 	 * 
 	 * @return
 	 */
@@ -105,17 +126,14 @@ public class CommonItemComposite extends CommonDataComposite {
 	}
 	
 	/**
-	 * Установить список обязательных полей для формы.
-	 * Список устанавливается один раз при создании формы,
-	 * далее поле не может быть объявлено как необязательное. 
-	 * Пока так.
-	 * 
+	 * Set mandatory fields list for item form. This list
+     * is set once at form creation and then fields from this
+     * list cannot be declared as non-mandatory.
+     *
 	 * @param fields
 	 */
 	protected void setMandatoryFields(IField[] fields) {
-		// Если у нас есть какие-то поля, обявленные обязательными, надо
-		// их сделать необязательными, потом очистить список и дать новый список.
-		if (mMandatoryFields != null) {			
+		if (mMandatoryFields != null) {
 			for (IField field : mMandatoryFields) {
 				field.setMandatory(false);
 			}			

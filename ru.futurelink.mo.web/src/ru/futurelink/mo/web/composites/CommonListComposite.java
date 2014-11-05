@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2013-2014 Pavlov Denis
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Pavlov Denis - initial API and implementation
+ ******************************************************************************/
+
 package ru.futurelink.mo.web.composites;
 
 import org.eclipse.swt.widgets.Composite;
@@ -14,12 +25,11 @@ import ru.futurelink.mo.web.controller.iface.IListComposite;
 import ru.futurelink.mo.web.controller.iface.ListDTOAccessor;
 
 /**
- * Класс композита для работы со списочными данными, реализует все, что унаследовано от
- * родительского класса CommonDataComposite.
- * 
- * Объект этого класса имеет внутри ссылку на коллекцию CommonDTO объектов, которые используются
- * в нем для доступа к данным.
- * 
+ * <p>Composite to work with listed data sets.</p>
+ *
+ * <p>This composite has CommonDTOList object which contains a set of DTO objects, each of them is an
+ * item of the data list to deal with.</p>
+ *
  * @author pavlov
  * @param <T>
  *
@@ -36,12 +46,15 @@ abstract public class CommonListComposite
 	public CommonListComposite(ApplicationSession session,
 			Composite parent, int style, CompositeParams params) {
 		super(session, parent, style, params);
-		mDTO = new EditorDTOList<CommonDTO>(getSession().persistent(), new AllowOwnChecker(getSession().getUser()), CommonDTO.class);
+
+        // Create default editor DTO list with default access checker
+		mDTO = new EditorDTOList<CommonDTO>(getSession().persistent(),
+            new AllowOwnChecker(getSession().getUser()), CommonDTO.class
+        );
 	}
 
 	/**
-	 * Приаттачить список CommonDTO объектов для работы в списочном композите.
-	 * Лучше не вызывать из
+	 * Link CommonDTOList object to this composite.
 	 * 
 	 * @param data коллекция CommonDTO
 	 * @throws DTOException 
@@ -52,11 +65,10 @@ abstract public class CommonListComposite
 	}
 
 	/**
-	 * Удалить и отвязать модель (список CommonDTO) от списка.
+	 * Unlink and free CommonDTOList linked to composite.
 	 * @throws DTOException 
 	 */
 	protected void removeDTO() throws DTOException {
-		// Удаляем все DTO ссылки из элемента, а перед этим чистим DTO
 		if (mDTO != null) {		
 			mDTO = null;			
 			refresh();
@@ -64,12 +76,15 @@ abstract public class CommonListComposite
 	}
 	
 	/**
-	 * Получить приаттаченую коллекцию объектов CommonDTO, либо коллекцию объектов
-	 * DTO от контроллера через обработчик. При этом обработчик должен реализовывать
-	 * интерфейс ListDTOAccessor. Если обработчика нет, то будет возвращаться внутренняя
-	 * коллекция объектов.
-	 * 
-	 * @return - коллекция CommonDTO
+     * <p>Get DTO list:</p>
+     * <ul>
+     * <li>1) attached to list view if controller listener is not assigned</li>
+     * <li>2) attached to list controller if controller listener is assigned via its
+     *    getControllerDTO() method. Controller listener must implement ListDTOAccessor
+     *    interface.</li>
+     * </ul>
+     *
+	 * @return - CommonDTOList instance
 	 */
 	@Override
 	public CommonDTOList<? extends CommonDTO> getDTO() throws DTOException {
@@ -92,7 +107,7 @@ abstract public class CommonListComposite
 	}
 
 	/**
-	 * Получить объект фильтра.
+	 * Get FilterDTO object which desribes filter conditions to be applied to list view.
 	 * 
 	 * @return объект FilterDTO
 	 * @throws DTOException
@@ -106,9 +121,9 @@ abstract public class CommonListComposite
 	}
 
 	/**
-	 * Метод сохраняет в объекте указатель на выбранный элемент из коллекции списочных данных.
-	 * 
-	 * @param data элемент CommonDTO, желательно, чтобы он присутствовал данных модели
+	 * Set active (selected) item in list view.
+	 *
+	 * @param data element from CommonDTOList attached to list view
 	 */
 	@Override
 	public void setActiveData(CommonDTO data) {
@@ -116,9 +131,9 @@ abstract public class CommonListComposite
 	}
 
 	/**
-	 * Получить выбранный элемент из коллекции списочных данных.
+	 * Get active (selected) item from list view.
 	 * 
-	 * @return выбранный элемент из модели (коллекции CommonDTO), привязанной к списку
+	 * @return
 	 */
 	@Override
 	public CommonDTO getActiveData() {
