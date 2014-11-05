@@ -7,6 +7,8 @@ import ru.futurelink.mo.web.controller.CompositeController;
 
 /**
  * Application controller listener interface.
+ *
+ * This listener is to use with ApplicationController as controller listener.
  * 
  * @author pavlov
  *

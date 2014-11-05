@@ -7,6 +7,9 @@ import org.eclipse.swt.widgets.Composite;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.controller.CompositeParams;
 
+/**
+ * Fullscreen composite to use as main application window composite.
+ */
 public class FullscreenComposite extends CommonComposite {
 
 	private static final long serialVersionUID = 1L;

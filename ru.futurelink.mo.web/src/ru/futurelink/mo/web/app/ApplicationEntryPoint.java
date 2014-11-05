@@ -38,7 +38,7 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 	/**
 	 * Get application session.
 	 * 
-	 * @return
+	 * @return user application session
 	 */
 	public ApplicationSession getSession() {
 		return mSession;
@@ -69,20 +69,20 @@ abstract public class ApplicationEntryPoint implements EntryPoint {
 	}
 
 	/**
-	 * Из точки входа в приложение можно запустить юзкейс, но этот
-	 * юзкейс должен быть особенным, ему не должно требоваться работать с данными.
-	 * 
-	 * Юзкейс будет запущен как раз после того, как создастся окно приложения.
-	 * 
-	 * @param usecaseBundle
+	 * The special usecase can be executed from application entry point.
+     *
+     * This specified usecase is to run immediatly after appiation composite is
+     * created.
+	 *
+	 * @param usecaseBundle the name of usecase bundle from register
 	 */
 	public void runDeferredUsecase(String usecaseBundle) {
 		mDeferredUsecaseRun = usecaseBundle;
 	}
 
 	/**
-	 * Метод вызывается после создания интерфейса приложения.
-	 * При определении нужно явно вызвать его после создания главного окна в createUI().
+	 * This method is called after UI creation. If createUI() is reimplemented this method
+     * is to be called directly from it.
 	 */
 	protected void doAfterUICreation() {
 		// Запустить отложенный юзкейс

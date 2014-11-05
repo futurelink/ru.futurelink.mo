@@ -132,8 +132,8 @@ abstract public class ApplicationController extends CompositeController {
 
 		uninitNavigation();
 
-		// Если есть привязанная кнопка фидбэка, надо
-		// ее убрать и очистить контроллер.
+		// If this application has a feedback button
+		// remove it and clear controller.
 		if (mFeedbackButtonController != null) {
 			mFeedbackButtonController.uninit();
 			mFeedbackButtonController = null;
@@ -141,9 +141,8 @@ abstract public class ApplicationController extends CompositeController {
 	}
 	
     /** 
-     * Тут смотрим, если у нас зарегистирован юзкейс обратной связи, то
-     * надо вызвать у него execute('feedbackButton'), чтобы создать кнопку
-     * обратной связи.
+     * Look if feedback usecase is registered, and then call execute('feedbackButton')
+     * to activate feedback button action.
      */
 	private void startFeedback() {
 		UseCaseRegister register = (UseCaseRegister) mBundleContext.getService(

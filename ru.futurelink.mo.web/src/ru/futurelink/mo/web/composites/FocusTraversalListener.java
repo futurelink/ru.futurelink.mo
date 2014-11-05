@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Control;
  * @author pavlov
  *
  */
+@Deprecated
 public class FocusTraversalListener implements FocusListener {
 	private static final long serialVersionUID = 1L;
 
