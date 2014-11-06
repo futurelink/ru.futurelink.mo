@@ -72,13 +72,13 @@ public class CommonItemDialog {
 		try {
 			mController.init();
 		} catch (InitException ex1) {
-			mController.handleError("Ошибка инициализации контроллера.", ex1);
+			mController.handleError("Initialization exception", ex1);
 			return -1;
 		}
 		
 		if (mController.getComposite() == null) {			
 			mController.uninit();
-			mController.handleError("Композит для отображения в диалоговом окне не создан!", null);
+			mController.handleError("Composite is not created", null);
 			return -1;
 		}
 

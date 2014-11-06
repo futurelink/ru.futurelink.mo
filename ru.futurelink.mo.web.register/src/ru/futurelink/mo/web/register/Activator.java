@@ -18,8 +18,6 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.event.EventConstants;
-import org.osgi.service.event.EventHandler;
 
 /**
  * The activator class controls the plug-in life cycle!
@@ -27,13 +25,12 @@ import org.osgi.service.event.EventHandler;
  */
 @SuppressWarnings("rawtypes")
 public class Activator implements BundleActivator {
-	private ServiceRegistration mUsecaseRegistration;
+	private ServiceRegistration<?> mUsecaseRegistration;
+	private ServiceRegistration<?> mEntryPointRegistration;
 	private ServiceRegistration mEventHandlerRegistration;
 	
-	private ApplicationConfig config;
-
 	@Override
-	public void start(BundleContext context) {
+	public synchronized void start(BundleContext context) {
 		
 		/*
 		 *  Зарегистрируем сервис регистра юзкейсов.
@@ -41,34 +38,32 @@ public class Activator implements BundleActivator {
 		if (mUsecaseRegistration == null) {
 			mUsecaseRegistration = context.registerService(
 					UseCaseRegister.class.getName(), 
-					 new UseCaseRegister(context), 
-					 null
+					UseCaseRegister.getInstance(), 
+					null
 				);
+			Dictionary<String, Object> dic = new Hashtable<String, Object>();
+			dic.put("info", "Usecase registry service");
+			mUsecaseRegistration.setProperties(dic);			
 		}
 	
 		/*
 		 *  Зарегистрируем обработчик для подключений точек входа
 		 *  к основному бандлу.
 		 */		
-		config = new ApplicationConfig(context);
-		context.registerService(
-				EntryPointRegister.class.getName(),
-				new EntryPointRegister(config),
-				null
-			);
-
-		// Устаревщий регистратор
-		mEventHandlerRegistration = context.registerService(
-				EventHandler.class.getName(),
-		        new EntryPointActivationEventHandler(config),
-		        getHandlerServiceProperties("ru/futurelink/mo/web/entrypoint/Activator")
-			);
+		if (mEntryPointRegistration == null) {
+			mEntryPointRegistration = context.registerService(
+					EntryPointRegister.class.getName(),
+					EntryPointRegister.getInstance(),
+					null
+				);
+			Dictionary<String, Object> dic = new Hashtable<String, Object>();
+			dic.put("info", "EntryPoint registry service");
+			mEntryPointRegistration.setProperties(dic);
+		}
 	}
 
 	@Override
-	public void stop(BundleContext context) {
-		config = null;		
-		
+	public void stop(BundleContext context) {		
 		if (mEventHandlerRegistration != null)
 			mEventHandlerRegistration.unregister();
 
@@ -80,16 +75,28 @@ public class Activator implements BundleActivator {
 
 				// And remove UseCaseRegister service
 				context.ungetService(ref);
+				
+				ref = null;
 			}
 		} catch (IllegalStateException ex) {
 			
 		}
-	}
 
-	protected Dictionary<String, Object> getHandlerServiceProperties(String... topics) {
-		Dictionary<String, Object> result = new Hashtable<String, Object>();
-		result.put(EventConstants.EVENT_TOPIC, topics);
-		return result;
-	}
+		try {			
+			ServiceReference<EntryPointRegister> ref = context.getServiceReference(EntryPointRegister.class);
+			if (ref != null) {
+				// Stop applications
+				EntryPointRegister register = context.getService(ref);
+				register.stop();
 
+				// Remove EntryPointRegister service				
+				context.ungetService(ref);
+				
+				register = null;
+				ref = null;
+			}
+		} catch (IllegalStateException ex) {
+			
+		}	
+	}
 }

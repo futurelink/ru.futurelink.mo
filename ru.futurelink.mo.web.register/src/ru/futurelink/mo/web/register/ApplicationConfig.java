@@ -54,11 +54,11 @@ public class ApplicationConfig implements ApplicationConfiguration {
 		mLogger = LoggerFactory.getLogger(getClass());
 	}
 
-	public void setRegistration(ServiceRegistration reg) {
+	protected void setRegistration(ServiceRegistration reg) {
 		mRegistration = reg;
 	}
 
-	public ServiceRegistration getRegistration() {
+	protected ServiceRegistration getRegistration() {
 		return mRegistration;
 	}
 
@@ -81,13 +81,19 @@ public class ApplicationConfig implements ApplicationConfiguration {
 		info.favicon = favicon;
 		info.factory = factory;
 		
-		// Удалим точку, чтобы неповторялись. 
-		// Не может быть больше одной на одном URL.
 		removeEntryPoint(url);		
 		
 		mEntryPoints.add(info);
 	}
 
+	/**
+	 * Add new entry point with specified URL into registry.
+	 * 
+	 * @param title
+	 * @param url
+	 * @param favicon
+	 * @param factory
+	 */
 	public synchronized void addEntryPoint(String title, String url, InputStream favicon,
 			EntryPointFactory factory) {		
 		EntryPointInfo info  = new EntryPointInfo();
@@ -102,15 +108,20 @@ public class ApplicationConfig implements ApplicationConfiguration {
 	}
 
 	/**
-	 * Удалить точку входа из реестра.
+	 * Remove entry point from registry.
+	 * 
 	 * @param url
 	 */	
 	public synchronized void removeEntryPoint(String url) {
-		for (EntryPointInfo info : mEntryPoints) {
-			if (info.url.equals(url)) mEntryPoints.remove(info);
+		for (int i = 0; i < mEntryPoints.size(); i++) {
+			if (mEntryPoints.get(i).url.equals(url)) mEntryPoints.remove(i);
 		}
-	};
+	}
 
+	public synchronized void removeAllEntryPoints() {
+		mEntryPoints.clear();
+	}
+	
 	/**
 	 * Приложение будет полностью переконфигурировано на основе
 	 * данных о точках входа в прилоежние.
@@ -171,11 +182,11 @@ public class ApplicationConfig implements ApplicationConfiguration {
 				mLogger.warn("Невозможно загрузить favicon, по всей видимости он не доступен из classpath бандла ru.futurelin.mo.web.register");
 			}
 
-			// Зарегистрируем точку входа
+			// Register entry point from configuration into application
 			properties.put( WebClient.PAGE_TITLE, info.title );
 			application.addEntryPoint(info.url, 
 					info.factory, 
-					properties);
+					properties);			
 		}
 	}  
 

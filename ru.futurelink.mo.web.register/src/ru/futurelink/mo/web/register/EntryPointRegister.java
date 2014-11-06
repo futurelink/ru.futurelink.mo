@@ -36,8 +36,18 @@ public class EntryPointRegister {
 	private BundleContext			mContext;
 	private ApplicationConfig 		mApplicationConfig;
 	private String					mApplicationContext;
-
-	protected EntryPointRegister(ApplicationConfig applicationConfig) {
+	
+	private static EntryPointRegister Instance = new EntryPointRegister(
+		new ApplicationConfig(
+			FrameworkUtil.getBundle(ApplicationConfiguration.class).getBundleContext()
+		)
+	); 
+	
+	public static EntryPointRegister getInstance() {
+		return Instance;
+	}
+	
+	private EntryPointRegister(ApplicationConfig applicationConfig) {
 		mApplicationConfig = applicationConfig;	
 		mApplicationContext = "";
 	}
@@ -47,14 +57,20 @@ public class EntryPointRegister {
 		unregisterAppConfig();
 		registerAppConfig();
 		
-		mLogService.log(LogService.LOG_INFO, "Контекст приложения изменился на "+mApplicationContext , null);
+		mLogService.log(LogService.LOG_INFO, "Application context changed to '"+mApplicationContext+"'" , null);
+	}
+
+	public void stop() {
+		preInit();
+		unregisterAppConfig();
+		mApplicationConfig.removeAllEntryPoints();
 	}
 
 	private void preInit() {
 		mContext = FrameworkUtil.getBundle(ApplicationConfiguration.class).getBundleContext();
 		
 		/*
-		 * Получаем доступ к сервису логирования
+		 * Get logging service instance
 		 */
 		mLogService = (LogService) mContext.getService(
 				mContext.getServiceReference(LogService.class.getName())
@@ -64,12 +80,12 @@ public class EntryPointRegister {
 	private void unregisterAppConfig() {
 		if ((mApplicationConfig != null) && (mApplicationConfig.getRegistration() != null)) {
 			mApplicationConfig.getRegistration().unregister();
-			mLogService.log(LogService.LOG_INFO, "Сервис приложения остановлен", null);
+			mLogService.log(LogService.LOG_INFO, "RWT application service stopped", null);
 		}			
 	}
 
 	private void registerAppConfig() {
-		// Регистрируем приложение обратно
+		// Register application service back again
 		Dictionary<String, Object> props = new Hashtable<String, Object>();
 		if ((mApplicationContext != null) && !("".equals(mApplicationContext))) {
 			props.put("contextName", mApplicationContext);
@@ -82,11 +98,11 @@ public class EntryPointRegister {
 					)
 			);
 		
-		mLogService.log(LogService.LOG_INFO, "Сервис приложения запущен", null);
+		mLogService.log(LogService.LOG_INFO, "RWT application service started", null);
 	}
 	
 	/**
-	 * Зарегистрировать точку входа в приложение в конфигурации.
+	 * Register application entry point in configuration.
 	 * 
 	 * @param title
 	 * @param url
@@ -105,7 +121,8 @@ public class EntryPointRegister {
 	}
 	
 	/**
-	 * Удалить точку входа в приложение из конфигурации. 
+	 * Remove application entry point from configuration. 
+	 * 
 	 * @param url
 	 */
 	public void removeEntryPoint(String url) {
