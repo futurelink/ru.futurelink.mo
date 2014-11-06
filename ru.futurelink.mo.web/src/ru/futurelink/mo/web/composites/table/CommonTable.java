@@ -33,7 +33,7 @@ import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
-import ru.futurelink.mo.orm.mongodb.objects.UserParams;
+import ru.futurelink.mo.orm.security.IUserParams;
 
 /**
  * Класс CommonTable является оберткой над JFace TableViewer. Снабженный только теми методами,
@@ -55,9 +55,7 @@ public abstract class CommonTable
 	private 	CommonDTOList<? extends CommonDTO>	mData;
 
 	private		CommonTableListener 					mListener;
-
-	// Пользовтельские параметры таблицы
-	private		UserParams								mUserParams;
+	private		IUserParams								mUserParams;
 
 	public CommonTable(ApplicationSession session, Composite parent, int style, CompositeParams params) {
 		super(session, parent, style, params);

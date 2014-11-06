@@ -6,12 +6,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.futurelink.mo.demo.app.DemoApplicationEntryPointFactory;
+import ru.futurelink.mo.web.controller.CommonController;
 import ru.futurelink.mo.web.register.EntryPointRegister;
 
-class Activator implements BundleActivator {
+public class Activator implements BundleActivator {
 
+	private static String favicon = "/images/16/document_time.png";
+	
 	private Logger logger;
 	
+	public Activator() {}
+
 	@Override
 	public void start(BundleContext context) throws Exception {
 		logger = LoggerFactory.getLogger(getClass());
@@ -24,8 +29,7 @@ class Activator implements BundleActivator {
 			register.addEntryPoint(
 					"Demo application", 
 					"/demo", 
-					//CommonController.class.getResourceAsStream(favicon),
-					null,
+					CommonController.class.getResourceAsStream(favicon),
 					 new DemoApplicationEntryPointFactory(context)
 				);
 			
