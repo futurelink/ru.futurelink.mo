@@ -14,7 +14,7 @@ import ru.futurelink.mo.web.controller.MainCompositeController;
 
 public class DemoApplicationController extends ApplicationController {
 
-	private MainCompositeController			mMainCompositeController;
+	private MainCompositeController	 mainCompositeController;
 
 	public DemoApplicationController(ApplicationSession session, Shell shell) {
 		super(session, shell);
@@ -30,10 +30,10 @@ public class DemoApplicationController extends ApplicationController {
 	@Override
 	protected void doAfterCreateComposite() {
 		// Create workspace subcontroller after the composite was created
-		mMainCompositeController = new MainCompositeController(this, null, 
+		mainCompositeController = new MainCompositeController(this, null, 
 			((DemoApplicationWindow)getComposite()).getMainComposite(), null);
-		mMainCompositeController.setBundleContext(getBundleContext());
-		addSubController(mMainCompositeController);
+		mainCompositeController.setBundleContext(getBundleContext());
+		addSubController(mainCompositeController);
 	
 		super.doAfterCreateComposite();
 	}
@@ -72,7 +72,7 @@ public class DemoApplicationController extends ApplicationController {
 	public CompositeController handleRunUsecase(String usecaseBundle, boolean clearBeforeRun) {
 		// When the application controller gets run usecase method executed
 		// we redirect it to main composite controller so as it run use case itself
-		return mMainCompositeController.handleRunUsecase(usecaseBundle, clearBeforeRun);
+		return mainCompositeController.handleRunUsecase(usecaseBundle, clearBeforeRun);
 	}
 
 	public void handleTestEvent() {
