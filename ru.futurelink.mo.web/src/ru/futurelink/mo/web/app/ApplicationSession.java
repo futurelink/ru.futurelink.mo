@@ -24,9 +24,8 @@ import org.eclipse.rap.rwt.RWT;
 import ru.futurelink.mo.orm.PersistentManager;
 import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.exceptions.SaveException;
-import ru.futurelink.mo.orm.mongodb.MongoDBProvider;
-import ru.futurelink.mo.orm.mongodb.objects.LoginEventObject;
-import ru.futurelink.mo.orm.mongodb.objects.UserParams;
+import ru.futurelink.mo.orm.security.IUserParams;
+import ru.futurelink.mo.orm.security.IUserParamsAccessor;
 import ru.futurelink.mo.orm.security.User;
 
 /**
@@ -38,29 +37,32 @@ import ru.futurelink.mo.orm.security.User;
 final public class ApplicationSession {
 	private PersistentManagerSession 	mPersistentSession;
 
-	private MongoDBProvider		mMongoDB;
 	private String				mLogin = "";
 	private Locale				mLocale = null;
 	private User				mDatabaseUser;
 	private Logger				mLogger;
 	private BundleContext		mBundleContext;
 	private Boolean				mMobileMode = false;
+	private IUserParamsAccessor userParamsAccessor;
 
 	public ApplicationSession(BundleContext context) {
 		mBundleContext = context;
 		mLocale = new Locale("ru", "RU");
+		
+		// Get persistent manager service
 		PersistentManager persistent = (PersistentManager) mBundleContext.getService(
 				mBundleContext.getServiceReference(PersistentManager.class.getName())
+		);
+
+		// Get user params accessor service
+		userParamsAccessor = (IUserParamsAccessor) mBundleContext.getService(
+				mBundleContext.getServiceReference(IUserParamsAccessor.class.getName())
 		);
 
 		mPersistentSession = new PersistentManagerSession(persistent);
 
 		// Make session never ending
 		RWT.getUISession().getHttpSession().setMaxInactiveInterval(8640000);
-
-		// Создаем подключение к MongoDB, база "fluvio"
-        // TODO Remove mongoDB direct connection
-		mMongoDB = new MongoDBProvider("fluvio");
 		
 		/*
 		 * Get logged in user object from HTTP session.
@@ -98,13 +100,12 @@ final public class ApplicationSession {
 		RWT.getUISession().getHttpSession().setAttribute("login", mLogin);
 		RWT.getUISession().getHttpSession().setAttribute("user", user);
 
-		// Сохраняем данные о входе пользователя
-		Calendar c = Calendar.getInstance();		
+		/*Calendar c = Calendar.getInstance();		
 		LoginEventObject leo = new LoginEventObject(mMongoDB);
 		leo.setLogin(mLogin);
 		leo.setTime(c.getTime());
 		leo.save();
-        leo.saveCommit();
+        leo.saveCommit();*/
 
 		logger().debug("User {} began session", mLogin);		
 	}
@@ -196,9 +197,9 @@ final public class ApplicationSession {
      *
      * @return
      */
-	final public MongoDBProvider mongo() {
+	/*final public MongoDBProvider mongo() {
 		return mMongoDB;
-	}
+	}*/
 	
 	/**
 	 * Get if user is logged in.
@@ -275,17 +276,12 @@ final public class ApplicationSession {
      *
 	 * @return
 	 */
-	public UserParams getUserParams(String usecaseName, String paramName) {		
-		// Формируем запрос параметров
-		UserParams paramsQuery = new UserParams(mMongoDB);
-		paramsQuery.setUser(getUser().getId());
-		paramsQuery.setUsecaseName(usecaseName);
-		paramsQuery.setParamName(paramName);
-		
-		// Выполняем запрос параметров
-		paramsQuery.queryAndFill();
-		
-		return paramsQuery;
+	public IUserParams getUserParams(String usecaseName, String paramName) {
+		if (userParamsAccessor != null) {
+			return userParamsAccessor.getUserParams(getUser().getId(), usecaseName, paramName);
+		} else {
+			return null;
+		}
 	}
 
     /**
@@ -294,8 +290,10 @@ final public class ApplicationSession {
      * @param params
      * @throws SaveException
      */
-	public void setUserParams(UserParams params) throws SaveException {
-		params.save();
+	public void setUserParams(IUserParams params) throws SaveException {
+		if (userParamsAccessor != null) {
+			userParamsAccessor.saveUserParams(params);
+		}
 	}
 
     /**
