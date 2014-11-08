@@ -115,7 +115,7 @@ public class PersistentManager {
 		return mLogger;
 	}
 	
-	public synchronized EntityManager getEm() {
+	protected synchronized EntityManager getEm() {
 		if (mEm == null) {
 			mFactory = getEntityManagerFactory(mPersistenceUnitName);
 			mEm = mFactory.createEntityManager();
@@ -127,7 +127,7 @@ public class PersistentManager {
 			return mEm;
 	}
 
-	public synchronized EntityManager getOldEm() {
+	protected synchronized EntityManager getOldEm() {
 		if (mOldEm == null) {
 			mFactory = getEntityManagerFactory(mPersistenceUnitName);
 			mOldEm = mFactory.createEntityManager();
@@ -225,7 +225,7 @@ public class PersistentManager {
 	 * @return
 	 * @throws SaveException
 	 */
-	public Object saveWithHistory(HistoryObject object, String oldId, PersistentManagerSession session) 
+	protected Object saveWithHistory(HistoryObject object, String oldId, PersistentManagerSession session) 
 		throws SaveException, OpenException {
 		// Записать ссылку на следующий объект в предыдущий
 		// Записать ссылку на предыдущий объект в следующий
@@ -308,7 +308,7 @@ public class PersistentManager {
 	 * @param id
 	 * @return
 	 */
-	public <T extends CommonObject> T open(Class<T> cls, String id) throws OpenException {
+	protected <T extends CommonObject> T open(Class<T> cls, String id) throws OpenException {
 		T obj = getEm().find(cls, id);
 		if (obj == null) throw new OpenException(id, "Элемент не найден.", null);
 		

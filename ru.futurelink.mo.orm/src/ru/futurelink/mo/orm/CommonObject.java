@@ -258,7 +258,7 @@ public class CommonObject extends ModelObject {
 	 * @throws LockException 
 	 */
 	public		Object edit() throws LockException {
-		UserLock.acquireLock(mPersistentManagerSession.getPersistentManager(), getClass().getSimpleName(), getId());
+		UserLock.acquireLock(mPersistentManagerSession, getClass().getSimpleName(), getId());
 		mEditFlag = true;		
 		return null;
 	}
@@ -268,7 +268,7 @@ public class CommonObject extends ModelObject {
 	 * @throws LockException 
 	 */
 	public		void close() throws LockException {		
-		UserLock.releaseLock(mPersistentManagerSession.getPersistentManager(), getClass().getSimpleName(), getId());
+		UserLock.releaseLock(mPersistentManagerSession, getClass().getSimpleName(), getId());
 		mUnmodifiedObject = null;
 		mEditFlag = false;
 	}
