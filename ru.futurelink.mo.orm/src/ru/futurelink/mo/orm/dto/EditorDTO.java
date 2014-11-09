@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import ru.futurelink.mo.orm.CommonObject;
+import ru.futurelink.mo.orm.IPersistentManagerSession;
 import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
@@ -58,7 +59,7 @@ public class EditorDTO extends CommonDTO {
 		mChangesBuffer = new HashMap<String, Object[]>();
 	}
 
-	protected PersistentManagerSession getPersistenceManagerSession() {
+	protected IPersistentManagerSession getPersistenceManagerSession() {
 		return ((CommonObject)mData).getPersistenceManagerSession();
 	}
 	

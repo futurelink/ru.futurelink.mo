@@ -52,16 +52,16 @@ public class CommonObject extends ModelObject {
 	 * есть объект может сохранить себя сам благодаря этому.
 	 */
 	@Transient
-	protected PersistentManagerSession mPersistentManagerSession;	
-	final public void setPersistentManagerSession(PersistentManagerSession pm) {
+	protected IPersistentManagerSession mPersistentManagerSession;	
+	final public void setPersistentManagerSession(IPersistentManagerSession pm) {
 		mPersistentManagerSession = pm;
 	}
 
-	final public PersistentManagerSession getPersistenceManagerSession() {
+	final public IPersistentManagerSession getPersistenceManagerSession() {
 		return mPersistentManagerSession;
 	}
 	
-	public static Query getSingleObjectSelectQuery(PersistentManagerSession pms, Class<?> cls, Long id) {
+	public static Query getSingleObjectSelectQuery(IPersistentManagerSession pms, Class<?> cls, Long id) {
 		Query q = pms.getEm().createQuery("select obj from "+cls.getSimpleName()+" obj where obj.mId = :id", 
 				cls);
 		q.setParameter("id", id);
@@ -80,11 +80,13 @@ public class CommonObject extends ModelObject {
 	 * 
 	 * @param pmSession
 	 */	
-	public CommonObject(PersistentManagerSession pmSession) {
+	public CommonObject(IPersistentManagerSession pmSession) {
 		mPersistentManagerSession = pmSession;
 		mDeleteFlag = false;
-		if (mCreator == null) mCreator = pmSession.getUser();
-		if (mAuthor == null) mAuthor = pmSession.getUser();
+		if (PersistentManagerSessionUI.class.isAssignableFrom(mPersistentManagerSession.getClass())) {
+			if (mCreator == null) mCreator = ((PersistentManagerSessionUI)pmSession).getUser();
+			if (mAuthor == null) mAuthor = ((PersistentManagerSessionUI)pmSession).getUser();
+		}
 	}
 
 	/**
@@ -204,8 +206,10 @@ public class CommonObject extends ModelObject {
 		
 		// Дата создания и модификации - во временной зоне GMT.
 		if (mCreateDate == null) setCreateDate(Calendar.getInstance().getTime());
-		if (getCreator() == null) setCreator(mPersistentManagerSession.getAccessUser());
-		if (getAuthor() == null) setAuthor(mPersistentManagerSession.getUser());
+		if (PersistentManagerSessionUI.class.isAssignableFrom(mPersistentManagerSession.getClass())) {
+			if (getCreator() == null) setCreator(((PersistentManagerSessionUI)mPersistentManagerSession).getAccessUser());
+			if (getAuthor() == null) setAuthor(((PersistentManagerSessionUI)mPersistentManagerSession).getUser());
+		}
 		if (getCode() == null) { 
 			mCode = new CodeSupport();
 			mCode.setObject(this);
@@ -235,9 +239,9 @@ public class CommonObject extends ModelObject {
 	public void refresh() {
 		mPersistentManagerSession.getEm().refresh(this);
 	}
-	
+
 	public Logger logger() {
-		return mPersistentManagerSession.getPersistentManager().logger();
+		return mPersistentManagerSession.logger();
 	}
 	
 	/**

@@ -14,52 +14,32 @@ package ru.futurelink.mo.orm;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import org.slf4j.Logger;
+
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
-import ru.futurelink.mo.orm.security.User;
 
 /**
  * @author pavlov
  *
  */
-public class PersistentManagerSession {
+public class PersistentManagerSession 
+	implements IPersistentManagerSession {
 
 	private PersistentManager		mPersistent;
-	private User					mUser;
-	private User					mAccessUser;
 	private EntityTransaction		transaction;
 	
 	private EntityManager			entityManager;
 	private EntityManager			oldEntityManager;
 
-	/**
-	 * 
-	 */
 	public PersistentManagerSession(PersistentManager persistent) {
 		mPersistent = persistent;
 	}
 
 	public PersistentManager getPersistentManager() { return mPersistent; }
 	
-	/**
-	 * Пользователь от имени которого совершаются действия
-	 * персистент-менеджера.
-	 */
-	public void setUser(User user) { mUser = user; }
-	public User getUser() { return mUser; } 
-
-	/**
-	 * Пользователь, которому принадлжеат данные.
-	 */
-	public void setAccessUser(User user) { mAccessUser = user; }
-	public User getAccessUser() {
-		if (mAccessUser == null) 
-			return mUser; 
-		else
-			return mAccessUser; 
-	} 
-	
 	@SuppressWarnings("unchecked")
+	@Override
 	public <T extends CommonObject> T open(Class<T> cls, String id) throws OpenException {
 		CommonObject obj = getPersistentManager().open(cls, id, this);
 		obj.setPersistentManagerSession(this);
@@ -67,6 +47,7 @@ public class PersistentManagerSession {
 		
 	}
 
+	@Override
 	public EntityManager getEm() {
 		if (entityManager == null) {
 			entityManager = getPersistentManager().createEntityManager();
@@ -78,6 +59,7 @@ public class PersistentManagerSession {
 			return entityManager;
 	}
 	
+	@Override
 	public EntityManager getOldEm() {
 		if (oldEntityManager == null) {
 			oldEntityManager = getPersistentManager().createEntityManager();
@@ -89,44 +71,48 @@ public class PersistentManagerSession {
 			return oldEntityManager;
 	}
 	
+	@Override
 	public boolean transactionIsOpened() {
 		return (transaction != null);
 	}
 
+	@Override
 	public void transactionBegin() {
 		if (transaction == null) {
 			transaction = getEm().getTransaction();
 			transaction.begin();
 		}
 	}
-	
+
+	@Override
 	public void transactionCommit() {
 		if (transaction != null) {
 			transaction.commit();
 			transaction = null;
 		}
 	}
-	
+
+	@Override
 	public void transactionRollback() {
 		if (transaction != null) {
 			transaction.rollback();
 			transaction = null;
 		}
 	}
-	
-	public Object save(CommonObject object) throws SaveException {
-		if (getUser() == null) {
-			throw new SaveException("No user in persistent manager session!", null);
-		}
 
+	@Override
+	public Object save(CommonObject object) throws SaveException {
 		return getPersistentManager().save(object, this);
 	}
 
-	public Object saveWithHistory(HistoryObject object, String oldId) throws SaveException, OpenException {
-		if (getUser() == null) {
-			throw new SaveException("No user in persistent manager session!", null);
-		}
-
+	@Override
+	public Object saveWithHistory(HistoryObject object, String oldId) 
+			throws SaveException, OpenException {
 		return getPersistentManager().saveWithHistory(object, oldId, this);
+	}
+
+	@Override
+	public Logger logger() {
+		return getPersistentManager().logger();
 	}
 }

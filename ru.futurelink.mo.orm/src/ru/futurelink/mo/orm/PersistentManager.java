@@ -144,8 +144,10 @@ public class PersistentManager {
 		try {
 			// Создатель элемента - по сути его владелец, в данном случае,
 			// это пользователь в базе которого производится модификация.
-			if (object.getCreator() == null) object.setCreator(session.getAccessUser());
-			if (object.getAuthor() == null) object.setAuthor(session.getUser());
+			if (PersistentManagerSessionUI.class.isAssignableFrom(session.getClass())) {
+				if (object.getCreator() == null) object.setCreator(((PersistentManagerSessionUI)session).getAccessUser());
+				if (object.getAuthor() == null) object.setAuthor(((PersistentManagerSessionUI)session).getUser());
+			}
 
 			object.onBeforeSave(saveFlag);			// Вызов перед сохранением объекта
 			
@@ -161,18 +163,20 @@ public class PersistentManager {
 			// у добавим ссылку на элемент ворклога в элемент данных.
 			// Для элемента ворклога запись в ворклоге делать не надо!
 			WorkLogSupport workLogObject = null;
-			if (object.getWorkLogSupport()) {
-				if (!object.getClass().getSimpleName().equals("WorkLogSupport")) {
-					workLogObject = new WorkLogSupport(session);
-					workLogObject.setCreateDate(Calendar.getInstance().getTime());
-					workLogObject.setCreator(session.getUser());
-					if (object.getId() == null) {
-						workLogObject.setDescription("CREATED");
-					} else {
-						workLogObject.setDescription("MODIFIED");
+			if (PersistentManagerSessionUI.class.isAssignableFrom(session.getClass())) {
+				if (object.getWorkLogSupport()) {
+					if (!object.getClass().getSimpleName().equals("WorkLogSupport")) {
+						workLogObject = new WorkLogSupport(session);
+						workLogObject.setCreateDate(Calendar.getInstance().getTime());
+						workLogObject.setCreator(((PersistentManagerSessionUI)session).getUser());
+						if (object.getId() == null) {
+							workLogObject.setDescription("CREATED");
+						} else {
+							workLogObject.setDescription("MODIFIED");
+						}
+						session.getEm().persist(workLogObject);
+						object.setWorkLog(workLogObject);
 					}
-					session.getEm().persist(workLogObject);
-					object.setWorkLog(workLogObject);
 				}
 			}
 
@@ -230,22 +234,26 @@ public class PersistentManager {
 
 				// Создатель элемента - по сути его владелец, в данном случае,
 				// это пользователь в базе которого производится модификация.
-				if (object.getCreator() == null) object.setCreator(session.getAccessUser());
-				if (object.getAuthor() == null) object.setAuthor(session.getUser());
+				if (PersistentManagerSessionUI.class.isAssignableFrom(session.getClass())) {
+					if (object.getCreator() == null) object.setCreator(((PersistentManagerSessionUI)session).getAccessUser());
+					if (object.getAuthor() == null) object.setAuthor(((PersistentManagerSessionUI)session).getUser());
+				}
 		
 				// Добавляем в ворклог данные о том, что элменет был изменен
 				// у добавим ссылку на элемент ворклога в элемент данных.
 				// Для элемента ворклога запись в ворклоге делать не надо!
 				WorkLogSupport workLogObject = null;
-				if (object.getWorkLogSupport()) {				
-					if (!object.getClass().getName().equals("WorkLog")) {
-						workLogObject = new WorkLogSupport(session);
-						workLogObject.setCreateDate(Calendar.getInstance().getTime());
-						workLogObject.setCreator(session.getUser());
-						workLogObject.setObjectId(newId);
-						workLogObject.setDescription("MODIFIED");
-						session.getEm().persist(workLogObject);
-						object.setWorkLog(workLogObject);
+				if (PersistentManagerSessionUI.class.isAssignableFrom(session.getClass())) {
+					if (object.getWorkLogSupport()) {				
+						if (!object.getClass().getName().equals("WorkLog")) {
+							workLogObject = new WorkLogSupport(session);
+							workLogObject.setCreateDate(Calendar.getInstance().getTime());
+							workLogObject.setCreator(((PersistentManagerSessionUI)session).getUser());
+							workLogObject.setObjectId(newId);
+							workLogObject.setDescription("MODIFIED");
+							session.getEm().persist(workLogObject);
+							object.setWorkLog(workLogObject);
+						}
 					}
 				}
 				
