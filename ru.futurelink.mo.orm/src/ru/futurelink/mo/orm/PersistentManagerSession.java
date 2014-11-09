@@ -28,6 +28,9 @@ public class PersistentManagerSession {
 	private User					mUser;
 	private User					mAccessUser;
 	private EntityTransaction		transaction;
+	
+	private EntityManager			entityManager;
+	private EntityManager			oldEntityManager;
 
 	/**
 	 * 
@@ -58,18 +61,32 @@ public class PersistentManagerSession {
 	
 	@SuppressWarnings("unchecked")
 	public <T extends CommonObject> T open(Class<T> cls, String id) throws OpenException {
-		CommonObject obj = getPersistentManager().open(cls, id);
+		CommonObject obj = getPersistentManager().open(cls, id, this);
 		obj.setPersistentManagerSession(this);
 		return (T) obj;
 		
 	}
 
 	public EntityManager getEm() {
-		return getPersistentManager().getEm();
+		if (entityManager == null) {
+			entityManager = getPersistentManager().createEntityManager();
+		}
+
+		if (entityManager == null) {
+			throw new RuntimeException("Нет доступного EntityManager, вероятно фабрику создать не удалось!");	
+		} else
+			return entityManager;
 	}
 	
 	public EntityManager getOldEm() {
-		return getPersistentManager().getOldEm();
+		if (oldEntityManager == null) {
+			oldEntityManager = getPersistentManager().createEntityManager();
+		}
+
+		if (oldEntityManager == null) {
+			throw new RuntimeException("Нет доступного EntityManager, вероятно фабрику создать не удалось!");	
+		} else
+			return oldEntityManager;
 	}
 	
 	public boolean transactionIsOpened() {

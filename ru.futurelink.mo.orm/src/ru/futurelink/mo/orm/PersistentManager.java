@@ -43,8 +43,6 @@ import ru.futurelink.mo.orm.exceptions.SaveException;
  */
 public class PersistentManager {
 	private EntityManagerFactory 	mFactory;
-	private EntityManager 			mEm;
-	private EntityManager 			mOldEm;
 	private Logger					mLogger;
 
 	private BundleContext			mBundleContext;
@@ -115,30 +113,15 @@ public class PersistentManager {
 		return mLogger;
 	}
 	
-	protected synchronized EntityManager getEm() {
-		if (mEm == null) {
-			mFactory = getEntityManagerFactory(mPersistenceUnitName);
-			mEm = mFactory.createEntityManager();
-		}
+	protected synchronized EntityManager createEntityManager() {
+		mFactory = getEntityManagerFactory(mPersistenceUnitName);
+		EntityManager em = mFactory.createEntityManager();
 
-		if (mEm == null) {
+		if (em == null) {
 			throw new RuntimeException("Нет доступного EntityManager, вероятно фабрику создать не удалось!");
 		} else
-			return mEm;
+			return em;
 	}
-
-	protected synchronized EntityManager getOldEm() {
-		if (mOldEm == null) {
-			mFactory = getEntityManagerFactory(mPersistenceUnitName);
-			mOldEm = mFactory.createEntityManager();
-		}
-
-		if (mOldEm == null) {
-			throw new RuntimeException("Нет доступного EntityManager, вероятно фабрику создать не удалось!");	
-		} else
-			return mOldEm;
-	}
-
 
 	/**
 	 * Операция сохранения объекта на менеджере.
@@ -153,7 +136,7 @@ public class PersistentManager {
 		// это актуально если объект сохраняется, а потом изменяется
 		// тот же экземпляр и снова сохраняется.
 		if (object.getId() != null) {
-			object.setUnmodifiedObject(getOldEm().find(object.getClass(), object.getId()));
+			object.setUnmodifiedObject(session.getOldEm().find(object.getClass(), object.getId()));
 			object.setModifyDate(Calendar.getInstance().getTime());
 			saveFlag = CommonObject.SAVE_MODIFY;
 		}
@@ -188,12 +171,12 @@ public class PersistentManager {
 					} else {
 						workLogObject.setDescription("MODIFIED");
 					}
-					getEm().persist(workLogObject);
+					session.getEm().persist(workLogObject);
 					object.setWorkLog(workLogObject);
 				}
 			}
 
-			getEm().persist(object);					// ...
+			session.getEm().persist(object);					// ...
 
 			object.onAfterSave(saveFlag);			// Вызов после сохранения объекта
 			
@@ -237,7 +220,7 @@ public class PersistentManager {
 				object.onBeforeSave(saveFlag);					// Вызов перед сохранением объекта
 			
 				session.transactionBegin();
-				getEm().detach(object);							// Отдетачиваем элемент от базы
+				session.getEm().detach(object);							// Отдетачиваем элемент от базы
 
 				String newId = UUID.randomUUID().toString().toUpperCase();
 				
@@ -261,24 +244,24 @@ public class PersistentManager {
 						workLogObject.setCreator(session.getUser());
 						workLogObject.setObjectId(newId);
 						workLogObject.setDescription("MODIFIED");
-						getEm().persist(workLogObject);
+						session.getEm().persist(workLogObject);
 						object.setWorkLog(workLogObject);
 					}
 				}
 				
-				getEm().merge(object);
+				session.getEm().merge(object);
 
 				// Проставляем устаревание старому объекту
-				HistoryObject oldObj = getEm().find(object.getClass(), oldId);
+				HistoryObject oldObj = session.getEm().find(object.getClass(), oldId);
 				oldObj.setOutdated(true);
-				getEm().persist(oldObj);
+				session.getEm().persist(oldObj);
 				
 				object.onAfterSave(saveFlag);			// Вызов после сохранения объекта
 				
 				// Открываем объект заново, чтобы был доступен,
 				// потому что после detach-merge он слетает с управления
 				// EntityManager.
-				open(object.getClass(), newId);
+				open(object.getClass(), newId, session);
 				
 				// После сохранения пересохраняем элемент ворклога,
 				// добавляем туда имя класса и ИД объекта, к которому он
@@ -308,11 +291,12 @@ public class PersistentManager {
 	 * @param id
 	 * @return
 	 */
-	protected <T extends CommonObject> T open(Class<T> cls, String id) throws OpenException {
-		T obj = getEm().find(cls, id);
+	protected <T extends CommonObject> T open(Class<T> cls, String id, 
+			PersistentManagerSession session) throws OpenException {
+		T obj = session.getEm().find(cls, id);
 		if (obj == null) throw new OpenException(id, "Элемент не найден.", null);
 		
-		obj.setUnmodifiedObject(getOldEm().find(cls, id));
+		obj.setUnmodifiedObject(session.getOldEm().find(cls, id));
 		
 		return  obj;
 	}
