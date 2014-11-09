@@ -28,7 +28,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 
-import ru.futurelink.mo.orm.PersistentManager;
+import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.exceptions.LockException;
 
 /**
@@ -90,10 +90,10 @@ public class UserLock implements Serializable {
 	 * @param objId
 	 * @return
 	 */
-	private static UserLock getLockInfo(PersistentManager pm, String objClassName, String objId) {
+	private static UserLock getLockInfo(PersistentManagerSession pms, String objClassName, String objId) {
 		
 		// Получаем данные о том, залочен ли объект
-		Query q = pm.getEm().createQuery("select lock from UserLock lock where lock.mObjectClassName = :class and lock.mObjectId = :id");
+		Query q = pms.getEm().createQuery("select lock from UserLock lock where lock.mObjectClassName = :class and lock.mObjectId = :id");
 		q.setParameter("class", objClassName);
 		q.setParameter("id", objId);
 		UserLock lock = null;
@@ -113,16 +113,16 @@ public class UserLock implements Serializable {
 	 * @param user
 	 * @return
 	 */
-	private static UserLock setLock(PersistentManager pm, String objClassName, String objId, User user) {
+	private static UserLock setLock(PersistentManagerSession pms, String objClassName, String objId, User user) {
 		UserLock lock = new UserLock();
 		lock.mLockBegin = Calendar.getInstance(TimeZone.getTimeZone("GMT")).getTime();
 		lock.mLockUser = user;
 		lock.mObjectClassName = objClassName;
 		lock.mObjectId = objId;
 		
-		pm.getEm().getTransaction().begin();
-		pm.getEm().persist(lock);
-		pm.getEm().getTransaction().commit();
+		pms.getEm().getTransaction().begin();
+		pms.getEm().persist(lock);
+		pms.getEm().getTransaction().commit();
 	
 		return lock;
 	}
@@ -133,8 +133,8 @@ public class UserLock implements Serializable {
 	 * @param objId
 	 * @return - ID блокировки
 	 */
-	public static UserLock acquireLock(PersistentManager pm, String objClassName, String objId) throws LockException {		
-		return acquireLock(pm, objClassName, objId, null);
+	public static UserLock acquireLock(PersistentManagerSession pms, String objClassName, String objId) throws LockException {		
+		return acquireLock(pms, objClassName, objId, null);
 	}
 	
 	/**
@@ -145,8 +145,8 @@ public class UserLock implements Serializable {
 	 * @throws LockException 
 	 * @return - ID блокировки
 	 */
-	public static UserLock acquireLock(PersistentManager pm, String objClassName, String objId, User lockUser) throws LockException {
-		UserLock lock = getLockInfo(pm, objClassName, objId);
+	public static UserLock acquireLock(PersistentManagerSession pms, String objClassName, String objId, User lockUser) throws LockException {
+		UserLock lock = getLockInfo(pms, objClassName, objId);
 		
 		// Если залочен - вываливаем эксепшн
 		if (lock != null) {
@@ -161,7 +161,7 @@ public class UserLock implements Serializable {
 			throw le;
 		}		
 
-		return setLock(pm, objClassName, objId, lockUser);
+		return setLock(pms, objClassName, objId, lockUser);
 	}
 	
 	/**
@@ -170,8 +170,8 @@ public class UserLock implements Serializable {
 	 * @param objId
 	 * @throws LockException
 	 */
-	public static void releaseLock(PersistentManager pm, String objClassName, String objId) throws LockException {
-		UserLock lock = getLockInfo(pm, objClassName, objId);
+	public static void releaseLock(PersistentManagerSession pms, String objClassName, String objId) throws LockException {
+		UserLock lock = getLockInfo(pms, objClassName, objId);
 		
 		if (lock == null) {
 			LockException le = new LockException();
@@ -182,10 +182,10 @@ public class UserLock implements Serializable {
 		}
 
 		// Отменяем блокировку
-		lock = pm.getEm().find(UserLock.class, lock.getId());
-		pm.getEm().getTransaction().begin();
-		pm.getEm().remove(lock);
-		pm.getEm().getTransaction().commit();
+		lock = pms.getEm().find(UserLock.class, lock.getId());
+		pms.getEm().getTransaction().begin();
+		pms.getEm().remove(lock);
+		pms.getEm().getTransaction().commit();
 	}
 	
 	/**
@@ -193,8 +193,8 @@ public class UserLock implements Serializable {
 	 * 
 	 * @param pm
 	 */
-	public static void clearLocks(PersistentManager pm) {
-		clearLocks(pm, null);
+	public static void clearLocks(PersistentManagerSession pms) {
+		clearLocks(pms, null);
 	}
 	
 	/**
@@ -203,17 +203,17 @@ public class UserLock implements Serializable {
 	 * @param pm
 	 * @param lockUser
 	 */
-	public static void clearLocks(PersistentManager pm, User lockUser) {	
+	public static void clearLocks(PersistentManagerSession pms, User lockUser) {	
 		Query q;
 		if (lockUser != null) {
-			q = pm.getEm().createQuery("delete from UserLock u where mLockUser = :user");
+			q = pms.getEm().createQuery("delete from UserLock u where mLockUser = :user");
 			q.setParameter("user", lockUser);
 		} else {
-			q = pm.getEm().createQuery("delete from UserLock u");			
+			q = pms.getEm().createQuery("delete from UserLock u");			
 		}
-		pm.getEm().getTransaction().begin();
+		pms.getEm().getTransaction().begin();
 		q.executeUpdate();
-		pm.getEm().getTransaction().commit();
+		pms.getEm().getTransaction().commit();
 	}
 	
 }

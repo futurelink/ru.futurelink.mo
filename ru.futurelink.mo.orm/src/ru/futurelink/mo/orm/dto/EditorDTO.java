@@ -524,6 +524,6 @@ public class EditorDTO extends CommonDTO {
 	
 	@Override
 	public void refresh() {
-		getPersistenceManagerSession().getPersistentManager().getEm().refresh(mData);
+		getPersistenceManagerSession().getEm().refresh(mData);
 	}
 }

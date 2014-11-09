@@ -110,7 +110,7 @@ public abstract class RelatedItemController
 			// Если направление связки обратное, то есть в этом элементе данных есть
 			// ссылка на родительский объект, то получаем объект связанный.
 			if (mRelatedController.getDTO().getId() != null) { 
-				Query q = getSession().persistent().getPersistentManager().getEm().createQuery(
+				Query q = getSession().persistent().getEm().createQuery(
 						"select d from "+mDataClass.getSimpleName()+" d where d."+mFieldName+".mId = :relatedItemId"
 					);
 				q.setParameter("relatedItemId", mRelatedController.getDTO().getId());

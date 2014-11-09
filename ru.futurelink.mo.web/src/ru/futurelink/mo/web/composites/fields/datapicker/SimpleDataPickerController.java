@@ -133,7 +133,7 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 			queryString += " order by d."+mOrderBy;
 		}
 
-		q2 = mSession.persistent().getPersistentManager().getEm().createQuery(queryString, mDataClass);
+		q2 = mSession.persistent().getEm().createQuery(queryString, mDataClass);
 		if (!mPublic) q2.setParameter("creator", getSession().getDatabaseUser());
 		if (additionalValues.size() > 0) {
 			for (String key : additionalValues.keySet()) {

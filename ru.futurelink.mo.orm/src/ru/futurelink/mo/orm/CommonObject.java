@@ -61,8 +61,8 @@ public class CommonObject extends ModelObject {
 		return mPersistentManagerSession;
 	}
 	
-	public static Query getSingleObjectSelectQuery(PersistentManager pm, Class<?> cls, Long id) {
-		Query q = pm.getEm().createQuery("select obj from "+cls.getSimpleName()+" obj where obj.mId = :id", 
+	public static Query getSingleObjectSelectQuery(PersistentManagerSession pms, Class<?> cls, Long id) {
+		Query q = pms.getEm().createQuery("select obj from "+cls.getSimpleName()+" obj where obj.mId = :id", 
 				cls);
 		q.setParameter("id", id);
 		return q;
@@ -233,7 +233,7 @@ public class CommonObject extends ModelObject {
 	}
 	
 	public void refresh() {
-		mPersistentManagerSession.getPersistentManager().getEm().refresh(this);
+		mPersistentManagerSession.getEm().refresh(this);
 	}
 	
 	public Logger logger() {
@@ -258,7 +258,7 @@ public class CommonObject extends ModelObject {
 	 * @throws LockException 
 	 */
 	public		Object edit() throws LockException {
-		UserLock.acquireLock(mPersistentManagerSession.getPersistentManager(), getClass().getSimpleName(), getId());
+		UserLock.acquireLock(mPersistentManagerSession, getClass().getSimpleName(), getId());
 		mEditFlag = true;		
 		return null;
 	}
@@ -268,7 +268,7 @@ public class CommonObject extends ModelObject {
 	 * @throws LockException 
 	 */
 	public		void close() throws LockException {		
-		UserLock.releaseLock(mPersistentManagerSession.getPersistentManager(), getClass().getSimpleName(), getId());
+		UserLock.releaseLock(mPersistentManagerSession, getClass().getSimpleName(), getId());
 		mUnmodifiedObject = null;
 		mEditFlag = false;
 	}
@@ -290,7 +290,7 @@ public class CommonObject extends ModelObject {
 	 * @param dataItem
 	 */
 	public void forceUpdateField(String field, CommonObject dataItem) {
-		Query q = mPersistentManagerSession.getPersistentManager().getEm().createQuery(
+		Query q = mPersistentManagerSession.getEm().createQuery(
 			"update "+getClass().getSimpleName()+" set "+field+" = :param where mId = :id"
 		);
 		q.setParameter("param", dataItem);

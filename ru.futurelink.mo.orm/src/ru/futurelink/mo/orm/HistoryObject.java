@@ -88,7 +88,7 @@ public class HistoryObject extends CommonObject {
 	 */
 	@Transient
 	public HistoryObject getPrevObject() {
-		HistoryObject obj = mPersistentManagerSession.getPersistentManager().getEm().find(HistoryObject.class, mPrevId);
+		HistoryObject obj = mPersistentManagerSession.getEm().find(HistoryObject.class, mPrevId);
 		return obj; 
 	}
 
@@ -99,7 +99,7 @@ public class HistoryObject extends CommonObject {
 	 */
 	@Transient
 	public HistoryObject getNextObject() {
-		Query q = mPersistentManagerSession.getPersistentManager().getEm().createQuery("select obj from "+this.getClass().getSimpleName()+" obj where obj.prevId = :id");
+		Query q = mPersistentManagerSession.getEm().createQuery("select obj from "+this.getClass().getSimpleName()+" obj where obj.prevId = :id");
 		q.setParameter("id", getId());
 		HistoryObject obj = (HistoryObject) q.getSingleResult();
 		return obj; 
@@ -171,7 +171,7 @@ public class HistoryObject extends CommonObject {
 				// Перед сохранением сохраняем неизмененную копию объекта
 				// это актуально если объект сохраняется, а потом изменяется
 				// тот же экземпляр и снова сохраняется.
-				setUnmodifiedObject(mPersistentManagerSession.getPersistentManager().getOldEm().find(getClass(), oldId));
+				setUnmodifiedObject(mPersistentManagerSession.getOldEm().find(getClass(), oldId));
 
 				if (checkDontCreateHistory()) {
 					// Сохраняем элемент без создания исторического элемента,
