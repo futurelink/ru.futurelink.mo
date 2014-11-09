@@ -23,6 +23,7 @@ import org.eclipse.rap.rwt.RWT;
 
 import ru.futurelink.mo.orm.PersistentManager;
 import ru.futurelink.mo.orm.PersistentManagerSession;
+import ru.futurelink.mo.orm.PersistentManagerSessionUI;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.security.IUserParams;
 import ru.futurelink.mo.orm.security.IUserParamsAccessor;
@@ -35,7 +36,7 @@ import ru.futurelink.mo.orm.security.User;
  *
  */
 final public class ApplicationSession {
-	private PersistentManagerSession 	mPersistentSession;
+	private PersistentManagerSessionUI 	mPersistentSession;
 
 	private String				mLogin = "";
 	private Locale				mLocale = null;
@@ -59,7 +60,7 @@ final public class ApplicationSession {
 				mBundleContext.getServiceReference(IUserParamsAccessor.class.getName())
 		);
 
-		mPersistentSession = new PersistentManagerSession(persistent);
+		mPersistentSession = new PersistentManagerSessionUI(persistent);
 
 		// Make session never ending
 		RWT.getUISession().getHttpSession().setMaxInactiveInterval(8640000);
@@ -179,7 +180,7 @@ final public class ApplicationSession {
 	 * 
 	 * @return
 	 */
-	final public PersistentManagerSession persistent() {
+	final public PersistentManagerSessionUI persistent() {
 		// If user is released by some reason, try to reset it from session variable
 		if (mPersistentSession.getUser() == null) {
 			logger().warn("Persistent manager has null user. Trying to reset from session.");

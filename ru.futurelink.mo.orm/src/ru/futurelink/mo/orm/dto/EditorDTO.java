@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import ru.futurelink.mo.orm.CommonObject;
+import ru.futurelink.mo.orm.IPersistentManagerSession;
 import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
@@ -58,7 +59,7 @@ public class EditorDTO extends CommonDTO {
 		mChangesBuffer = new HashMap<String, Object[]>();
 	}
 
-	protected PersistentManagerSession getPersistenceManagerSession() {
+	protected IPersistentManagerSession getPersistenceManagerSession() {
 		return ((CommonObject)mData).getPersistenceManagerSession();
 	}
 	
@@ -83,7 +84,7 @@ public class EditorDTO extends CommonDTO {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}
 
-		EditorDTO.applyChanges((CommonObject) mData, this);
+		EditorDTO.applyChanges(mData, this);
 
 		// Проверка права на сохранение объекта
 		if (!mAccessChecker.checkSave(this)) {
@@ -280,7 +281,7 @@ public class EditorDTO extends CommonDTO {
 	 * @param dto
 	 * @throws DTOException
 	 */
-	public static void applyChanges(CommonObject data, CommonDTO dto) throws DTOException {
+	public static void applyChanges(ModelObject data, CommonDTO dto) throws DTOException {
 		if (dto.mAccessChecker == null) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}

@@ -7,13 +7,14 @@
 		<class>ru.futurelink.mo.orm.WorkLogSupport</class>
 		<class>ru.futurelink.mo.orm.CommonObject</class>
 		<class>ru.futurelink.mo.orm.HistoryObject</class>
+		<class>ru.futurelink.mo.orm.CommonRegister</class>
 		<class>ru.futurelink.mo.orm.security.UserLock</class>
 		<class>ru.futurelink.mo.orm.security.User</class>
 		<class>ru.futurelink.mo.orm.security.Client</class>
 		<class>ru.futurelink.mo.orm.security.Access</class>	
 		<class>ru.futurelink.mo.orm.mailer.MailServer</class>
 		<class>ru.futurelink.mo.orm.mailer.MailQueue</class>
-		<class>ru.futurelink.mo.orm.mailer.MailTemplate</class> 
+		<class>ru.futurelink.mo.orm.mailer.MailTemplate</class> 		
 		<class>ru.futurelink.mo.orm.migration.MigrationVersion</class>
 
 		<!--  

@@ -287,6 +287,9 @@ public abstract class CommonItemController
 	public void doAfterOpen() throws OpenException {}
 	
 	@Override
+	public void doBeforeSave() throws SaveException {}
+	
+	@Override
 	public void doAfterSave() throws SaveException {}
 	
 	/**
@@ -329,6 +332,9 @@ public abstract class CommonItemController
 	@Override
 	public void save() throws SaveException, DTOException {
 		if (getDTO() != null) {
+			
+			doBeforeSave();
+			
 			logger().debug("Сохранение данныех из связанных контроллеров, до сохранения объекта...");
 			for (RelatedController ctrl : mRelatedControllers) {
 				if (ctrl.getSaveMode() == SaveMode.SAVE_BEFORE)

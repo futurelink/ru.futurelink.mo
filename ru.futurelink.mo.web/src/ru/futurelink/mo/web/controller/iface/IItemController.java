@@ -47,7 +47,9 @@ public interface IItemController
 	/* События об операциях с объектом */
 
 	public void doAfterCreate();	
-	public void doAfterOpen() throws OpenException;	
+	public void doAfterOpen() throws OpenException;
+	
+	public void doBeforeSave() throws SaveException;
 	public void doAfterSave() throws SaveException;
 
 	/* Разные другие методы */
