@@ -32,9 +32,6 @@ import ru.futurelink.mo.orm.security.UserLock;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name="entityClass", discriminatorType=DiscriminatorType.STRING,length=20)
 public class CommonObject extends ModelObject {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	@Transient
@@ -117,7 +114,7 @@ public class CommonObject extends ModelObject {
 	 * Код элемента данных, идентификатор не зависящий от ID.
 	 */
 	@Index
-	@ManyToOne(cascade=CascadeType.PERSIST)
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	@JoinColumn(name = "code")
 	private		CodeSupport	mCode;
 	public 		CodeSupport	getCode() { return mCode; }

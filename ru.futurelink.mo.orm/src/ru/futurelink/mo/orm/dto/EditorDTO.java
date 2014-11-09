@@ -84,7 +84,7 @@ public class EditorDTO extends CommonDTO {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}
 
-		EditorDTO.applyChanges((CommonObject) mData, this);
+		EditorDTO.applyChanges(mData, this);
 
 		// Проверка права на сохранение объекта
 		if (!mAccessChecker.checkSave(this)) {
@@ -281,7 +281,7 @@ public class EditorDTO extends CommonDTO {
 	 * @param dto
 	 * @throws DTOException
 	 */
-	public static void applyChanges(CommonObject data, CommonDTO dto) throws DTOException {
+	public static void applyChanges(ModelObject data, CommonDTO dto) throws DTOException {
 		if (dto.mAccessChecker == null) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}
