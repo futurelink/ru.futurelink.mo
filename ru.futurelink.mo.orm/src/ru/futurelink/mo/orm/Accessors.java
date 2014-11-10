@@ -11,11 +11,18 @@
 
 package ru.futurelink.mo.orm;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * @author pavlov
  *
  */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
 public @interface Accessors {
-	String setter();
-	String getter();
+	public String setter();
+	public String getter();
 }

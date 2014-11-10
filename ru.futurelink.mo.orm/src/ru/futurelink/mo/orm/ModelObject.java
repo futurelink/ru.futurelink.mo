@@ -12,6 +12,7 @@
 package ru.futurelink.mo.orm;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 
 import javax.persistence.MappedSuperclass;
 
@@ -30,4 +31,29 @@ public abstract class ModelObject implements Serializable {
 	// Abstract method to save model
 	abstract public Object save() throws SaveException;
 	abstract public void saveCommit() throws SaveException;
+	
+	public Accessors getAccessors(String fieldName) throws NoSuchFieldException {
+		return getField(fieldName).getAnnotation(Accessors.class);		
+	}
+
+	private Field getField(String fieldName) throws NoSuchFieldException {
+		boolean trySuper = true;
+		Field field = null;
+		Class<?> clazz = getClass();
+		while (field == null && trySuper) {
+			try {
+				field = clazz.getDeclaredField(fieldName);
+			} catch (NoSuchFieldException ex) {
+				if (!clazz.equals(Object.class)) {
+					clazz = clazz.getSuperclass();
+					trySuper = true;
+				} else {
+					trySuper = false;
+					if (field == null)
+						throw ex;					
+				}
+			}
+		}
+		return field;
+	}
 }
