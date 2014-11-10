@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import ru.futurelink.mo.orm.Accessors;
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
@@ -118,10 +119,42 @@ public abstract class CommonDTO implements Serializable, IDTO {
 		return null;
 	}
 
+	public void setDataField(String fieldName, Object data) throws DTOException {
+		Accessors accessors = getAccessors(fieldName);		
+		if (accessors != null && accessors.getter() != null && accessors.setter() != null) {
+			setDataField(fieldName, accessors.getter(), accessors.setter(), data);
+		} else {
+			throw new DTOException("No getter or setter defined in annotation on setDataField.", null);
+		}
+	}
+
+	public Object getDataField(String fieldName) throws DTOException {
+		Accessors accessors = getAccessors(fieldName);
+		if (accessors != null && accessors.getter() != null && accessors.setter() != null) {
+			return getDataField(fieldName, accessors.getter(), accessors.setter());
+		} else {
+			throw new DTOException("No getter or setter defined in annotation on getDataField.", null);
+		}
+	}
+	
 	public Object getDataField(String fieldName, String fieldGetterName, String fieldSetterName) throws DTOException {
 		return getDataField(fieldName, fieldGetterName, fieldSetterName, true);
 	}
 
+	public String getDataFieldAsString(String fieldName, String defaultValue) {
+		Accessors accessors;
+		try {
+			accessors = getAccessors(fieldName);
+		} catch (DTOException e) {
+			return "[ Error getting accessors on field '"+fieldName+"']";
+		}
+		if (accessors != null && accessors.getter() != null) {
+			return getDataFieldAsString(fieldName, accessors.getter(), defaultValue);
+		} else {
+			return "[ No getter in annotation ]";
+		}
+	}
+	
 	public String getDataFieldAsString(String fieldName, String getter, String defaultValue) {
 		try {
 			Object f = getDataField(fieldName, getter, null);
@@ -175,4 +208,16 @@ public abstract class CommonDTO implements Serializable, IDTO {
 	}
 	
 	abstract public void refresh();
+	
+	private Accessors getAccessors(String fieldName) throws DTOException {
+		Accessors accessors = null;
+		try {
+			accessors = mData.getAccessors(fieldName);
+		} catch (NoSuchFieldException e) {
+			throw new DTOException("No field named '"+fieldName+"' on setDataField.", e);
+		} catch (SecurityException e) {
+			throw new DTOException("Field '"+fieldName+"' security exception on setDataField.", e);
+		}
+		return accessors;
+	}
 }
