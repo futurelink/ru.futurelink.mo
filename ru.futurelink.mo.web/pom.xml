@@ -82,11 +82,6 @@
 		<version>0.0.1.8</version>
 	</dependency>
 	<dependency>
-		<groupId>ru.futurelink.mo</groupId>
-		<artifactId>orm.mongodb</artifactId>
-		<version>0.0.1.5</version>
-	</dependency>
-	<dependency>
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-api</artifactId>
 		<version>1.7.6</version>
