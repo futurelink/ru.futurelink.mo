@@ -36,8 +36,10 @@ public class CommonObject extends ModelObject {
 
 	@Transient
 	private SaveHandler 	mSaveHandler = null;
-	
-	// Флаг типа сохранения
+
+    public static final String FIELD_ID = "mId";
+    public static final String FIELD_DELETEFLAG = "mDeleteFlag";
+
 	public static final int SAVE_CREATE = 1;
 	public static final int SAVE_MODIFY = 2;
 	public static final int SAVE_DELETE = 3;
@@ -66,14 +68,13 @@ public class CommonObject extends ModelObject {
 	}
 
 	/**
-	 * Конструктор сделан приватным, 
-	 * чтобы его нельзя было использовать.
+	 * Default constructor is protected. It's not private because
+     * JPA needs to access it.
 	 */
 	protected CommonObject() {}
 	
 	/**
-	 * Правильный конструктор, который позволяет создать объект сразу
-	 * с менеджером хранения.
+	 * Object constructor to use. The persistent manager session mandatory.
 	 * 
 	 * @param pmSession
 	 */	
@@ -87,7 +88,7 @@ public class CommonObject extends ModelObject {
 	}
 
 	/**
-	 * ID объекта
+	 * Object ID
 	 */
 	@Id
 	@GeneratedValue(generator="system-uuid")
@@ -102,20 +103,22 @@ public class CommonObject extends ModelObject {
 	
 	
 	/**
-	 * Флаг удаления или устаревания элемента данных.
+	 * Object deletion flag
 	 */
 	@Index
 	@Column(name = "deleteFlag")
+    @Accessors(getter = "getDeleteFlag", setter = "setDeleteFlag")
 	private		Boolean mDeleteFlag;
 	public		Boolean getDeleteFlag() { if (mDeleteFlag == null) return false; else return mDeleteFlag; }
 	public		void	setDeleteFlag(Boolean deleteFlag) { mDeleteFlag = deleteFlag; }
 	
 	/**
-	 * Код элемента данных, идентификатор не зависящий от ID.
+	 * Object code
 	 */
 	@Index
 	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
 	@JoinColumn(name = "code")
+    @Accessors(getter = "getCode", setter = "setCode")
 	private		CodeSupport	mCode;
 	public 		CodeSupport	getCode() { return mCode; }
 
@@ -125,7 +128,7 @@ public class CommonObject extends ModelObject {
 	public		void 			setUnmodifiedObject(CommonObject object) { mUnmodifiedObject = object; }
 
 	/**
-	 * Создатель элемента
+	 * Object creator user
 	 */
 	@Index
 	@DontCreateHistory
@@ -136,7 +139,7 @@ public class CommonObject extends ModelObject {
 	public		void	setCreator(User creator) { mCreator = creator; }  
 
 	/**
-	 * Автор элемента
+	 * Object author user (who changed object last time)
 	 */
 	@Index
 	@DontCreateHistory
@@ -147,7 +150,7 @@ public class CommonObject extends ModelObject {
 	public		void	setAuthor(User author) { mAuthor = author; }  
 	
 	/**
-	 * Дата создания элемента.
+	 * Object creation date and time
 	 */
 	@DontCreateHistory
 	@Temporal(TemporalType.TIMESTAMP)
@@ -158,7 +161,7 @@ public class CommonObject extends ModelObject {
 	public 		Date	getCreateDate() { return mCreateDate; }
 	
 	/**
-	 * Дата последнего изменения элемента.
+	 * Object last modified date and time
 	 */
 	@DontCreateHistory
 	@Temporal(TemporalType.TIMESTAMP)
@@ -169,7 +172,7 @@ public class CommonObject extends ModelObject {
 	public 		Date	getModifyDate() { return mModifyDate; }
 	
 	/**
-	 * Элемент ворклога
+	 * Object worklog (change log)
 	 */
 	@DontCreateHistory
 	@JoinColumn(name = "workLog", referencedColumnName = "id")
@@ -179,29 +182,32 @@ public class CommonObject extends ModelObject {
 	public		WorkLogSupport	getWorklog() { return mWorkLog; }
 	
 	/**
-	 * Удалить текущий объект, проставить ему флаг удаления
+	 * Set object deletion flag
 	 */
 	public 		void delete() {
 		mDeleteFlag = true;
 	}
 
 	/**
-	 * Восстановить текущий объект, снять ему флаг удаления
+	 * Unset object deletion flag
 	 */
 	public		void recover() {
 		mDeleteFlag = false;
 	}
 	
 	/**
-	 * Выполнить персист объекта и обработки сохранения.
+	 * Access persistent manager session to save object.
+     *
 	 * @return
 	 * @throws Exception 
 	 */
 	public 		Object save() throws SaveException {
 		mModifyDate = null;
-		if (mPersistentManagerSession == null) { throw new SaveException("No persistent manager on CommonObject!", null); }
+		if (mPersistentManagerSession == null) {
+            throw new SaveException("No persistent manager session on CommonObject!", null);
+        }
 		
-		// Дата создания и модификации - во временной зоне GMT.
+		// Creation datetime in server time zone.
 		if (mCreateDate == null) setCreateDate(Calendar.getInstance().getTime());
 		if (PersistentManagerSessionUI.class.isAssignableFrom(mPersistentManagerSession.getClass())) {
 			if (getCreator() == null) setCreator(((PersistentManagerSessionUI)mPersistentManagerSession).getAccessUser());
@@ -212,8 +218,8 @@ public class CommonObject extends ModelObject {
 			mCode.setObject(this);
 			mCode.setObjectClass(getClass().getName());
 		}
-		
-		// Дата изменения тоже во временной зоне GMT.
+
+        // Modification datetime in server time zone too.
 		mModifyDate = Calendar.getInstance().getTime();
 
 		Object result;
@@ -266,6 +272,7 @@ public class CommonObject extends ModelObject {
 
 	/**
 	 * Закрытие объекта с разблокировкой.
+     *
 	 * @throws LockException 
 	 */
 	public		void close() throws LockException {		
@@ -301,6 +308,7 @@ public class CommonObject extends ModelObject {
 	
 	/**
 	 * Установить обработчик записи элемента данных.
+     *
 	 * @param handler
 	 */
 	final public 	void setSaveHandler(SaveHandler handler) {
@@ -309,6 +317,7 @@ public class CommonObject extends ModelObject {
 	
 	/**
 	 * Обработка перед сохранением объекта
+     *
 	 * @param saveFlag
 	 * @return
 	 */	
@@ -321,6 +330,7 @@ public class CommonObject extends ModelObject {
 
 	/**
 	 * Обработка после сохранения объекта
+     *
 	 * @param saveFlag
 	 * @return
 	 */
@@ -347,7 +357,8 @@ public class CommonObject extends ModelObject {
 	
 	/**
 	 * Получить данные о том, используется ли лог действий в данном элементе.
-	 * Опция определяется аннотацией EnableWorkLog. 
+	 * Опция определяется аннотацией EnableWorkLog.
+     *
 	 * @return
 	 */
 	protected boolean getWorkLogSupport() {

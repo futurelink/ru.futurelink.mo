@@ -20,30 +20,27 @@ import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 
 /**
- * Структурированный список объектов DTO. Этот класс - абстракция, созданная
- * для того, чтобы обеспечить работу со списком и его упорядожение.
- * 
- * Особенность этого класса в том, что он обеспечивает порядок элементов при
- * помощи дополнительной структуры TreeSet. Эту структуру можно получить методом
- * getOrderList(). Ключ структуры - индекс, по которому просходит упорядочение,
- * значение ID элемента данных.
- * 
+ * DTO object list implementation.
+ *
+ * The list ordering is provided by intertal ordering map which
+ * can be aquired by getOrderList. The key of ordering map is the ID
+ * of data contained by DTO.
+ *
+ * Access checking agent is provided on list construction to all list DTOs.
+ *
  * @author pavlov
  *
  */
 public abstract class CommonDTOList<T extends IDTO> {
-	private TreeMap<Integer, String>	mOrderList;	// Упорядочение
-	private HashMap<String, T>			mDTOList;	// Данные
-	
+	private TreeMap<Integer, String>	mOrderList;	// Ordering map
+	private HashMap<String, T>			mDTOList;	// Data map
+
 	private IDTOAccessChecker			mAccessChecker;
 	private PersistentManagerSession	mPersistent;
-	
+
 	private Class<T>					mDTOClass;
-	private Integer						mIndex;		// Счетчик-индекс
-	
-	/**
-	 * 
-	 */
+	private Integer						mIndex;		// Ordering index
+
 	public CommonDTOList(PersistentManagerSession persistent, IDTOAccessChecker accessChecker, Class<T> DTOclass) {
 		mPersistent = persistent;
 		mAccessChecker = accessChecker;
@@ -55,7 +52,7 @@ public abstract class CommonDTOList<T extends IDTO> {
 	}
 	
 	/**
-	 * Получить данные из структуры списка.
+	 * Get DTO map from list. The key of this map is item ID.
 	 * 
 	 * @return
 	 */
@@ -64,7 +61,7 @@ public abstract class CommonDTOList<T extends IDTO> {
 	}
 
 	/**
-	 * Получить упорядочивающую структуру.
+	 * Get list ordering structure.
 	 * 
 	 * @return
 	 */
@@ -73,8 +70,7 @@ public abstract class CommonDTOList<T extends IDTO> {
 	}
 	
 	/**
-	 * Получить элемента данных по индексу из упорядочивающей
-	 * карты.
+	 * Get DTO item by order list index (see getOrderList).
 	 * 
 	 * @param index
 	 * @return
@@ -84,9 +80,8 @@ public abstract class CommonDTOList<T extends IDTO> {
 	}
 
 	/**
-	 * Добавить элемент данных в список.
+	 * Add DTO object to list.
 	 * 
-	 * @param id
 	 * @param dtoItem
 	 * @throws DTOException 
 	 */
@@ -107,7 +102,7 @@ public abstract class CommonDTOList<T extends IDTO> {
 	}
 
 	/**
-	 * Удалить элемент из списка.
+	 * Remove DTO item from list.
 	 * 
 	 * @param dtoItem
 	 * @throws DTOException
@@ -123,7 +118,7 @@ public abstract class CommonDTOList<T extends IDTO> {
 	}
 	
 	/**
-	 * Очистить структуры списка.
+	 * Clear the list.
 	 */
 	public void clear() {
 		mOrderList.clear();
@@ -132,6 +127,8 @@ public abstract class CommonDTOList<T extends IDTO> {
 	}
 	
 	/**
+     * Get access checker agent.
+     *
 	 * @return
 	 */
 	protected IDTOAccessChecker getAccessChecker() {
@@ -139,6 +136,8 @@ public abstract class CommonDTOList<T extends IDTO> {
 	}
 
 	/**
+     * Get DTO item class.
+     *
 	 * @return
 	 */
 	protected Class<T> getDTOClass() {

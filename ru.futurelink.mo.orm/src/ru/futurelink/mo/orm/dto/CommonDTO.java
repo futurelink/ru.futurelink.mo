@@ -25,13 +25,13 @@ import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.security.User;
 
 /**
- * @since 0.0
+ * @author pavlov_d
  */
 public abstract class CommonDTO implements Serializable, IDTO {
 	private static final long serialVersionUID = 1L;
 
-	protected  ModelObject 		mData;
-	protected	IDTOAccessChecker	mAccessChecker;
+	protected   ModelObject 		mData;
+	protected   IDTOAccessChecker	mAccessChecker;
 	
 	public CommonDTO(ModelObject dataItem) {
 		mData = dataItem;
@@ -42,7 +42,7 @@ public abstract class CommonDTO implements Serializable, IDTO {
 	}
 	
 	/**
-	 * Прицепить элемент данных к DTO.
+	 * Attach data model to DTO.
 	 * 
 	 * @param dataItem
 	 */
@@ -51,6 +51,11 @@ public abstract class CommonDTO implements Serializable, IDTO {
 		mData = dataItem;
 	}
 
+    /**
+     * Get model object data class.
+     *
+     * @return
+     */
 	public Class<? extends ModelObject> getDataClass() {
 		if (mData != null)
 			return mData.getClass();
@@ -70,14 +75,22 @@ public abstract class CommonDTO implements Serializable, IDTO {
 	public void save() throws DTOException, SaveException {
 		throw new SaveException("Saving is not implemented on CommonDTO.", null);
 	}
-	
+
+    /**
+     * Persistent manager commit wrapper method.
+     *
+     * In common case it just needs to call saveCommit() on data modelcc
+     * within this method.
+     *
+     * @throws SaveException
+     */
 	public void saveCommit() throws SaveException {
 		throw new SaveException("Saving is not implemented on CommonDTO.", null);
 	}
 	
 	@Override
 	public String getId() throws DTOException {	
-		Object idObj = getDataField("mId", "getId", "setId");
+		Object idObj = getDataField(CommonObject.FIELD_ID);
 		if (idObj != null) {
 			return idObj.toString();
 		} else {
@@ -87,7 +100,7 @@ public abstract class CommonDTO implements Serializable, IDTO {
 	
 	@Override
 	public boolean getDeleteFlag() throws DTOException {
-		Object d = getDataField("mDeleteFlag", "getDeleteFlag", "setDeleteFlag");
+		Object d = getDataField(CommonObject.FIELD_DELETEFLAG);
 		if (d != null) {
 			return Boolean.valueOf(d.toString());
 		} else {
@@ -108,7 +121,7 @@ public abstract class CommonDTO implements Serializable, IDTO {
 
 	@Override
 	public void setDeleteFlag(boolean deleteFlag) throws DTOException {
-		setDataField("mDeleteFlag", "getDeleteFlag", "setDeleteFlag", deleteFlag);
+		setDataField(CommonObject.FIELD_DELETEFLAG, deleteFlag);
 	}
 	
 	@Override
@@ -119,6 +132,14 @@ public abstract class CommonDTO implements Serializable, IDTO {
 		return null;
 	}
 
+    /**
+     * Set data field convinience method. Field setter and getter methods are
+     * aquired from @Accessors annotation on data field in model class definition.
+     *
+     * @param fieldName
+     * @param data
+     * @throws DTOException
+     */
 	public void setDataField(String fieldName, Object data) throws DTOException {
 		Accessors accessors = getAccessors(fieldName);		
 		if (accessors != null && accessors.getter() != null && accessors.setter() != null) {
@@ -128,7 +149,15 @@ public abstract class CommonDTO implements Serializable, IDTO {
 		}
 	}
 
-	public Object getDataField(String fieldName) throws DTOException {
+    /**
+     * Get data field value convinience method. Field setter and getter methods are
+     * aquired from @Accessors annotation on data field in model class definition.
+     *
+     * @param fieldName
+     * @return
+     * @throws DTOException
+     */
+ 	public Object getDataField(String fieldName) throws DTOException {
 		Accessors accessors = getAccessors(fieldName);
 		if (accessors != null && accessors.getter() != null && accessors.setter() != null) {
 			return getDataField(fieldName, accessors.getter(), accessors.setter());
@@ -141,6 +170,15 @@ public abstract class CommonDTO implements Serializable, IDTO {
 		return getDataField(fieldName, fieldGetterName, fieldSetterName, true);
 	}
 
+    /**
+     * Get data field value and convert it to string value. This method is implemeneted for
+     * convinience. Field setter and getter methods are aquired from @Accessors
+     * annotation on data field in model class definition.
+     *
+     * @param fieldName
+     * @param defaultValue
+     * @return
+     */
 	public String getDataFieldAsString(String fieldName, String defaultValue) {
 		Accessors accessors;
 		try {
@@ -167,21 +205,11 @@ public abstract class CommonDTO implements Serializable, IDTO {
 		}
 	}
 
-	/**
-	 * Установить для DTO агента, проверяющего права доступа.
-	 * 
-	 * @param checker
-	 */
 	@Override
 	public void addAccessChecker(IDTOAccessChecker checker) {
 		mAccessChecker = checker;
 	}
 	
-	/**
-	 * Получить агент, проверяющий права доступа.
-	 * 
-	 * @return
-	 */
 	@Override
 	public IDTOAccessChecker getAccessChecker() {
 		return mAccessChecker;
@@ -208,7 +236,14 @@ public abstract class CommonDTO implements Serializable, IDTO {
 	}
 	
 	abstract public void refresh();
-	
+
+    /**
+     * Get data model field accessors from @Accessors annotation for this field.
+     *
+     * @param fieldName
+     * @return
+     * @throws DTOException
+     */
 	private Accessors getAccessors(String fieldName) throws DTOException {
 		Accessors accessors = null;
 		try {
