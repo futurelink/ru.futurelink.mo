@@ -15,9 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 
 /**
  * DTO object list implementation.
@@ -36,12 +36,12 @@ public abstract class CommonDTOList<T extends IDTO> {
 	private HashMap<String, T>			mDTOList;	// Data map
 
 	private IDTOAccessChecker			mAccessChecker;
-	private PersistentManagerSession	mPersistent;
+	private IPersistentManagerSession	mPersistent;
 
 	private Class<T>					mDTOClass;
 	private Integer						mIndex;		// Ordering index
 
-	public CommonDTOList(PersistentManagerSession persistent, IDTOAccessChecker accessChecker, Class<T> DTOclass) {
+	public CommonDTOList(IPersistentManagerSession persistent, IDTOAccessChecker accessChecker, Class<T> DTOclass) {
 		mPersistent = persistent;
 		mAccessChecker = accessChecker;
 		mDTOClass = DTOclass;
@@ -147,7 +147,7 @@ public abstract class CommonDTOList<T extends IDTO> {
 	/**
 	 * @return
 	 */
-	protected PersistentManagerSession getPersistentManagerSession() {
+	protected IPersistentManagerSession getPersistentManagerSession() {
 		return mPersistent;
 	}
 }

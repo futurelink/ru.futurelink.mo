@@ -1,8 +1,10 @@
 /**
  * 
  */
-package ru.futurelink.mo.orm;
+package ru.futurelink.mo.orm.pm;
 
+import ru.futurelink.mo.orm.CommonObject;
+import ru.futurelink.mo.orm.HistoryObject;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.security.User;

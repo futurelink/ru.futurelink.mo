@@ -40,14 +40,14 @@ public interface IDTOLinkage {
 	 * 
 	 * @param linkageItem
 	 */
-	public void setLinkageItem(CommonObject linkageItem);
+	public void setLinkedItem(CommonObject linkageItem);
 
 	/**
 	 * Get linked DTO on linked data object.
 	 * 
 	 * @return
 	 */
-	public EditorDTO getLinkageDTO();
+	public EditorDTO getLinkedDTO();
 
 	/**
 	 * Activate linkage.

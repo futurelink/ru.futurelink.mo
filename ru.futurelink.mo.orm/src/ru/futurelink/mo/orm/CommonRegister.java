@@ -23,9 +23,9 @@ import javax.persistence.Transient;
 
 import org.eclipse.persistence.annotations.Index;
 
-import ru.futurelink.mo.orm.IPersistentManagerSession;
 import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 
 /**
  * @author pavlov

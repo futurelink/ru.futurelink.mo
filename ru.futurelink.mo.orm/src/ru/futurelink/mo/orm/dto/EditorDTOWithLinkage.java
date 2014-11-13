@@ -30,7 +30,6 @@ public class EditorDTOWithLinkage extends EditorDTO
 	implements IDTOLinkage {
 	private static final long serialVersionUID = 1L;
 
-	private CommonObject 	mLinkageItem;
 	private EditorDTO		mLinkageDTO;
 
 	public EditorDTOWithLinkage(CommonObject dataItem) {
@@ -38,13 +37,13 @@ public class EditorDTOWithLinkage extends EditorDTO
 	}
 
 	@Override
-	public void setLinkageItem(CommonObject linkageItem) {
+	public void setLinkedItem(CommonObject linkageItem) {
 		mLinkageDTO = new EditorDTO(linkageItem);
 		mLinkageDTO.addAccessChecker(mAccessChecker);
 	}
 
 	@Override
-	public EditorDTO getLinkageDTO() {
+	public EditorDTO getLinkedDTO() {
 		return mLinkageDTO;
 	}
 
@@ -62,8 +61,8 @@ public class EditorDTOWithLinkage extends EditorDTO
 
 		// Надо созхранить данные только по подписке, т.к. основной объект
 		// не является объектом, принадлежащим тому пользователю, который имеет подписку.
-		if (getLinkageDTO() != null) {
-			getLinkageDTO().save();
+		if (getLinkedDTO() != null) {
+			getLinkedDTO().save();
 		} else {
 			throw new SaveException("Ошибка сохранения подписки, подписка = null!", null);
 		}

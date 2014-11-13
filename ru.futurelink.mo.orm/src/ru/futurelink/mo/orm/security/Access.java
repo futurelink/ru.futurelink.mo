@@ -19,7 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManagerSession;
+import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 
 @Entity(name = "Access")
 @Table(name = "ACCESS")

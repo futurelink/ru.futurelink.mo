@@ -20,13 +20,13 @@ import java.util.List;
 import java.util.Map;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.IPersistentManagerSession;
 import ru.futurelink.mo.orm.ModelObject;
-import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
+import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 
 /**
  * Объект переноса данных.

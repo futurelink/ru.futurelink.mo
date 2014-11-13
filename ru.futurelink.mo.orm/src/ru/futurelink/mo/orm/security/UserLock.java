@@ -28,8 +28,8 @@ import javax.persistence.TemporalType;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 
-import ru.futurelink.mo.orm.IPersistentManagerSession;
 import ru.futurelink.mo.orm.exceptions.LockException;
+import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 
 /**
  * Таблица блокировок элементов данных
