@@ -19,7 +19,6 @@ import java.util.Map;
 import org.eclipse.swt.widgets.Composite;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
 import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
@@ -28,6 +27,7 @@ import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.exceptions.ValidationException;
+import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 import ru.futurelink.mo.web.composites.CommonItemComposite;
 import ru.futurelink.mo.web.controller.RelatedController.SaveMode;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
