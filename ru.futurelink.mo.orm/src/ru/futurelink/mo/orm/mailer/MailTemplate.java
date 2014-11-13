@@ -20,7 +20,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManagerSession;
+import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 
 @Entity (name = "MailTemplate")
 @Table(name = "MAIL_TEMPLATE")

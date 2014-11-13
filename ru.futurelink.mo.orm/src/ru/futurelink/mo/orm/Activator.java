@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 import ru.futurelink.mo.orm.migration.MigrationEngine;
+import ru.futurelink.mo.orm.pm.PersistentManager;
 
 /**
  * Активатор запускает процедуру миграции.

@@ -16,56 +16,71 @@ import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.security.User;
 
 /**
+ * Linkage interface for DTO.
+ *
+ * Assume there is one data object and we want to link it to another data
+ * object. Also we want to have ability to unlink it. This linked data object may
+ * already exist before link is created.
+ *
+ * So there are three objects in a chain: the object itself (parent), link object and
+ * linked object.
+ *
+ * Adding a link means creating link object between parent object and linked object.
+ * Removing a link doesn't delete linked object but removes a linkage.
+ *
+ * The example of usage is: user-shared subscription when any user can create linked
+ * object and any other user may use it.
+ *
  * @author pavlov
  *
  */
 public interface IDTOLinkage {
 	/**
-	 * Задать объект данных для подписки.
+	 * Set linked data object.
 	 * 
 	 * @param linkageItem
 	 */
-	public void setLinkageItem(CommonObject linkageItem);
-	
+	public void setLinkedItem(CommonObject linkageItem);
+
 	/**
-	 * Получить DTO объект подписки.
+	 * Get linked DTO on linked data object.
 	 * 
 	 * @return
 	 */
-	public EditorDTO getLinkageDTO();
-	
+	public EditorDTO getLinkedDTO();
+
 	/**
-	 * Активировать (восстановить) подписку.
+	 * Activate linkage.
 	 * 
 	 * @throws DTOException
 	 */
 	public void activateLinkage() throws DTOException;
-	
+
 	/**
-	 * Деактивировать (удалить) подписку.
+	 * Deactivate linkage.
 	 * 
 	 * @throws DTOException
 	 */
 	public void deactivateLinkage() throws DTOException;
-	
+
 	/**
-	 * Получить пометку об активности/неактивности (удалении) подписки.
+	 * Get if linkage is active or inactive.
 	 * 
 	 * @return
 	 * @throws DTOException
 	 */
 	public Boolean getLinkageActive() throws DTOException;
-	
+
 	/**
-	 * Узнать, сохранена ли подписка в БД,
+	 * Get if the linked object was persisted.
 	 * 
 	 * @return
 	 * @throws DTOException
 	 */
 	public Boolean getLinkagePersisted() throws DTOException;
-	
+
 	/**
-	 * Получить создателя подписки.
+	 * Get linkage object creator.
 	 * 
 	 * @return
 	 */

@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import ru.futurelink.mo.orm.Accessors;
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.ModelObject;
+import ru.futurelink.mo.orm.annotations.Accessors;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.SaveException;

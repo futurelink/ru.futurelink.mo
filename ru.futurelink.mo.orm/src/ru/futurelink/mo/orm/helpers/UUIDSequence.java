@@ -9,7 +9,7 @@
  *    Pavlov Denis - initial API and implementation
  ******************************************************************************/
 
-package ru.futurelink.mo.orm;
+package ru.futurelink.mo.orm.helpers;
 
 import java.util.UUID;
 import java.util.Vector;

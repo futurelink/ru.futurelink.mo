@@ -25,9 +25,11 @@ import javax.persistence.Transient;
 
 import org.eclipse.persistence.annotations.Index;
 
+import ru.futurelink.mo.orm.annotations.Accessors;
 import ru.futurelink.mo.orm.annotations.DontCreateHistory;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 
 /**
  * Исторический объект.

@@ -22,8 +22,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 
-import ru.futurelink.mo.orm.PersistentManager;
-import ru.futurelink.mo.orm.PersistentManagerSession;
+import ru.futurelink.mo.orm.pm.PersistentManager;
+import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 
 /**
  * Движок, который запускаем в работу миграции, от версии к версии.

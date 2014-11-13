@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 
 import javax.persistence.MappedSuperclass;
 
+import ru.futurelink.mo.orm.annotations.Accessors;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 
 @MappedSuperclass

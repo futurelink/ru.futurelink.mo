@@ -9,7 +9,7 @@
  *    Pavlov Denis - initial API and implementation
  ******************************************************************************/
 
-package ru.futurelink.mo.orm;
+package ru.futurelink.mo.orm.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

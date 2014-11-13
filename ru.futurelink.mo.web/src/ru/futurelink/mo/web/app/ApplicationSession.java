@@ -21,10 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.eclipse.rap.rwt.RWT;
 
-import ru.futurelink.mo.orm.PersistentManager;
-import ru.futurelink.mo.orm.PersistentManagerSession;
-import ru.futurelink.mo.orm.PersistentManagerSessionUI;
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.pm.PersistentManager;
+import ru.futurelink.mo.orm.pm.PersistentManagerSession;
+import ru.futurelink.mo.orm.pm.PersistentManagerSessionUI;
 import ru.futurelink.mo.orm.security.IUserParams;
 import ru.futurelink.mo.orm.security.IUserParamsAccessor;
 import ru.futurelink.mo.orm.security.User;

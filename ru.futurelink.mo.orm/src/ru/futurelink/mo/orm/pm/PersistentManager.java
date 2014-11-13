@@ -9,7 +9,7 @@
  *    Pavlov Denis - initial API and implementation
  ******************************************************************************/
 
-package ru.futurelink.mo.orm;
+package ru.futurelink.mo.orm.pm;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -28,6 +28,9 @@ import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.futurelink.mo.orm.CommonObject;
+import ru.futurelink.mo.orm.HistoryObject;
+import ru.futurelink.mo.orm.WorkLogSupport;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 
@@ -58,7 +61,7 @@ public class PersistentManager {
 		mProperties = properties;
 	}
 
-	protected PersistentManager(BundleContext context, String persistenceUnitName, Dictionary<String, Object> properties) {
+	public PersistentManager(BundleContext context, String persistenceUnitName, Dictionary<String, Object> properties) {
 		mBundleContext = context;
 		mLogger = LoggerFactory.getLogger(PersistentManager.class);
 		mPersistenceUnitName = persistenceUnitName;

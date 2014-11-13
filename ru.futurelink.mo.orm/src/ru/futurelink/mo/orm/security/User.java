@@ -22,7 +22,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.PersistentManagerSession;
+import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 
 @Entity(name = "User")
 @Table(name = "USERS")

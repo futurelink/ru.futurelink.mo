@@ -15,6 +15,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import ru.futurelink.mo.orm.pm.PersistentManagerSession;
+
 
 /**
  * Лог работы пользователей с элементами данных.

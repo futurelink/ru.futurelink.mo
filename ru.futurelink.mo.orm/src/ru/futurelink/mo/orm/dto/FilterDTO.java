@@ -22,6 +22,12 @@ import javax.persistence.Query;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.types.DateRange;
 
+/**
+ * Filtering DTO object.
+ *
+ * Used for filtering in lists.
+ *
+ */
 public class FilterDTO extends CommonDTO {
 	private static final long serialVersionUID = 1L;
 
@@ -64,7 +70,7 @@ public class FilterDTO extends CommonDTO {
 	}
 
 	private void addCondition(String fieldName, Object fieldValue) {
-		// Пустое значение отменяет фильтр по этому полю
+		// Empty field value removes condition from filter
 		if (fieldValue == null || fieldName.equals("")) {
 			removeCondition(fieldName);
 		} else {
@@ -102,8 +108,7 @@ public class FilterDTO extends CommonDTO {
 				k++;
 				String cond = ""; 
 				for (int n = 0; n < mQueryConditions.get(fieldName).size(); n++) {
-					// Пустые условия мы не учитываем при формировании списка условий
-					// просто их пропускаем.
+					// Empty conditions are skipped
 					if (mQueryConditions.get(fieldName).get(n) != null) {
 						// If condition is a CommonDTO object - use data item specific value processing
 						if (CommonDTO.class.isAssignableFrom(mQueryConditions.get(fieldName).get(n).getClass())) {
@@ -133,7 +138,7 @@ public class FilterDTO extends CommonDTO {
 							}
 						}
 
-						// Если условий по одному полю несколько, то добавляем "or"
+						// If there is more than one condition on the same field, use "or"
 						if (n < mQueryConditions.get(fieldName).size()-1)
 							cond = cond + " or ";
 					}
@@ -147,12 +152,14 @@ public class FilterDTO extends CommonDTO {
 			if (additionalConditions.size() > 0)
 				mConditionsQueryString = mConditionsQueryString + " and " + join(additionalConditions, " and ");
 			
-			System.out.println("Допонительные условия для выбора из списка: " + mConditionsQueryString);			
+			System.out.println("Additional filter conditions: " + mConditionsQueryString);
 		}
 	}
 
 	/**
-	 * Получить список условий фильтра как часть выражения WHERE.
+	 * Get filtering conditions as a part of WHERE statement
+     *
+     * @param tableAlias
 	 * @return
 	 */
 	public String getConditionsAsQuery(String tableAlias) {
@@ -171,7 +178,7 @@ public class FilterDTO extends CommonDTO {
 	}
 
 	/**
-	 * Установить параметры для запроса.
+	 * Set filtering parameters for JPA query object
 	 * 
 	 * @param q
 	 */
@@ -185,15 +192,15 @@ public class FilterDTO extends CommonDTO {
 	}
 	
 	@Override
-	public void refresh() {
-		
-	}
+	public void refresh() {}
 
 	/**
-	 * @param string
+     * Returns true if there is a filtering condition for field.
+     *
+	 * @param field
 	 * @return
 	 */
-	public boolean haveCondition(String key) {
-		return mQueryConditions.containsKey(key);
+	public boolean haveCondition(String field) {
+		return mQueryConditions.containsKey(field);
 	}
 }

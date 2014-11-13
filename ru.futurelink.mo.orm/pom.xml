@@ -112,6 +112,8 @@
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Export-Package>
 							ru.futurelink.mo.orm,
+							ru.futurelink.mo.orm.pm,
+							ru.futurelink.mo.orm.helpers,
 							ru.futurelink.mo.orm.annotations,
 							ru.futurelink.mo.orm.aspects,
 							ru.futurelink.mo.orm.dto.*,

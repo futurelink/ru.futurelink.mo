@@ -17,9 +17,9 @@ import java.util.List;
 
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.ModelObject;
-import ru.futurelink.mo.orm.PersistentManagerSession;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 
 /**
  * @author pavlov
@@ -33,7 +33,7 @@ public class EditorDTOList<T extends CommonDTO>
 	 * @param accessChecker
 	 * @param DTOclass
 	 */
-	public EditorDTOList(PersistentManagerSession persistent,
+	public EditorDTOList(IPersistentManagerSession persistent,
 			IDTOAccessChecker accessChecker, Class<T> DTOclass) {
 		super(persistent, accessChecker, DTOclass);
 	}

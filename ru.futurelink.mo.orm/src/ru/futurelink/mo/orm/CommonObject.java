@@ -19,10 +19,13 @@ import javax.persistence.*;
 import org.eclipse.persistence.annotations.Index;
 import org.slf4j.Logger;
 
+import ru.futurelink.mo.orm.annotations.Accessors;
 import ru.futurelink.mo.orm.annotations.DontCreateHistory;
 import ru.futurelink.mo.orm.annotations.EnableWorkLog;
 import ru.futurelink.mo.orm.exceptions.LockException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
+import ru.futurelink.mo.orm.pm.PersistentManagerSessionUI;
 import ru.futurelink.mo.orm.security.User;
 import ru.futurelink.mo.orm.security.UserLock;
 
@@ -321,7 +324,7 @@ public class CommonObject extends ModelObject {
 	 * @param saveFlag
 	 * @return
 	 */	
-	protected 	Object onBeforeSave(int saveFlag) throws SaveException {
+	public 	Object onBeforeSave(int saveFlag) throws SaveException {
 		if (mSaveHandler != null) {
 			return mSaveHandler.onBeforeSave();
 		}
@@ -334,7 +337,7 @@ public class CommonObject extends ModelObject {
 	 * @param saveFlag
 	 * @return
 	 */
-	protected 	Object onAfterSave(int saveFlag) throws SaveException {
+	public 	Object onAfterSave(int saveFlag) throws SaveException {
 		if (mSaveHandler != null) {
 			return mSaveHandler.onAfterSave();
 		}
@@ -361,7 +364,7 @@ public class CommonObject extends ModelObject {
      *
 	 * @return
 	 */
-	protected boolean getWorkLogSupport() {
+	public boolean getWorkLogSupport() {
 		EnableWorkLog ewl = getClass().getAnnotation(EnableWorkLog.class);
 		if (ewl != null) {
 			return true;

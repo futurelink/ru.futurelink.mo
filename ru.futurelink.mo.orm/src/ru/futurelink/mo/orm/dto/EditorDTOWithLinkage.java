@@ -30,35 +30,23 @@ public class EditorDTOWithLinkage extends EditorDTO
 	implements IDTOLinkage {
 	private static final long serialVersionUID = 1L;
 
-	private CommonObject 	mLinkageItem;
 	private EditorDTO		mLinkageDTO;
 
 	public EditorDTOWithLinkage(CommonObject dataItem) {
 		super(dataItem);
 	}
-	
-	/**
-	 * Задать объект подписки для этого DTO.
-	 * 
-	 * @param linkageItem
-	 */
+
 	@Override
-	public void setLinkageItem(CommonObject linkageItem) {
-		mLinkageItem = linkageItem;
-		mLinkageDTO = new EditorDTO(mLinkageItem);
+	public void setLinkedItem(CommonObject linkageItem) {
+		mLinkageDTO = new EditorDTO(linkageItem);
 		mLinkageDTO.addAccessChecker(mAccessChecker);
 	}
 
-	/**
-	 * Получить DTO объекта подписки.
-	 * 
-	 * @return
-	 */
 	@Override
-	public EditorDTO getLinkageDTO() {
+	public EditorDTO getLinkedDTO() {
 		return mLinkageDTO;
 	}
-	
+
 	@Override
 	public void save() throws DTOException, SaveException {
 		if (mAccessChecker == null) {
@@ -67,14 +55,14 @@ public class EditorDTOWithLinkage extends EditorDTO
 
 		// Если объект DTO, к которому создана подписка - мой, то надо его сохранить.
 		// В противном случае - пропускаем его.
-		if (getCreator().equals(mLinkageItem.getCreator())) {
+		if (getCreator().equals(mLinkageDTO.getCreator())) {
 			super.save();
 		}
-		
+
 		// Надо созхранить данные только по подписке, т.к. основной объект
 		// не является объектом, принадлежащим тому пользователю, который имеет подписку.
-		if (getLinkageDTO() != null) {
-			getLinkageDTO().save();
+		if (getLinkedDTO() != null) {
+			getLinkedDTO().save();
 		} else {
 			throw new SaveException("Ошибка сохранения подписки, подписка = null!", null);
 		}
@@ -84,7 +72,7 @@ public class EditorDTOWithLinkage extends EditorDTO
 	public void activateLinkage() throws DTOException {
 		mLinkageDTO.recover();
 	}
-	
+
 	@Override
 	public void deactivateLinkage() throws DTOException {
 		mLinkageDTO.delete(false);		
@@ -104,7 +92,7 @@ public class EditorDTOWithLinkage extends EditorDTO
 	public User getLinkageCreator() {
 		return mLinkageDTO.getCreator();
 	}
-	
+
 	/**
 	 * Метод переопределен, помимо изменений в основном DTO он
 	 * также возвращает изменения в DTO подписки.
