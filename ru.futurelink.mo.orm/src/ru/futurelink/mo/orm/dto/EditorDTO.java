@@ -293,14 +293,14 @@ public class EditorDTO extends CommonDTO {
 			String key = (String) dto.getChangesBuffer().keySet().toArray()[i];
 			Object[] values = dto.getChangesBuffer().get(key);
 			if (values[1] == null) {
-				System.out.println("Поле сконфигурировано только для чтения т.к. сеттер не задан, пропускаем.");
+				dto.logger().debug("Поле сконфигурировано только для чтения т.к. сеттер не задан, пропускаем.");
 			} else {
 				try {
 					Method setValueMethod;
 					if (values[2] == null) {
-						System.out.println("Вызываем "+values[1].toString()+" для сохранения пустого значения.");
+						dto.logger().debug("Вызываем {} для сохранения пустого значения.", values[1]);
 					} else {
-						System.out.println("Вызываем "+values[1].toString()+" для сохранения "+values[2].toString());					
+						dto.logger().debug("Вызываем {} для сохранения {}",values[1], values[2]);					
 					}
 					Class<?> fieldClass = data.getClass().getMethod(values[0].toString()).getReturnType();
 					if ((values[2] != null) && (values[2].getClass().equals(EditorDTO.class))) {
@@ -308,9 +308,13 @@ public class EditorDTO extends CommonDTO {
 						// посетить как свойство.
 						for (Method method : data.getClass().getMethods()) {
 							if (values[1].toString().equals(method.getName())) {
-								if (method.getParameterTypes()[0].isAssignableFrom(((EditorDTO)values[2]).mData.getClass())) {
+								if (method.getParameterTypes()[0].isAssignableFrom(
+									((EditorDTO)values[2]).mData.getClass())
+								) {
 									setValueMethod = method;
-									setValueMethod.invoke(data, values[2] != null ? (((EditorDTO)values[2]).mData) : fieldClass);
+									setValueMethod.invoke(data, 
+										values[2] != null ? (((EditorDTO)values[2]).mData) : fieldClass
+									);
 									break;
 								}
 							}
@@ -321,14 +325,19 @@ public class EditorDTO extends CommonDTO {
 						boolean methodInvoked = false;
 						for (Method method : data.getClass().getMethods()) {
 							if (values[1].toString().equals(method.getName())) {
-								if (method.getParameterTypes()[0].isAssignableFrom(values[2] != null ? values[2].getClass() : fieldClass)) {
+								if (method.getParameterTypes()[0].isAssignableFrom(
+									values[2] != null ? values[2].getClass() : fieldClass)
+								) {
 									method.invoke(data, values[2]);
 									methodInvoked = true;
 									break;
 								}
 							}
 						}
-						if (!methodInvoked) throw new NoSuchMethodException("Нет подходящего метода "+values[1].toString()+" для сохранения данных типа "+values[2].getClass().getSimpleName());
+						if (!methodInvoked) throw new NoSuchMethodException(
+								"Нет подходящего метода "+values[1].toString()+" для сохранения данных типа "+
+								values[2].getClass().getSimpleName()
+							);
 					}
 				} catch (NoSuchMethodException e) {
 					throw new DTOException(e.toString(), e);

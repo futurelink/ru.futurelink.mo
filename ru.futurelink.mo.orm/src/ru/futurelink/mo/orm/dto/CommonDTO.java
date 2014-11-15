@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.annotations.Accessors;
@@ -30,11 +33,19 @@ import ru.futurelink.mo.orm.security.User;
 public abstract class CommonDTO implements Serializable, IDTO {
 	private static final long serialVersionUID = 1L;
 
-	protected   ModelObject 		mData;
-	protected   IDTOAccessChecker	mAccessChecker;
+	protected	ModelObject 		mData;
+	protected	IDTOAccessChecker	mAccessChecker;
+	private		Logger				logger;
 	
 	public CommonDTO(ModelObject dataItem) {
 		mData = dataItem;
+	}
+
+	protected Logger logger() {
+		if (logger == null)
+			logger = LoggerFactory.getLogger(getClass());
+
+		return logger;
 	}
 	
 	public static List<?> fromResultList(List<?> resultList) {

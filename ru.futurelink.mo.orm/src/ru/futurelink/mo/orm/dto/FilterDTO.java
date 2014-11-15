@@ -53,10 +53,10 @@ public class FilterDTO extends CommonDTO {
 			String fieldSetterName, Object value) {
 		if (fieldName == null) return;
 		if (value != null) {
-			System.out.println("FilterDTO does field "+fieldName+" set to "+value+" with "+fieldSetterName);
+			logger().debug("FilterDTO does field {} set to {} with {}", fieldName, value, fieldSetterName);
 			addCondition(fieldName, value);
 		} else {
-			System.out.println("FilterDTO does field "+fieldName+" removed condition with "+fieldSetterName);
+			logger().debug("FilterDTO does field {} removed condition with {}", fieldName, fieldSetterName);
 			removeCondition(fieldName);
 		}
 	}
@@ -152,7 +152,7 @@ public class FilterDTO extends CommonDTO {
 			if (additionalConditions.size() > 0)
 				mConditionsQueryString = mConditionsQueryString + " and " + join(additionalConditions, " and ");
 			
-			System.out.println("Additional filter conditions: " + mConditionsQueryString);
+			logger().debug("Additional filter conditions: {}", mConditionsQueryString);
 		}
 	}
 
