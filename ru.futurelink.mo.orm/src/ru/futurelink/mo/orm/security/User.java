@@ -22,6 +22,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import ru.futurelink.mo.orm.CommonObject;
+import ru.futurelink.mo.orm.annotations.Accessors;
 import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 
 @Entity(name = "User")
@@ -32,9 +33,6 @@ import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 	@NamedQuery(name="User.findUserByEmail", query="SELECT u FROM User u where u.mEmail = :email")
 })
 public class User extends CommonObject {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	protected User() {}
@@ -44,46 +42,52 @@ public class User extends CommonObject {
 	}
 
 	@Column(name = "email")
+	@Accessors(setter = "setEmail", getter = "getEmail")
 	private String mEmail;
 	public void setEmail(String email) { mEmail = email; }
 	public String getEmail() { return mEmail; }
 	
 	/**
-	 * Имя пользователя
+	 * User name
 	 */
 	@Column(name = "userName")
+	@Accessors(setter = "setUserName", getter = "getUserName")
 	private String mUserName;
 	public void setUserName(String userName) { mUserName = userName; }
 	public String getUserName() { return mUserName; }
 	
 	/**
-	 * Логин пользователя
+	 * User login
 	 */
 	@Column(name = "login")
+	@Accessors(setter = "setLogin", getter = "getLogin")
 	private String mLogin;
 	public void setLogin(String login) { mLogin = login; }
 	public String getLogin() { return mLogin; }
 	
 	/**
-	 * Пароль пользователя
+	 * User password stored in plain text
 	 */
 	@Column(name = "password")
+	@Accessors(setter = "setPassword", getter = "getPassword")
 	private String mPassword;
 	public void setPassword(String pass) { mPassword = pass; }
 	public String getPassword() { return mPassword; }
 	
 	/**
-	 * Город пользователя
+	 * User city name
 	 */
 	@Column(name = "city")
+	@Accessors(setter = "setCity", getter = "getCity")
 	private String mCity;
 	public void setCity(String city) { mCity = city; }
 	public String getCity() { return mCity; }
 	
 	/**
-	 * Часовой пояс пользователя
+	 * User time zone
 	 */
 	@Column(name = "timezone")
+	@Accessors(setter = "setTimeZone", getter = "getTimeZoneName")
 	private String mTimeZone;
 	public void setTimeZone(String timeZone) { mTimeZone = timeZone; }
 	public String getTimeZoneName() { return mTimeZone; }
@@ -96,7 +100,9 @@ public class User extends CommonObject {
 	}
 	
 	public String getGrantedUsersCount() {
-		Query q = getPersistenceManagerSession().getEm().createQuery("select count(d) from Access d where d.mCreator = :creator and d.mDeleteFlag = 0");
+		Query q = getPersistenceManagerSession().getEm().createQuery(
+				"select count(d) from Access d where d.mCreator = :creator and d.mDeleteFlag = 0"
+			);
 		q.setParameter("creator", this);
 		if (q.getResultList().size() > 0) {
 			logger().debug("Количество: {}", q.getSingleResult());
@@ -107,7 +113,9 @@ public class User extends CommonObject {
 	}
 
 	public User getSystemUser() {
-		TypedQuery<User> q = getPersistenceManagerSession().getEm().createNamedQuery("User.findUserByLogin", User.class);
+		TypedQuery<User> q = getPersistenceManagerSession().getEm().createNamedQuery(
+				"User.findUserByLogin", User.class
+			);
 		q.setParameter("login", "futurelink.vl@gmail.com");
 		if (q.getResultList().size() > 0) {
 			return q.getSingleResult();

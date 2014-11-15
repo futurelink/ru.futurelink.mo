@@ -53,7 +53,7 @@ public class Activator implements BundleActivator {
 			mContext = context;
 			new Thread() {
 				public void run() {
-					mLogger.info("Регистрация сервиса персистент-менеджера для mo");
+					mLogger.info("Registering persistent manager service");
 
 					// Получаем конфигруацию из нужного нам сервиса и передаем ее...
 					ServiceReference<ConfigurationAdmin> caRef = mContext.getServiceReference(ConfigurationAdmin.class);

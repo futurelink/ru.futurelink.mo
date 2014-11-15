@@ -99,12 +99,11 @@ public class EditorDTO extends CommonDTO {
 	}
 	
 	/**
-	 * Метод создает список DTO из списка элементов типа CommonObject. Если список
-	 * результата запроса пустой, то возвращается пустой список DTO.
 	 * 
 	 * @param resultList
 	 * @return
 	 */
+	@Deprecated
 	public static Map<String, EditorDTO> fromResultList(
 			List<? extends CommonObject> resultList, 
 			PersistentManagerSession pm, 
@@ -141,8 +140,6 @@ public class EditorDTO extends CommonDTO {
 	}
 
 	/**
-	 * Простой метод заполнения списка данных, привязанного к
-	 * отображению, перед переходом на асинхронные отображения.
 	 * 
 	 * @param result
 	 * @param sourceList
@@ -150,6 +147,7 @@ public class EditorDTO extends CommonDTO {
 	 * @param itemDTOClass
 	 * @param accessChecker
 	 */
+	@Deprecated
 	public static void fillResultList(
 			Map<String, ? extends CommonDTO> resultList,
 			List<?> sourceList, 

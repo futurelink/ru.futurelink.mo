@@ -14,7 +14,6 @@ package ru.futurelink.mo.orm.security;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,8 +31,7 @@ import ru.futurelink.mo.orm.exceptions.LockException;
 import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 
 /**
- * Таблица блокировок элементов данных
- * пользователями.
+ * Persistent objects lock table stored in data base table.
  * 
  * @author pavlov_d
  *
@@ -47,7 +45,7 @@ public class UserLock implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * ID объекта
+	 * Object ID
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,35 +55,36 @@ public class UserLock implements Serializable {
 	public		void setId(Long id) { mId = id; }	
 	
 	/**
-	 * Когда установлена блокировка
+	 * Lock set time
 	 */
 	@Column(name = "lockBegin")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date 	mLockBegin; 
 	
 	/**
-	 * Кем установлена блокировка.
+	 * The user who set lock
 	 */
 	@JoinColumn(name = "lockUser", referencedColumnName="id")
 	private User 	mLockUser;
 	public User		getLockUser() { return mLockUser; }
 	
 	/**
-	 * На какой класс?
+	 * What's the class of object has been locked
 	 */
 	@Column(name = "objectClassName")
 	private String 	mObjectClassName;
 	public String	getObjectClassName() { return mObjectClassName; }
 	
 	/**
-	 * На какой элемент?
+	 * What is an object ID?
 	 */
 	@Column(name = "objectId")
 	private String 	mObjectId;
 	public String	getObjectId() { return mObjectId; }
 	
 	/**
-	 * Выбрать информацию по блокировкам элементов данных.
+	 * Gets the lock information.
+	 * 
 	 * @param objClassName
 	 * @param objId
 	 * @return
@@ -93,7 +92,8 @@ public class UserLock implements Serializable {
 	private static UserLock getLockInfo(IPersistentManagerSession pms, String objClassName, String objId) {
 		
 		// Получаем данные о том, залочен ли объект
-		Query q = pms.getEm().createQuery("select lock from UserLock lock where lock.mObjectClassName = :class and lock.mObjectId = :id");
+		Query q = pms.getEm().createQuery("select lock from UserLock lock "
+				+ "where lock.mObjectClassName = :class and lock.mObjectId = :id");
 		q.setParameter("class", objClassName);
 		q.setParameter("id", objId);
 		UserLock lock = null;
@@ -107,7 +107,8 @@ public class UserLock implements Serializable {
 	}
 	
 	/**
-	 * Проставить блокировку в базе.
+	 * Sets the lock on object with ID by user.
+	 * 
 	 * @param objClassName
 	 * @param objId
 	 * @param user
@@ -115,7 +116,7 @@ public class UserLock implements Serializable {
 	 */
 	private static UserLock setLock(IPersistentManagerSession pms, String objClassName, String objId, User user) {
 		UserLock lock = new UserLock();
-		lock.mLockBegin = Calendar.getInstance(TimeZone.getTimeZone("GMT")).getTime();
+		lock.mLockBegin = Calendar.getInstance().getTime();
 		lock.mLockUser = user;
 		lock.mObjectClassName = objClassName;
 		lock.mObjectId = objId;
@@ -128,7 +129,8 @@ public class UserLock implements Serializable {
 	}
 	
 	/**
-	 * Установить блокировку без пользователя.
+	 * Sets the lock on object by ID by anonymous user.
+	 * 
 	 * @param objClassName
 	 * @param objId
 	 * @return - ID блокировки
@@ -138,12 +140,13 @@ public class UserLock implements Serializable {
 	}
 	
 	/**
-	 * Установить блокировку пользователем.
+	 * Request for lock on object by ID.
+	 * 
 	 * @param objClassName
 	 * @param objId
 	 * @param lockUser
 	 * @throws LockException 
-	 * @return - ID блокировки
+	 * @return - lock ID
 	 */
 	public static UserLock acquireLock(IPersistentManagerSession pms, String objClassName, String objId, User lockUser) throws LockException {
 		UserLock lock = getLockInfo(pms, objClassName, objId);
@@ -165,7 +168,8 @@ public class UserLock implements Serializable {
 	}
 	
 	/**
-	 * Отменить блокировку элемента пользователем.
+	 * Unlock an object by ID.
+	 * 
 	 * @param objClassName
 	 * @param objId
 	 * @throws LockException
@@ -189,7 +193,7 @@ public class UserLock implements Serializable {
 	}
 	
 	/**
-	 * Удалить все блокировки объектов вообще.
+	 * Clear all locks.
 	 * 
 	 * @param pm
 	 */
@@ -198,7 +202,7 @@ public class UserLock implements Serializable {
 	}
 	
 	/**
-	 * Удалить все блокировки, сделанные пользователем.
+	 * Clear all user locks.
 	 * 
 	 * @param pm
 	 * @param lockUser
