@@ -218,14 +218,14 @@ public class EditorDTO extends CommonDTO {
 		}
 
 		if (!hardDelete) {
-			setDataField("mDeleteFlag", "getDeleteFlag", "setDeleteFlag", true, true);
+			setDataField(CommonObject.FIELD_DELETEFLAG, "getDeleteFlag", "setDeleteFlag", true, true);
 		} else {
 			// TODO Жесткое удаление из базы навсегда!			
 		}
 	}
 	
 	public void recover() throws DTOException {
-		setDataField("mDeleteFlag", "getDeleteFlag", "setDeleteFlag", false, true);
+		setDataField(CommonObject.FIELD_DELETEFLAG, "getDeleteFlag", "setDeleteFlag", false, true);
 	}
 	
 	/**

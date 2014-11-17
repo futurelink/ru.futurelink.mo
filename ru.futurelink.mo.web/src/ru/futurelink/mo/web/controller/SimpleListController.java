@@ -128,8 +128,7 @@ abstract public class SimpleListController
 		// Только если есть выбранный элемент, есть активные данные
 		if (getActiveData() != null) {
 			try {
-				id = getActiveData().
-						getDataField("mId", "getId", "setId").toString();
+				id = getActiveData().getId().toString();
 				CommonObject obj = getSession().persistent().open(getDataClass(), id);
 				obj.delete();
 				obj.save();

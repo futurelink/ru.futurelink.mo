@@ -40,13 +40,16 @@ public class CommonObject extends ModelObject {
 	@Transient
 	private SaveHandler 	mSaveHandler = null;
 
-    public static final String FIELD_ID = "mId";
-    public static final String FIELD_DELETEFLAG = "mDeleteFlag";
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_DELETEFLAG = "deleteFlag";
+    public static final String FIELD_CREATOR = "mCreator";
+    public static final String FIELD_AUTHOR = "mAuthor";
+    public static final String FIELD_CODE = "mCode";
 
 	public static final int SAVE_CREATE = 1;
 	public static final int SAVE_MODIFY = 2;
 	public static final int SAVE_DELETE = 3;
-	
+
 	/**
 	 * Персистент менеджер нужен объекту для удобства, 
 	 * объект может испоьзовать некоторые функции ОРМ для
@@ -64,7 +67,7 @@ public class CommonObject extends ModelObject {
 	}
 	
 	public static Query getSingleObjectSelectQuery(IPersistentManagerSession pms, Class<?> cls, Long id) {
-		Query q = pms.getEm().createQuery("select obj from "+cls.getSimpleName()+" obj where obj.mId = :id", 
+		Query q = pms.getEm().createQuery("select obj from "+cls.getSimpleName()+" obj where obj."+FIELD_ID+" = :id", 
 				cls);
 		q.setParameter("id", id);
 		return q;
@@ -83,7 +86,7 @@ public class CommonObject extends ModelObject {
 	 */	
 	public CommonObject(IPersistentManagerSession pmSession) {
 		mPersistentManagerSession = pmSession;
-		mDeleteFlag = false;
+		deleteFlag = false;
 		if (PersistentManagerSessionUI.class.isAssignableFrom(mPersistentManagerSession.getClass())) {
 			if (mCreator == null) mCreator = ((PersistentManagerSessionUI)pmSession).getUser();
 			if (mAuthor == null) mAuthor = ((PersistentManagerSessionUI)pmSession).getUser();
@@ -98,11 +101,11 @@ public class CommonObject extends ModelObject {
 	@DontCreateHistory
 	@Column(name = "id", columnDefinition="VARCHAR(64)", nullable=false)
 	@Accessors(getter = "getId", setter = "setId")
-	private		String mId;
+	private		String id;
 
 	@Override
-	public 		String getId() {	return mId;	}
-	public		void setId(String id) { mId = id; }
+	public 		String getId() {	return id;	}
+	public		void setId(String id) { this.id = id; }
 	
 	
 	/**
@@ -111,9 +114,9 @@ public class CommonObject extends ModelObject {
 	@Index
 	@Column(name = "deleteFlag")
     @Accessors(getter = "getDeleteFlag", setter = "setDeleteFlag")
-	private		Boolean mDeleteFlag;
-	public		Boolean getDeleteFlag() { if (mDeleteFlag == null) return false; else return mDeleteFlag; }
-	public		void	setDeleteFlag(Boolean deleteFlag) { mDeleteFlag = deleteFlag; }
+	private		Boolean deleteFlag;
+	public		Boolean getDeleteFlag() { if (this.deleteFlag == null) return false; else return deleteFlag; }
+	public		void	setDeleteFlag(Boolean deleteFlag) { this.deleteFlag = deleteFlag; }
 	
 	/**
 	 * Object code
@@ -188,14 +191,14 @@ public class CommonObject extends ModelObject {
 	 * Set object deletion flag
 	 */
 	public 		void delete() {
-		mDeleteFlag = true;
+		deleteFlag = true;
 	}
 
 	/**
 	 * Unset object deletion flag
 	 */
 	public		void recover() {
-		mDeleteFlag = false;
+		deleteFlag = false;
 	}
 	
 	/**

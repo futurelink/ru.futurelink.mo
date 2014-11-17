@@ -29,7 +29,7 @@ import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 @Table(name = "MAIL_SERVERS")
 @MappedSuperclass
 @NamedQueries({
-	@NamedQuery(name="MailServers.all", query="SELECT u FROM MailServer u where u.mDeleteFlag = 0")
+	@NamedQuery(name="MailServers.all", query="SELECT u FROM MailServer u where u.deleteFlag = 0")
 })
 public class MailServer extends CommonObject {
 

@@ -101,7 +101,7 @@ public class User extends CommonObject {
 	
 	public String getGrantedUsersCount() {
 		Query q = getPersistenceManagerSession().getEm().createQuery(
-				"select count(d) from Access d where d.mCreator = :creator and d.mDeleteFlag = 0"
+				"select count(d) from Access d where d.mCreator = :creator and d.deleteFlag = 0"
 			);
 		q.setParameter("creator", this);
 		if (q.getResultList().size() > 0) {

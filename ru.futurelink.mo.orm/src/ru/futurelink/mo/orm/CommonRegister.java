@@ -51,8 +51,8 @@ public class CommonRegister extends ModelObject {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable=false)
-	private Long mId;	
-	@Override public String getId() { return mId.toString(); }
+	private Long id;	
+	@Override public String getId() { return id.toString(); }
 	@Override public void setId(String id) {}
 
 	@Override public Boolean getDeleteFlag() { return false; }

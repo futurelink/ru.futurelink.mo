@@ -50,9 +50,9 @@ public class UserLock implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
-	private		Long mId;	
-	public 		Long getId() {	return mId;	}
-	public		void setId(Long id) { mId = id; }	
+	private		Long id;	
+	public 		Long getId() {	return id;	}
+	public		void setId(Long id) { this.id = id; }	
 	
 	/**
 	 * Lock set time

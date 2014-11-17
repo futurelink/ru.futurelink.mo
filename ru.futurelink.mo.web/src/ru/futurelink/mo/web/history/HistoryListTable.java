@@ -71,8 +71,8 @@ public class HistoryListTable extends CommonTable {
 	      switch( columnIndex ) {
 	        case 0:
 	        	try {
-	        		if (dto.getDataField("date", "getDate", "setDate") != null) {
-	        			Date resultObj = (Date) dto.getDataField("date", "getDate", "setDate");
+	        		if (dto.getDataField("date") != null) {
+	        			Date resultObj = (Date) dto.getDataField("date");
 	        			SimpleDateFormat format = new SimpleDateFormat("dd.MM.y, hh:mm");
 	        			result = resultObj != null ? format.format(resultObj).toString() : "";
 	        		} else 
@@ -84,7 +84,7 @@ public class HistoryListTable extends CommonTable {
 
 	        case 1:
 	        	try {
-	        		if (dto.getDataField("mObjectId", "getObjectId", null) != null) {
+	        		if (dto.getDataField("objectId") != null) {
 	        			result = dto.getDataField("mObjectId", "getObjectId", null).toString();
 	        		}
 	        	} catch (DTOException ex) {
@@ -94,7 +94,7 @@ public class HistoryListTable extends CommonTable {
 
 	        case 2:
 	        	try {
-	        		if (dto.getDataField("operation", "getOperation", "setOperation") != null) {
+	        		if (dto.getDataField("operation") != null) {
 	        			result = dto.getDataField("id", "getOperation", "setOperation").toString();
 	        		}
 	        	} catch (DTOException ex) {

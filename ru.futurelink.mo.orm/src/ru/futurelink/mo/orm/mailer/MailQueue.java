@@ -37,9 +37,9 @@ public class MailQueue extends ModelObject {
 	@GeneratedValue(generator="system-uuid")
 	@DontCreateHistory
 	@Column(name = "id", columnDefinition="VARCHAR(64)", nullable=false) 
-	private		String mId;	
-	public 		String getId() {	return mId;	}
-	public		void setId(String id) { mId = id; }
+	private		String id;	
+	public 		String getId() {	return this.id;	}
+	public		void setId(String id) { this.id = id; }
 
 	@Column(name = "sent")
 	private		boolean mSent;

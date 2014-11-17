@@ -95,10 +95,10 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 		String queryString = "";
 		if (HistoryObject.class.isAssignableFrom(mDataClass)) {
 			queryString = 
-				"select d from "+mDataClass.getName()+" d where d.mDeleteFlag = 0 and d.mOutdated = 0";
+				"select d from "+mDataClass.getName()+" d where d.deleteFlag = 0 and d.mOutdated = 0";
 		} else {
 			queryString = 
-				"select d from "+mDataClass.getName()+" d where d.mDeleteFlag = 0";
+				"select d from "+mDataClass.getName()+" d where d.deleteFlag = 0";
 		}
 		
 		// If data picker is not public use only creator filtered records to select

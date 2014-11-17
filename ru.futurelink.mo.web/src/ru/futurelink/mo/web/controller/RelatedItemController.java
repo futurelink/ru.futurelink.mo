@@ -111,7 +111,7 @@ public abstract class RelatedItemController
 			// ссылка на родительский объект, то получаем объект связанный.
 			if (mRelatedController.getDTO().getId() != null) { 
 				Query q = getSession().persistent().getEm().createQuery(
-						"select d from "+mDataClass.getSimpleName()+" d where d."+mFieldName+".mId = :relatedItemId"
+						"select d from "+mDataClass.getSimpleName()+" d where d."+mFieldName+".id = :relatedItemId"
 					);
 				q.setParameter("relatedItemId", mRelatedController.getDTO().getId());
 				//q.setParameter("creator", getSession().getDatabaseUser());

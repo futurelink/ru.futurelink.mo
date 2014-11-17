@@ -26,8 +26,8 @@ import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 @Table(name = "MAIL_TEMPLATE")
 @MappedSuperclass
 @NamedQueries({
-	@NamedQuery(name="MailTemplate.findByName", query="SELECT u FROM MailTemplate u where u.mName = :name and u.mDeleteFlag = 0"),
-	@NamedQuery(name="MailTemplate.all", query="SELECT u FROM MailTemplate u where u.mDeleteFlag = 0")
+	@NamedQuery(name="MailTemplate.findByName", query="SELECT u FROM MailTemplate u where u.mName = :name and u.deleteFlag = 0"),
+	@NamedQuery(name="MailTemplate.all", query="SELECT u FROM MailTemplate u where u.deleteFlag = 0")
 })
 public class MailTemplate extends CommonObject {
 

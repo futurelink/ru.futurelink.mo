@@ -29,8 +29,8 @@ public class MigrationVersion {
 	@Id
 	@GeneratedValue(generator="system-uuid")
 	@Column(name = "id", columnDefinition="VARCHAR(64)", nullable=false)
-	private String mId;
-	public String getId() { return mId; }
+	private String id;
+	public String getId() { return id; }
 
 	/**
 	 * Номер версии базы данных.

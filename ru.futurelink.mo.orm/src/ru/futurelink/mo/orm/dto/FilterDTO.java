@@ -114,7 +114,7 @@ public class FilterDTO extends CommonDTO {
 						if (CommonDTO.class.isAssignableFrom(mQueryConditions.get(fieldName).get(n).getClass())) {
 							try {
 								String id = ((CommonDTO)mQueryConditions.get(fieldName).get(n)).getId();
-								cond = cond + fieldName + ".mId = :fieldData" + k + n;
+								cond = cond + fieldName + ".id = :fieldData" + k + n;
 								mAdditionalValues.put("fieldData" + k + n, id);
 							} catch (DTOException ex) {
 								// TODO handle this error

@@ -32,8 +32,8 @@ public class CodeSupport {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
-	private Long mId;
-	public Long getId() { return mId; }
+	private Long id;
+	public Long getId() { return id; }
 
 	@JoinColumn(name = "object", referencedColumnName="id")
 	private CommonObject mObject;
