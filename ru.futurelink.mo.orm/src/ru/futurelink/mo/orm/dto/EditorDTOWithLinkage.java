@@ -13,7 +13,6 @@ package ru.futurelink.mo.orm.dto;
 
 import java.util.ArrayList;
 
-import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
