@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.eclipse.swt.widgets.Composite;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
 import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
@@ -27,6 +26,8 @@ import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.exceptions.ValidationException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
+import ru.futurelink.mo.orm.iface.IModelObject;
 import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 import ru.futurelink.mo.web.composites.CommonItemComposite;
 import ru.futurelink.mo.web.controller.RelatedController.SaveMode;
@@ -57,7 +58,7 @@ public abstract class CommonItemController
 	
 	private		EditMode					editMode;
 	
-	public CommonItemController(ICompositeController parentController, Class<? extends CommonObject> dataClass,
+	public CommonItemController(ICompositeController parentController, Class<? extends ICommonObject> dataClass,
 			CompositeParams compositeParams) {
 		super(parentController, dataClass, compositeParams);
 		
@@ -67,7 +68,7 @@ public abstract class CommonItemController
 		mChecker = createAccessChecker();
 	}
 
-	public CommonItemController(ICompositeController parentController, Class<? extends CommonObject> dataClass,
+	public CommonItemController(ICompositeController parentController, Class<? extends ICommonObject> dataClass,
 			Composite container, CompositeParams compositeParams) {
 		super(parentController, dataClass, container, compositeParams);
 
@@ -124,11 +125,12 @@ public abstract class CommonItemController
 	 * @param data элемент данных
 	 * @return объект DTO
 	 */
-	protected CommonDTO createDTO(CommonObject data) throws DTOException {
-		if (data.getPersistenceManagerSession() == null) 
-			data.setPersistentManagerSession(mPersistentSession);
+	protected CommonDTO createDTO(IModelObject data) throws DTOException {
+		if (ICommonObject.class.isAssignableFrom(data.getClass()) &&
+				((ICommonObject)data).getPersistenceManagerSession() == null) 
+				((ICommonObject)data).setPersistentManagerSession(mPersistentSession);
 		
-		EditorDTO dto = new EditorDTO(data);
+		EditorDTO dto = new EditorDTO((IModelObject)data);
 		dto.addAccessChecker(mChecker);
 		return dto;
 	}
@@ -140,11 +142,12 @@ public abstract class CommonItemController
 	 * @param data элемент данных
 	 * @return объект DTO
 	 */
-	protected CommonDTO openDTO(CommonObject data) throws DTOException {
-		if (data.getPersistenceManagerSession() == null) 
-			data.setPersistentManagerSession(mPersistentSession);
+	protected CommonDTO openDTO(IModelObject data) throws DTOException {
+		if (ICommonObject.class.isAssignableFrom(data.getClass()) &&
+			((ICommonObject)data).getPersistenceManagerSession() == null) 
+			((ICommonObject)data).setPersistentManagerSession(mPersistentSession);
 
-		EditorDTO dto = new EditorDTO(data);
+		EditorDTO dto = new EditorDTO((IModelObject)data);
 		dto.addAccessChecker(mChecker);
 		return dto;
 	}
@@ -188,14 +191,14 @@ public abstract class CommonItemController
 		doAfterCreate();
 	}
 
-	public CommonObject createDataElement() throws DTOException {
+	public ICommonObject createDataElement() throws DTOException {
 		if (mDataClass == null) {
 			throw new DTOException("Класс данных ORM неизвестен, невозможно создать композит", null);
 		}
 
 		try {
 			Constructor<?> ctor = mDataClass.getConstructor(PersistentManagerSession.class);
-			return (CommonObject) ctor.newInstance(mPersistentSession);
+			return (ICommonObject) ctor.newInstance(mPersistentSession);
 		} catch (NoSuchMethodException ex) {
 			throw new DTOException("В объекте ORM, возможно, не определен правильный конструктор!", ex);			
 		} catch (SecurityException ex) {
@@ -250,7 +253,7 @@ public abstract class CommonItemController
 	 */
 	@Override
 	public final void openById(String id) throws OpenException {	
-		CommonObject data = (CommonObject) mPersistentSession.open(mDataClass, id);
+		ICommonObject data = (ICommonObject) mPersistentSession.open(mDataClass, id);
 		if (data != null) {
 			open(data);
 		} else {
@@ -264,7 +267,7 @@ public abstract class CommonItemController
 	 * @param data
 	 */
 	@Override
-	public final void open(CommonObject data) throws OpenException{		
+	public final void open(ICommonObject data) throws OpenException{		
 		if (data != null) {
 			try {
 				// Сначала открываем объект(тут важен порядок действий), 			

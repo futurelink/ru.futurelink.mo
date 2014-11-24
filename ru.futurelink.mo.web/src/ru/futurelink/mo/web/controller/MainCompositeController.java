@@ -15,7 +15,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import ru.futurelink.mo.orm.CommonObject;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.composites.CommonComposite;
 
 /**
@@ -33,7 +33,7 @@ public class MainCompositeController extends CompositeController {
 	 * @param container
 	 * @param compositeParams
 	 */
-	public MainCompositeController(CompositeController parentController, Class<? extends CommonObject> dataClass, 
+	public MainCompositeController(CompositeController parentController, Class<? extends ICommonObject> dataClass, 
 			Composite container, CompositeParams compositeParams) {
 		super(parentController, dataClass, container, compositeParams);
 	}

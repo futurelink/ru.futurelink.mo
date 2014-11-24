@@ -19,9 +19,9 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.client.service.UrlLauncher;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.controller.CommonController;
 import ru.futurelink.mo.web.exceptions.InitException;
@@ -40,7 +40,7 @@ public abstract class ExportController extends CommonController {
 	 * @param dataClass
 	 */
 	public ExportController(ApplicationSession session,
-			Class<? extends CommonObject> dataClass) {
+			Class<? extends ICommonObject> dataClass) {
 		super(session, dataClass);
 	}
 

@@ -18,13 +18,14 @@ import javax.persistence.TypedQuery;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableColumn;
 
-import ru.futurelink.mo.orm.CommonObject;
+import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.dto.ViewerDTO;
 import ru.futurelink.mo.orm.dto.ViewerDTOList;
 import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.controller.CommonControllerListener;
 import ru.futurelink.mo.web.controller.CompositeController;
 import ru.futurelink.mo.web.controller.CompositeParams;
@@ -41,7 +42,7 @@ public class RecycleListController extends SimpleListController {
 	private ViewerDTOList<ViewerDTO> mList;
 
 	public RecycleListController(CompositeController parentController,
-			Class<? extends CommonObject> dataClass, Composite container,
+			Class<? extends ICommonObject> dataClass, Composite container,
 			CompositeParams compositeParams) {
 		super(parentController, dataClass, container, compositeParams);
 	}
@@ -62,7 +63,7 @@ public class RecycleListController extends SimpleListController {
 			logger().debug("Количество элементов: {}", q2.getResultList().size());
 
 			try {
-				mList.addObjectList((List<? extends CommonObject>) q2.getResultList());
+				mList.addObjectList((List<? extends ModelObject>) q2.getResultList());
 				setDTO(mList);
 			} catch (DTOException e) {
 				throw new DTOException("Ошибка открытия корзины: "+e.getMessage(), e);

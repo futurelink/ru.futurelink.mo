@@ -60,21 +60,23 @@ public class Activator implements BundleActivator {
 					if (caRef == null) {
 						throw new RuntimeException("ConfigAdmin не запущен, конфигурация JPA невозможна");
 					}
-				
+			
 					ConfigurationAdmin configAdmin = (ConfigurationAdmin)  mContext.getService(caRef);
 					Configuration[] config = null;				
 
 					do {
-						try {
-							config = configAdmin.listConfigurations("(service.factoryPid=gemini.jpa.punit)");
-							if (config == null) {
-								mLogger.info("Конфигурация Gemini не доступна, повтор через 3 сек.");
-								Thread.sleep(3000);
+						synchronized (ConfigurationAdmin.class) {
+							try {
+								config = configAdmin.listConfigurations("(service.factoryPid=gemini.jpa.punit)");
+								if (config == null) {
+									mLogger.info("Конфигурация Gemini не доступна, повтор через 3 сек.");
+									Thread.sleep(3000);
+								}
+							} catch (InterruptedException ex) {
+								mLogger.warn("Попытка отыскать Gemini была прервана.");
+							} catch (IOException | InvalidSyntaxException ex) {
+								mLogger.error("Попытка отыскать Gemini завершилась ошибкой", ex);
 							}
-						} catch (InterruptedException ex) {
-							mLogger.warn("Попытка отыскать Gemini была прервана.");
-						} catch (IOException | InvalidSyntaxException ex) {
-							mLogger.error("Попытка отыскать Gemini завершилась ошибкой", ex);
 						}
 					} while (config == null);
 

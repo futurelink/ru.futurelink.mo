@@ -17,13 +17,14 @@ import javax.persistence.TypedQuery;
 
 import org.eclipse.swt.widgets.Composite;
 
-import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.HistoryObject;
+import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.ViewerDTO;
 import ru.futurelink.mo.orm.dto.ViewerDTOList;
 import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
+import ru.futurelink.mo.orm.iface.IHistoryObject;
 import ru.futurelink.mo.web.controller.CompositeController;
 import ru.futurelink.mo.web.controller.CompositeParams;
 import ru.futurelink.mo.web.controller.SimpleListController;
@@ -35,13 +36,13 @@ public class HistoryListController extends SimpleListController {
 	private ViewerDTOList<ViewerDTO> mList;
 
 	public HistoryListController(CompositeController parentController,
-			Class<? extends CommonObject> dataClass, Composite container,
+			Class<? extends ICommonObject> dataClass, Composite container,
 			CompositeParams compositeParams) {
 		super(parentController, dataClass, container, compositeParams);
 	}
 
 	public HistoryListController(CompositeController parentController,
-			Class<? extends CommonObject> dataClass, CompositeParams compositeParams) {
+			Class<? extends ICommonObject> dataClass, CompositeParams compositeParams) {
 		super(parentController, dataClass, compositeParams);
 	}
 
@@ -56,7 +57,7 @@ public class HistoryListController extends SimpleListController {
 		
 		String query;
 		TypedQuery<?> q2 = null;
-		if (HistoryObject.class.isAssignableFrom(getDataClass())) {
+		if (IHistoryObject.class.isAssignableFrom(getDataClass())) {
 			query =	"SELECT new ru.futurelink.mo.orm.HistoryResult(d.id, d.mModifyDate, d.mWorkLog.mDescription, d.id) FROM " + 
 				getDataClass().getSimpleName()+" d " +
 				"where d.mCreator = :creator and d.mCode.id = :code " +
@@ -88,7 +89,7 @@ public class HistoryListController extends SimpleListController {
 		
  		if ((q2 != null) && (q2.getResultList().size() > 0)) {
 			logger().debug("Количество элементов: {} ", q2.getResultList().size());
-			mList.addObjectList((List<? extends CommonObject>) q2.getResultList());
+			mList.addObjectList((List<? extends ModelObject>) q2.getResultList());
 		}
 		setDTO(mList);
 	}

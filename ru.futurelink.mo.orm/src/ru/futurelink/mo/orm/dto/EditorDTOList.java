@@ -15,10 +15,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 
 /**
@@ -50,8 +50,8 @@ public class EditorDTOList<T extends CommonDTO>
 			return;
 		} else {
 			for (ModelObject object : sourceList) {
-				if (CommonObject.class.isAssignableFrom(object.getClass())) {
-					((CommonObject)object).setPersistentManagerSession(getPersistentManagerSession());
+				if (ICommonObject.class.isAssignableFrom(object.getClass())) {
+					((ICommonObject)object).setPersistentManagerSession(getPersistentManagerSession());
 				}
 				try {
 					Constructor<T> ctr = getDTOClass().getConstructor(ModelObject.class);

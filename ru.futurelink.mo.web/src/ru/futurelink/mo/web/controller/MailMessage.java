@@ -18,10 +18,10 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ru.futurelink.mo.orm.mailer.MailTemplate;
+import ru.futurelink.mo.orm.iface.IMailTemplate;
 
 public class MailMessage {
-	private MailTemplate	mTemplate;
+	private IMailTemplate	mTemplate;
 	private String			mTemplatedMessage;
 	private String			mTemplatedSubject;
 	private HashMap<String, String> mAttributes;
@@ -41,7 +41,7 @@ public class MailMessage {
 		
 	}
 
-	public void setTemplate(MailTemplate template) {
+	public void setTemplate(IMailTemplate template) {
 		mTemplate = template;
 		
 		if (mTemplate.getSubject() == null) mTemplate.setSubject("");

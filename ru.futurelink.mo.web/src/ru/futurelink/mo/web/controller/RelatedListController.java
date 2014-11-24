@@ -13,11 +13,11 @@ package ru.futurelink.mo.web.controller;
 
 import org.eclipse.swt.widgets.Composite;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
 import ru.futurelink.mo.web.controller.iface.IListEditController;
 import ru.futurelink.mo.web.exceptions.InitException;
@@ -50,7 +50,7 @@ public abstract class RelatedListController
 	private boolean					mDataChanged;
 
 	public RelatedListController(ICompositeController parentController,
-			Class<? extends CommonObject> dataClass, Composite container,
+			Class<? extends ICommonObject> dataClass, Composite container,
 			CompositeParams compositeParams) {
 		super(parentController, dataClass, container, compositeParams);
 		
@@ -58,7 +58,7 @@ public abstract class RelatedListController
 	}
 
 	public RelatedListController(ICompositeController parentController,
-			Class<? extends CommonObject> dataClass, CompositeParams compositeParams) {
+			Class<? extends ICommonObject> dataClass, CompositeParams compositeParams) {
 		super(parentController, dataClass, compositeParams);
 		
 		setRelatedController((CommonItemController) parentController);

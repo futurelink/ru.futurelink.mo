@@ -19,7 +19,7 @@ import javax.persistence.TypedQuery;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-import ru.futurelink.mo.orm.CommonObject;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.composites.CommonComposite;
 import ru.futurelink.mo.web.controller.CommonControllerListener;
 import ru.futurelink.mo.web.controller.CompositeController;
@@ -42,7 +42,7 @@ public class LinkedListController extends CompositeController {
 	 * @param compositeParams
 	 */
 	public LinkedListController(CompositeController parentController,
-			Class<? extends CommonObject> dataClass,
+			Class<? extends ICommonObject> dataClass,
 			CompositeParams compositeParams) {
 		super(parentController, dataClass, compositeParams);
 	}	

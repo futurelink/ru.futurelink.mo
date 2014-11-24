@@ -17,11 +17,11 @@ import java.util.Iterator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableColumn;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.dto.EditorDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.composites.CommonDataComposite;
 import ru.futurelink.mo.web.composites.CommonListComposite;
 import ru.futurelink.mo.web.composites.dialogs.CommonItemDialog;
@@ -47,7 +47,7 @@ abstract public class CommonDataPickerController
 	private EditorDTO				mActiveData;
 
 	public CommonDataPickerController(CompositeController parentController,
-			Class<? extends CommonObject> dataClass, Composite container,
+			Class<? extends ICommonObject> dataClass, Composite container,
 			CompositeParams compositeParams) {
 		super(parentController, dataClass, container, compositeParams);
 	}

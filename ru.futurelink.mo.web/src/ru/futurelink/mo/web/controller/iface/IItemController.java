@@ -13,12 +13,12 @@ package ru.futurelink.mo.web.controller.iface;
 
 import java.util.ArrayList;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.exceptions.ValidationException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.controller.RelatedController;
 
 /**
@@ -37,7 +37,7 @@ public interface IItemController
 
 	public void create() throws DTOException;
 	public void openById(String id) throws OpenException;
-	public void open(CommonObject data) throws OpenException;
+	public void open(ICommonObject data) throws OpenException;
 	public void save() throws SaveException, DTOException, ValidationException;
 	public void saveCommit() throws SaveException;
 	public void close();

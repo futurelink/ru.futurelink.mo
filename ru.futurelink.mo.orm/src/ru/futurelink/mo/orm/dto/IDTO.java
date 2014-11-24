@@ -17,7 +17,7 @@ import java.util.HashMap;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
-import ru.futurelink.mo.orm.security.User;
+import ru.futurelink.mo.orm.iface.IUser;
 
 /**
  * DTO is an in-memory data access layer between model object and controller.
@@ -140,7 +140,7 @@ public interface IDTO {
      *
 	 * @return
 	 */
-	public User getCreator();
+	public IUser getCreator();
 
 	/**
 	 * Add access check agent to DTO.

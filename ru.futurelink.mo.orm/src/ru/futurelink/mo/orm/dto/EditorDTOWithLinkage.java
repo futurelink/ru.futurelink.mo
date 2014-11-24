@@ -13,11 +13,12 @@ package ru.futurelink.mo.orm.dto;
 
 import java.util.ArrayList;
 
-import ru.futurelink.mo.orm.CommonObject;
+import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
-import ru.futurelink.mo.orm.security.User;
+import ru.futurelink.mo.orm.iface.IModelObject;
+import ru.futurelink.mo.orm.iface.IUser;
 
 /**
  * Объект DTO с встроенной подпиской. Работает с двумя типами объектов - 
@@ -32,12 +33,12 @@ public class EditorDTOWithLinkage extends EditorDTO
 
 	private EditorDTO		mLinkageDTO;
 
-	public EditorDTOWithLinkage(CommonObject dataItem) {
+	public EditorDTOWithLinkage(IModelObject dataItem) {
 		super(dataItem);
 	}
 
 	@Override
-	public void setLinkedItem(CommonObject linkageItem) {
+	public void setLinkedItem(IModelObject linkageItem) {
 		mLinkageDTO = new EditorDTO(linkageItem);
 		mLinkageDTO.addAccessChecker(mAccessChecker);
 	}
@@ -89,7 +90,7 @@ public class EditorDTOWithLinkage extends EditorDTO
 	}
 
 	@Override
-	public User getLinkageCreator() {
+	public IUser getLinkageCreator() {
 		return mLinkageDTO.getCreator();
 	}
 

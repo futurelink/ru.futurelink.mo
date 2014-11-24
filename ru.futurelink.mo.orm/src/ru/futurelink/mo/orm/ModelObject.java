@@ -17,22 +17,23 @@ import java.lang.reflect.Field;
 import javax.persistence.MappedSuperclass;
 
 import ru.futurelink.mo.orm.annotations.Accessors;
-import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.iface.IModelObject;
 
 @MappedSuperclass
-public abstract class ModelObject implements Serializable {
+public abstract class ModelObject
+	implements IModelObject, Serializable {
 	private static final long serialVersionUID = 1L;	
 
-	abstract public String getId();
-	abstract public void setId(String id);
-	
-	abstract public Boolean getDeleteFlag();
-	abstract public void setDeleteFlag(Boolean deleteFlag);
-	
-	// Abstract method to save model
-	abstract public Object save() throws SaveException;
-	abstract public void saveCommit() throws SaveException;
-	
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_DELETEFLAG = "deleteFlag";
+    public static final String FIELD_CREATOR = "mCreator";
+    public static final String FIELD_AUTHOR = "mAuthor";
+    public static final String FIELD_CODE = "mCode";
+
+	public static final int SAVE_CREATE = 1;
+	public static final int SAVE_MODIFY = 2;
+	public static final int SAVE_DELETE = 3;
+
 	public Accessors getAccessors(String fieldName) throws NoSuchFieldException {
 		return getField(fieldName).getAnnotation(Accessors.class);		
 	}

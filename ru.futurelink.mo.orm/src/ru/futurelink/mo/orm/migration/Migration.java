@@ -62,13 +62,13 @@ public abstract class Migration {
 	private void storeVersion(String revision) {
 		logger().info("Сохранение новой версии базы данных...");
 		
-		MigrationVersion version = new MigrationVersion();
+		/*IMigrationVersion version = new MigrationVersion();
 		version.setVersion(getVersionTo());
 		version.setRevision(revision);
 		
 		getPersistent().getEm().getTransaction().begin();
 		getPersistent().getEm().persist(version);
-		getPersistent().getEm().getTransaction().commit();
+		getPersistent().getEm().getTransaction().commit();*/
 	}
 	
 	public abstract void doBeforeProcess() throws Exception;

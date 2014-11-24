@@ -25,8 +25,8 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.controller.iface.IBundleDecorator;
 import ru.futurelink.mo.web.controller.iface.IController;
@@ -39,7 +39,7 @@ public abstract class CommonController
 {
 		protected BundleContext						mBundleContext;
 
-		protected Class<? extends CommonObject>		mDataClass;
+		protected Class<? extends ICommonObject>		mDataClass;
 		protected ApplicationSession					mSession;
 		protected List<IController>					mSubControllers;
 		protected IController							mThisController;
@@ -51,7 +51,7 @@ public abstract class CommonController
 		//@SuppressWarnings("rawtypes")
 		//private	 ServiceRegistration					mEventHandlerRegistration;
 		
-		public CommonController(ApplicationSession session, Class<? extends CommonObject> dataClass) {
+		public CommonController(ApplicationSession session, Class<? extends ICommonObject> dataClass) {
 			mSession = session;
 			mDataClass = dataClass;
 			mThisController = this;
@@ -219,7 +219,7 @@ public abstract class CommonController
 		 * 
 		 * @return класс данных модели
 		 */
-		protected Class<? extends CommonObject> getDataClass() {
+		protected Class<? extends ICommonObject> getDataClass() {
 			return mDataClass;
 		}
 
