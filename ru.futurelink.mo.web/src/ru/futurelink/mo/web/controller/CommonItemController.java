@@ -28,7 +28,7 @@ import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.exceptions.ValidationException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.orm.iface.IModelObject;
-import ru.futurelink.mo.orm.pm.PersistentManagerSession;
+import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 import ru.futurelink.mo.web.composites.CommonItemComposite;
 import ru.futurelink.mo.web.controller.RelatedController.SaveMode;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
@@ -50,7 +50,7 @@ public abstract class CommonItemController
 	
 	public enum EditMode { DIALOG, CONTAINER };
 
-	private 	PersistentManagerSession	mPersistentSession;
+	private 	IPersistentManagerSession	mPersistentSession;
 	private		ArrayList<RelatedController> mRelatedControllers;
 
 	private		CommonDTO					mDTO;
@@ -197,7 +197,7 @@ public abstract class CommonItemController
 		}
 
 		try {
-			Constructor<?> ctor = mDataClass.getConstructor(PersistentManagerSession.class);
+			Constructor<?> ctor = mDataClass.getConstructor(IPersistentManagerSession.class);
 			return (ICommonObject) ctor.newInstance(mPersistentSession);
 		} catch (NoSuchMethodException ex) {
 			throw new DTOException("В объекте ORM, возможно, не определен правильный конструктор!", ex);			

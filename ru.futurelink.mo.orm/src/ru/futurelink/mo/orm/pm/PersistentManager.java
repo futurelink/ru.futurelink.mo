@@ -94,11 +94,13 @@ public class PersistentManager {
     			if (emfb != null) {    				 
     				// Переводим словарь в мап
     				Map<String, String> props = new HashMap<String, String>();
-    				Enumeration<String> keys = mProperties.keys();
-    				while (keys.hasMoreElements()) {
-    					String key = keys.nextElement();
-    			        props.put(key, (String) mProperties.get(key));
-    			    }    				
+    				if (mProperties != null) {
+    					Enumeration<String> keys = mProperties.keys();
+    					while (keys.hasMoreElements()) {
+    						String key = keys.nextElement();
+    						props.put(key, (String) mProperties.get(key));
+    					}
+    				}
     				return emfb.createEntityManagerFactory(props);
     			} else {
     				return null;

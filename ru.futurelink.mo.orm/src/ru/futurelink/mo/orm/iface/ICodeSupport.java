@@ -11,6 +11,8 @@
 
 package ru.futurelink.mo.orm.iface;
 
+import java.util.Set;
+
 /**
  * @author pavlov
  *
@@ -19,8 +21,8 @@ public interface ICodeSupport {
 
 	public Long getId();
 	
-	public ICommonObject getObject();
-	public void setObject(ICommonObject object);
+	public Set<ICommonObject> getObject();
+	//public void setObject(ICommonObject object);
 
 	public void setObjectClass(String className);
 	public String getObjectClass();

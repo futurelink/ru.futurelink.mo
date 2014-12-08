@@ -135,6 +135,7 @@ public class CommonObject
 	 * Object creator user
 	 */
 	@Index
+	@ManyToOne
 	@DontCreateHistory
 	@JoinColumn(name = "creator", referencedColumnName = "id")
 	@Accessors(getter = "getCreator", setter = "setCreator")
@@ -146,6 +147,7 @@ public class CommonObject
 	 * Object author user (who changed object last time)
 	 */
 	@Index
+	@ManyToOne
 	@DontCreateHistory
 	@JoinColumn(name = "author", referencedColumnName = "id")
 	@Accessors(getter = "getAuthor", setter = "setAuthor")
@@ -179,6 +181,7 @@ public class CommonObject
 	 * Object worklog (change log)
 	 */
 	@DontCreateHistory
+	@ManyToOne
 	@JoinColumn(name = "workLog", referencedColumnName = "id")
 	@Accessors(getter = "getWorkLog", setter = "setWorkLog")
 	private		WorkLogSupport	mWorkLog;
@@ -220,7 +223,7 @@ public class CommonObject
 		}
 		if (getCode() == null) { 
 			mCode = new CodeSupport();
-			mCode.setObject(this);
+			//mCode.setObject(this);
 			mCode.setObjectClass(getClass().getName());
 		}
 

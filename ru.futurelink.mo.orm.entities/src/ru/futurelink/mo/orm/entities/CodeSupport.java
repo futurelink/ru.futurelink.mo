@@ -11,11 +11,14 @@
 
 package ru.futurelink.mo.orm.entities;
 
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
 
@@ -38,10 +41,11 @@ public class CodeSupport implements ICodeSupport {
 	private Long id;
 	public Long getId() { return id; }
 
+	@OneToMany(targetEntity=CommonObject.class)
 	@JoinColumn(name = "object", referencedColumnName="id")
-	private CommonObject mObject;
-	public  ICommonObject getObject() { return mObject; }
-	public void setObject(ICommonObject object) { mObject = (CommonObject) object; }
+	private Set<ICommonObject> mObjects;
+	public  Set<ICommonObject> getObject() { return mObjects; }
+	//public void setObject(ICommonObject object) { mObject = (CommonObject) object; }
 
 	@Column(name = "objectClass")
 	private String mObjectClass;

@@ -19,6 +19,7 @@ import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
+import ru.futurelink.mo.orm.iface.IModelObject;
 import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 
 /**
@@ -54,7 +55,7 @@ public class EditorDTOList<T extends CommonDTO>
 					((ICommonObject)object).setPersistentManagerSession(getPersistentManagerSession());
 				}
 				try {
-					Constructor<T> ctr = getDTOClass().getConstructor(ModelObject.class);
+					Constructor<T> ctr = getDTOClass().getConstructor(IModelObject.class);
 					T dto = ctr.newInstance(object);
 					if (dto != null) {
 						if (dto.getAccessChecker() == null) dto.addAccessChecker(getAccessChecker());

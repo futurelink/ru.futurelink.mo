@@ -24,7 +24,7 @@ import javax.persistence.TypedQuery;
 import ru.futurelink.mo.orm.annotations.Accessors;
 import ru.futurelink.mo.orm.entities.CommonObject;
 import ru.futurelink.mo.orm.iface.IUser;
-import ru.futurelink.mo.orm.pm.PersistentManagerSession;
+import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 
 @Entity(name = "User")
 @Table(name = "USERS")
@@ -40,7 +40,7 @@ public class User
 
 	protected User() {}
 
-	public User(PersistentManagerSession manager) {
+	public User(IPersistentManagerSession manager) {
 		super(manager);
 	}
 
