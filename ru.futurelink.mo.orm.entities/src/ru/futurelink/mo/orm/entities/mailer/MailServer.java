@@ -19,7 +19,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import ru.futurelink.mo.orm.entities.CommonObject;
-import ru.futurelink.mo.orm.pm.PersistentManagerSession;
+import ru.futurelink.mo.orm.iface.IMailServer;
+import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 
 /**
  * @author pavlov
@@ -31,7 +32,9 @@ import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 @NamedQueries({
 	@NamedQuery(name="MailServers.all", query="SELECT u FROM MailServer u where u.deleteFlag = 0")
 })
-public class MailServer extends CommonObject {
+public class MailServer 
+	extends CommonObject 
+	implements IMailServer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -41,7 +44,7 @@ public class MailServer extends CommonObject {
 	 */
 	protected MailServer() {}
 
-	public MailServer(PersistentManagerSession manager) {
+	public MailServer(IPersistentManagerSession manager) {
 		super(manager);
 	}
 

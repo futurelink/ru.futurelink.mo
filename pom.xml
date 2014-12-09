@@ -11,6 +11,7 @@
 
 	<modules>
 		<module>ru.futurelink.mo.orm</module>
+		<module>ru.futurelink.mo.orm.entities</module>
 		<module>ru.futurelink.mo.orm.config</module>
 		<module>ru.futurelink.mo.web</module>
 		<module>ru.futurelink.mo.web.graphics</module>

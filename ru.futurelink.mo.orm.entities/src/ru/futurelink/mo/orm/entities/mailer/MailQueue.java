@@ -22,11 +22,14 @@ import javax.persistence.Table;
 import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.annotations.DontCreateHistory;
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.iface.IMailQueue;
 
 @Entity(name = "MailQueue")
 @Table(name = "MAIL_QUEUE")
 @MappedSuperclass
-public class MailQueue extends ModelObject {
+public class MailQueue 
+	extends ModelObject
+	implements IMailQueue {
 
 	private static final long serialVersionUID = 1L;
 
@@ -87,5 +90,6 @@ public class MailQueue extends ModelObject {
 	@Override
 	public void saveCommit() throws SaveException {
 		throw new SaveException("Save for mail queue messages is not allowed!", null);		
-	}  
+	}
+
 }
