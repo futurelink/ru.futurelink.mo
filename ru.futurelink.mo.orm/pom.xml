@@ -26,31 +26,6 @@
 			</plugin>
 
 			<plugin>
-               <groupId>de.empulse.eclipselink</groupId>
-               <artifactId>staticweave-maven-plugin</artifactId>
-               <version>1.0.0</version>
-               <executions>
-                   <execution>
-                       <phase>package</phase>
-                       <goals>
-                           <goal>weave</goal>
-                       </goals>
-                       <configuration>
-                           <persistenceXMLLocation>../../META-INF/persistence.xml</persistenceXMLLocation>
-                           <logLevel>FINE</logLevel>
-                       </configuration>
-                   </execution>
-               </executions>
-               <dependencies>
-                   <dependency>
-                       <groupId>org.eclipse.persistence</groupId>
-                       <artifactId>org.eclipse.persistence.jpa</artifactId>
-                       <version>2.5.1</version>
-                   </dependency>
-               </dependencies>
-			</plugin>
-
-			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.4.3</version>
 				<executions>
@@ -112,13 +87,12 @@
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Export-Package>
 							ru.futurelink.mo.orm,
+							ru.futurelink.mo.orm.iface,
 							ru.futurelink.mo.orm.pm,
-							ru.futurelink.mo.orm.helpers,
 							ru.futurelink.mo.orm.annotations,
 							ru.futurelink.mo.orm.aspects,
 							ru.futurelink.mo.orm.dto.*,
-							ru.futurelink.mo.orm.exceptions,
-							ru.futurelink.mo.orm.mailer,
+							ru.futurelink.mo.orm.exceptions,							
 							ru.futurelink.mo.orm.migration,
 							ru.futurelink.mo.orm.security,
 							ru.futurelink.mo.orm.types
@@ -126,11 +100,9 @@
 						<Bundle-Activator>ru.futurelink.mo.orm.Activator</Bundle-Activator>
 						<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 						<Bundle-ClassPath>.</Bundle-ClassPath>
-						<Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
 						<Include-Resource>
 							{maven-resources},
-							META-INF/aop.xml=META-INF/aop.xml,
-							META-INF/persistence.xml=META-INF/persistence.xml
+							META-INF/aop.xml=META-INF/aop.xml
 						</Include-Resource>
 						<Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
 					</instructions>

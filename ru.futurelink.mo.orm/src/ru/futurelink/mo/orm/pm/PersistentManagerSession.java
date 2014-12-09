@@ -16,10 +16,10 @@ import javax.persistence.EntityTransaction;
 
 import org.slf4j.Logger;
 
-import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.HistoryObject;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
+import ru.futurelink.mo.orm.iface.IHistoryObject;
 
 /**
  * @author pavlov
@@ -42,8 +42,8 @@ public class PersistentManagerSession
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends CommonObject> T open(Class<T> cls, String id) throws OpenException {
-		CommonObject obj = getPersistentManager().open(cls, id, this);
+	public <T extends ICommonObject> T open(Class<T> cls, String id) throws OpenException {
+		ICommonObject obj = getPersistentManager().open(cls, id, this);
 		obj.setPersistentManagerSession(this);
 		return (T) obj;
 		
@@ -103,12 +103,12 @@ public class PersistentManagerSession
 	}
 
 	@Override
-	public Object save(CommonObject object) throws SaveException {
+	public Object save(ICommonObject object) throws SaveException {
 		return getPersistentManager().save(object, this);
 	}
 
 	@Override
-	public Object saveWithHistory(HistoryObject object, String oldId) 
+	public Object saveWithHistory(IHistoryObject object, String oldId) 
 			throws SaveException, OpenException {
 		return getPersistentManager().saveWithHistory(object, oldId, this);
 	}

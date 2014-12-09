@@ -15,13 +15,13 @@ import java.lang.reflect.Constructor;
 
 import org.eclipse.swt.widgets.Composite;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.dto.EditorDTOList;
 import ru.futurelink.mo.orm.dto.FilterDTO;
 import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.composites.CommonDataComposite;
 import ru.futurelink.mo.web.composites.CommonListComposite;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
@@ -36,12 +36,12 @@ abstract public class CommonListController
 	private CommonDTOList<? extends CommonDTO>	 mDTO;
 	
 	public CommonListController(ICompositeController parentController,
-			Class<? extends CommonObject> dataClass, CompositeParams compositeParams) {
+			Class<? extends ICommonObject> dataClass, CompositeParams compositeParams) {
 		super(parentController, dataClass, compositeParams);	
 	}
 
 	public CommonListController(ICompositeController parentController,
-			Class<? extends CommonObject> dataClass, Composite container, CompositeParams compositeParams) {
+			Class<? extends ICommonObject> dataClass, Composite container, CompositeParams compositeParams) {
 		super(parentController, dataClass, container, compositeParams);
 	}
 

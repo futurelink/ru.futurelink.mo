@@ -32,10 +32,10 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.FilterDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonComposite;
 import ru.futurelink.mo.web.composites.CommonItemComposite;
@@ -60,7 +60,7 @@ public class DataPicker extends CommonField implements IField {
 	private ModifyListener 			mModifyListener;
 	private SelectionListener		mDataPickListener;
 	
-	private Class<? extends CommonObject> 			mDataClass;
+	private Class<? extends ICommonObject> 		mDataClass;
 	private Class<?>								mTableClass;
 	private Class<? extends CommonItemController> mItemControllerClass;
 	private CompositeParams							mItemDialogParams;
@@ -332,7 +332,7 @@ public class DataPicker extends CommonField implements IField {
 	 * 
 	 * @param classType
 	 */
-	final public void setDataClass(Class<? extends CommonObject> classType) {
+	final public void setDataClass(Class<? extends ICommonObject> classType) {
 		mDataClass = classType;
 	}
 
@@ -345,7 +345,7 @@ public class DataPicker extends CommonField implements IField {
 		mTableClass = classType;
 	}
 
-	final public Class<? extends CommonObject> getDataClass() {
+	final public Class<? extends ICommonObject> getDataClass() {
 		return mDataClass;
 	}
 	

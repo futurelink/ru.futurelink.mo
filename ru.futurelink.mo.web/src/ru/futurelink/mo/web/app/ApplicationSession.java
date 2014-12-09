@@ -22,12 +22,12 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.rap.rwt.RWT;
 
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.iface.IUser;
 import ru.futurelink.mo.orm.pm.PersistentManager;
 import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 import ru.futurelink.mo.orm.pm.PersistentManagerSessionUI;
 import ru.futurelink.mo.orm.security.IUserParams;
 import ru.futurelink.mo.orm.security.IUserParamsAccessor;
-import ru.futurelink.mo.orm.security.User;
 
 /**
  * HttpSession wrapper for MO user application sessions.
@@ -40,7 +40,7 @@ final public class ApplicationSession {
 
 	private String				mLogin = "";
 	private Locale				mLocale = null;
-	private User				mDatabaseUser;
+	private IUser				mDatabaseUser;
 	private Logger				mLogger;
 	private BundleContext		mBundleContext;
 	private Boolean				mMobileMode = false;
@@ -71,7 +71,7 @@ final public class ApplicationSession {
 		if (RWT.getUISession().getHttpSession().getAttribute("user") != null) {
 			// Если у нас есть пользователь, залогиненый в сессии, его
 			// надо передать персистент-менеджеру.
-			mPersistentSession.setUser((User)RWT.getUISession().getHttpSession().getAttribute("user"));
+			mPersistentSession.setUser((IUser)RWT.getUISession().getHttpSession().getAttribute("user"));
 
 			if (RWT.getUISession().getHttpSession().getAttribute("login") != null)
 				mLogin = (String) RWT.getUISession().getHttpSession().getAttribute("login");
@@ -94,7 +94,7 @@ final public class ApplicationSession {
      * @param login
      * @throws SaveException
      */
-	final public void login(User user, String login) throws SaveException {
+	final public void login(IUser user, String login) throws SaveException {
 		mLogin = login;
 		mPersistentSession.setUser(user);
 
@@ -126,7 +126,7 @@ final public class ApplicationSession {
 	 * 
 	 * @param user
 	 */
-	final public void setUser(User user) {
+	final public void setUser(IUser user) {
 		RWT.getUISession().getHttpSession().setAttribute("user", user);
 		
 		// Log user enter events to debug session lificycle
@@ -141,8 +141,8 @@ final public class ApplicationSession {
 	 * 
 	 * @return current session user or null if no user logged in
 	 */
-	final public User getUser() {
-		return (User) RWT.getUISession().getHttpSession().getAttribute("user");
+	final public IUser getUser() {
+		return (IUser) RWT.getUISession().getHttpSession().getAttribute("user");
 	}
 
     /**
@@ -150,7 +150,7 @@ final public class ApplicationSession {
      *
      * @param user
      */
-	final public void setDatabaseUser(User user) {
+	final public void setDatabaseUser(IUser user) {
 		mDatabaseUser = user;
 		mPersistentSession.setAccessUser(user);
 		logger().debug("Application access user set to: "+user.getUserName());
@@ -161,11 +161,11 @@ final public class ApplicationSession {
      *
      * @return
      */
-	final public User getDatabaseUser() {
+	final public IUser getDatabaseUser() {
 		if (mDatabaseUser != null) {
 			return mDatabaseUser;
 		} else {
-			return (User) RWT.getUISession().getHttpSession().getAttribute("user");
+			return (IUser) RWT.getUISession().getHttpSession().getAttribute("user");
 		}
 	}
 	
@@ -185,7 +185,7 @@ final public class ApplicationSession {
 		if (mPersistentSession.getUser() == null) {
 			logger().warn("Persistent manager has null user. Trying to reset from session.");
 			mPersistentSession.setUser(
-				(User) RWT.getUISession().getHttpSession().getAttribute("user")
+				(IUser) RWT.getUISession().getHttpSession().getAttribute("user")
 			);
 		}
 		return mPersistentSession;

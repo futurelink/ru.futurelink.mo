@@ -20,12 +20,12 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableColumn;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonComposite;
 import ru.futurelink.mo.web.composites.IDragDropDecorator;
@@ -62,12 +62,12 @@ abstract public class SimpleListController
 	implements IListEditController {
 	
 	public SimpleListController(ICompositeController parentController,
-			Class<? extends CommonObject> dataClass, CompositeParams compositeParams) {
+			Class<? extends ICommonObject> dataClass, CompositeParams compositeParams) {
 		super(parentController, dataClass, compositeParams);
 	}
 
 	public SimpleListController(ICompositeController parentController,
-			Class<? extends CommonObject> dataClass, Composite container, CompositeParams compositeParams) { 
+			Class<? extends ICommonObject> dataClass, Composite container, CompositeParams compositeParams) { 
 		super(parentController, dataClass, container, compositeParams);
 	}
 	
@@ -128,9 +128,8 @@ abstract public class SimpleListController
 		// Только если есть выбранный элемент, есть активные данные
 		if (getActiveData() != null) {
 			try {
-				id = getActiveData().
-						getDataField("mId", "getId", "setId").toString();
-				CommonObject obj = getSession().persistent().open(getDataClass(), id);
+				id = getActiveData().getId().toString();
+				ICommonObject obj = getSession().persistent().open(getDataClass(), id);
 				obj.delete();
 				obj.save();
 				logger().debug("Item deleted, ID=", id);

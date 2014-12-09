@@ -19,12 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
+import ru.futurelink.mo.orm.iface.IModelObject;
 import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 
@@ -52,7 +53,7 @@ public class EditorDTO extends CommonDTO {
 
 	protected HashMap<String, Object[]> 	mChangesBuffer;
 
-	public EditorDTO(ModelObject dataItem) {
+	public EditorDTO(IModelObject dataItem) {
 		super(dataItem);
 
 		// Структура буфера изменений: "название поля": [ геттер, сеттер, значение ]
@@ -60,12 +61,12 @@ public class EditorDTO extends CommonDTO {
 	}
 
 	protected IPersistentManagerSession getPersistenceManagerSession() {
-		return ((CommonObject)mData).getPersistenceManagerSession();
+		return ((ICommonObject)mData).getPersistenceManagerSession();
 	}
 	
-	public static EditorDTO create(Class <? extends CommonObject> dataClass, PersistentManagerSession session, IDTOAccessChecker accessChecker) throws DTOException {
-		Constructor<? extends CommonObject> cons = null;
-		CommonObject						data = null;
+	public static EditorDTO create(Class <? extends ModelObject> dataClass, PersistentManagerSession session, IDTOAccessChecker accessChecker) throws DTOException {
+		Constructor<? extends ModelObject> cons = null;
+		ModelObject data = null;
 		try {
 			cons = dataClass.getConstructor(PersistentManagerSession.class);
 			data = cons.newInstance(session);
@@ -99,29 +100,28 @@ public class EditorDTO extends CommonDTO {
 	}
 	
 	/**
-	 * Метод создает список DTO из списка элементов типа CommonObject. Если список
-	 * результата запроса пустой, то возвращается пустой список DTO.
 	 * 
 	 * @param resultList
 	 * @return
 	 */
+	@Deprecated
 	public static Map<String, EditorDTO> fromResultList(
-			List<? extends CommonObject> resultList, 
+			List<? extends ICommonObject> resultList, 
 			PersistentManagerSession pm, 
 			Class<? extends CommonDTO> itemDTOClass,
 			IDTOAccessChecker accessChecker) throws DTOException {
 		Map<String, EditorDTO> list = new HashMap<String, EditorDTO>();
 		if ((resultList != null) && (resultList.size() > 0)) {
 			for (Object c : resultList) {
-				((CommonObject)c).setPersistentManagerSession(pm);
+				((ICommonObject)c).setPersistentManagerSession(pm);
 
 				// Создаем DTO рефлексией
 				try {
-					Constructor<? extends CommonDTO> ctr = itemDTOClass.getConstructor(CommonObject.class);
-					EditorDTO dto = (EditorDTO)ctr.newInstance((CommonObject)c);
+					Constructor<? extends CommonDTO> ctr = itemDTOClass.getConstructor(ICommonObject.class);
+					EditorDTO dto = (EditorDTO)ctr.newInstance((ICommonObject)c);
 					if (dto != null) {
 						dto.addAccessChecker(accessChecker);
-						list.put(((CommonObject)c).getId(), dto);
+						list.put(((ICommonObject)c).getId(), dto);
 					} else {
 						throw new DTOException("Ошибка, созданный DTO = null", null);
 					}
@@ -141,8 +141,6 @@ public class EditorDTO extends CommonDTO {
 	}
 
 	/**
-	 * Простой метод заполнения списка данных, привязанного к
-	 * отображению, перед переходом на асинхронные отображения.
 	 * 
 	 * @param result
 	 * @param sourceList
@@ -150,6 +148,7 @@ public class EditorDTO extends CommonDTO {
 	 * @param itemDTOClass
 	 * @param accessChecker
 	 */
+	@Deprecated
 	public static void fillResultList(
 			Map<String, ? extends CommonDTO> resultList,
 			List<?> sourceList, 
@@ -166,16 +165,16 @@ public class EditorDTO extends CommonDTO {
 			return;
 		} else {
 			for (Object c : sourceList) {
-				((CommonObject)c).setPersistentManagerSession(pm);
+				((ICommonObject)c).setPersistentManagerSession(pm);
 				
 				// Создаем DTO рефлексией
 				try {
-					Constructor<? extends CommonDTO> ctr = itemDTOClass.getConstructor(CommonObject.class);
-					EditorDTO dto = (EditorDTO)ctr.newInstance((CommonObject)c);
+					Constructor<? extends CommonDTO> ctr = itemDTOClass.getConstructor(ICommonObject.class);
+					EditorDTO dto = (EditorDTO)ctr.newInstance((ICommonObject)c);
 					if (dto != null) {
 						dto.addAccessChecker(accessChecker);
 						localDTO.put(
-							((CommonObject)c).getId(),
+							((ICommonObject)c).getId(),
 							dto
 						);
 					} else {
@@ -220,14 +219,14 @@ public class EditorDTO extends CommonDTO {
 		}
 
 		if (!hardDelete) {
-			setDataField("mDeleteFlag", "getDeleteFlag", "setDeleteFlag", true, true);
+			setDataField(ModelObject.FIELD_DELETEFLAG, "getDeleteFlag", "setDeleteFlag", true, true);
 		} else {
 			// TODO Жесткое удаление из базы навсегда!			
 		}
 	}
 	
 	public void recover() throws DTOException {
-		setDataField("mDeleteFlag", "getDeleteFlag", "setDeleteFlag", false, true);
+		setDataField(ModelObject.FIELD_DELETEFLAG, "getDeleteFlag", "setDeleteFlag", false, true);
 	}
 	
 	/**
@@ -281,7 +280,7 @@ public class EditorDTO extends CommonDTO {
 	 * @param dto
 	 * @throws DTOException
 	 */
-	public static void applyChanges(ModelObject data, CommonDTO dto) throws DTOException {
+	public static void applyChanges(IModelObject data, CommonDTO dto) throws DTOException {
 		if (dto.mAccessChecker == null) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}
@@ -295,14 +294,14 @@ public class EditorDTO extends CommonDTO {
 			String key = (String) dto.getChangesBuffer().keySet().toArray()[i];
 			Object[] values = dto.getChangesBuffer().get(key);
 			if (values[1] == null) {
-				System.out.println("Поле сконфигурировано только для чтения т.к. сеттер не задан, пропускаем.");
+				dto.logger().debug("Поле сконфигурировано только для чтения т.к. сеттер не задан, пропускаем.");
 			} else {
 				try {
 					Method setValueMethod;
 					if (values[2] == null) {
-						System.out.println("Вызываем "+values[1].toString()+" для сохранения пустого значения.");
+						dto.logger().debug("Вызываем {} для сохранения пустого значения.", values[1]);
 					} else {
-						System.out.println("Вызываем "+values[1].toString()+" для сохранения "+values[2].toString());					
+						dto.logger().debug("Вызываем {} для сохранения {}",values[1], values[2]);					
 					}
 					Class<?> fieldClass = data.getClass().getMethod(values[0].toString()).getReturnType();
 					if ((values[2] != null) && (values[2].getClass().equals(EditorDTO.class))) {
@@ -310,9 +309,13 @@ public class EditorDTO extends CommonDTO {
 						// посетить как свойство.
 						for (Method method : data.getClass().getMethods()) {
 							if (values[1].toString().equals(method.getName())) {
-								if (method.getParameterTypes()[0].isAssignableFrom(((EditorDTO)values[2]).mData.getClass())) {
+								if (method.getParameterTypes()[0].isAssignableFrom(
+									((EditorDTO)values[2]).mData.getClass())
+								) {
 									setValueMethod = method;
-									setValueMethod.invoke(data, values[2] != null ? (((EditorDTO)values[2]).mData) : fieldClass);
+									setValueMethod.invoke(data, 
+										values[2] != null ? (((EditorDTO)values[2]).mData) : fieldClass
+									);
 									break;
 								}
 							}
@@ -323,14 +326,19 @@ public class EditorDTO extends CommonDTO {
 						boolean methodInvoked = false;
 						for (Method method : data.getClass().getMethods()) {
 							if (values[1].toString().equals(method.getName())) {
-								if (method.getParameterTypes()[0].isAssignableFrom(values[2] != null ? values[2].getClass() : fieldClass)) {
+								if (method.getParameterTypes()[0].isAssignableFrom(
+									values[2] != null ? values[2].getClass() : fieldClass)
+								) {
 									method.invoke(data, values[2]);
 									methodInvoked = true;
 									break;
 								}
 							}
 						}
-						if (!methodInvoked) throw new NoSuchMethodException("Нет подходящего метода "+values[1].toString()+" для сохранения данных типа "+values[2].getClass().getSimpleName());
+						if (!methodInvoked) throw new NoSuchMethodException(
+								"Нет подходящего метода "+values[1].toString()+" для сохранения данных типа "+
+								values[2].getClass().getSimpleName()
+							);
 					}
 				} catch (NoSuchMethodException e) {
 					throw new DTOException(e.toString(), e);
@@ -394,7 +402,7 @@ public class EditorDTO extends CommonDTO {
 			oldValue = getValueMethod.invoke(mData);
 			boolean propModified = false;
 			if (!force) {
-				if (CommonObject.class.isAssignableFrom(fieldClass)) {
+				if (ICommonObject.class.isAssignableFrom(fieldClass)) {
 					//mData.getClass().getMethod(fieldSetterName, fieldClass);
 					if ((oldValue == null && value != null) ||
 						(value == null && oldValue != null) ||
@@ -468,13 +476,13 @@ public class EditorDTO extends CommonDTO {
 		try {
 			Class<?> fieldClass = mData.getClass().getMethod(fieldGetterName).getReturnType();
 	        Method getValueMethod = mData.getClass().getMethod(fieldGetterName);
-	        if (CommonObject.class.isAssignableFrom(fieldClass)) {
+	        if (ICommonObject.class.isAssignableFrom(fieldClass)) {
 	        	// Нужно генерить DTO на основании объекта только тогда,
 	        	// когда этот объект, то есть значение поля в ORM не null.
-	        	CommonObject obj = (CommonObject) getValueMethod.invoke(mData);
+	        	ICommonObject obj = (ICommonObject) getValueMethod.invoke(mData);
 	        	if (obj != null) {
 	        		obj.setPersistentManagerSession(getPersistenceManagerSession());
-		        	a = new EditorDTO((CommonObject)obj);
+		        	a = new EditorDTO((ModelObject)obj);
 		        	((CommonDTO)a).addAccessChecker(mAccessChecker);
 	        	}
 	        } else {
@@ -508,7 +516,7 @@ public class EditorDTO extends CommonDTO {
 	
 	public Long getCode() {
 		if (mData != null)
-			return ((CommonObject)mData).getCode().getId();
+			return ((ICommonObject)mData).getCode().getId();
 		else
 			return (long)0;	
 	}
@@ -520,9 +528,9 @@ public class EditorDTO extends CommonDTO {
 	}
 
 	public void forceUpdateField(String field, CommonDTO dto) {
-		((CommonObject)mData).forceUpdateField(field, (CommonObject)dto.mData);
+		((ICommonObject)mData).forceUpdateField(field, (ICommonObject)dto.mData);
 	}
-	
+
 	@Override
 	public void refresh() {
 		getPersistenceManagerSession().getEm().refresh(mData);

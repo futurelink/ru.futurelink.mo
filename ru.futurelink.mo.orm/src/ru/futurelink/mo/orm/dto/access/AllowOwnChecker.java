@@ -12,7 +12,7 @@
 package ru.futurelink.mo.orm.dto.access;
 
 import ru.futurelink.mo.orm.dto.CommonDTO;
-import ru.futurelink.mo.orm.security.User;
+import ru.futurelink.mo.orm.iface.IUser;
 
 /**
  * Агент проверки. Разрешает доступ только к своим обьектам, если владелец-создатель
@@ -25,13 +25,13 @@ import ru.futurelink.mo.orm.security.User;
  */
 public class AllowOwnChecker implements IDTOAccessChecker {
 
-	private User mUser;
+	private IUser mUser;
 	
-	public AllowOwnChecker(User user) {
+	public AllowOwnChecker(IUser user) {
 		mUser = user;
 	}
 	
-	public User getUser() { return mUser; }
+	public IUser getUser() { return mUser; }
 	
 	@Override
 	public boolean checkRead(CommonDTO dto, String fieldName) {

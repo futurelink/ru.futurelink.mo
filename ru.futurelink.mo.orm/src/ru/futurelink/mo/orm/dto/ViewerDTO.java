@@ -16,10 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 
 /**
  * Simple DTO for viewing data only.
@@ -45,7 +45,7 @@ public class ViewerDTO extends CommonDTO {
 			for (Object c : resultList) {
 				ViewerDTO dto = new ViewerDTO((ModelObject)c);
 				dto.addAccessChecker(accessChecker);
-				list.put(((CommonObject)c).getId(), dto);
+				list.put(((ICommonObject)c).getId(), dto);
 			}
 			return list;
 		} else {
@@ -69,10 +69,10 @@ public class ViewerDTO extends CommonDTO {
 			Class<?> fieldClass = mData.getClass().getMethod(fieldGetterName).getReturnType();
 	        Method getValueMethod = mData.getClass().getMethod(fieldGetterName);
             // If field is an object type - create ViewerDTO and set access checker
-	        if (CommonObject.class.isAssignableFrom(fieldClass)) {
-	        	CommonObject obj = (CommonObject) getValueMethod.invoke(mData);
+	        if (ICommonObject.class.isAssignableFrom(fieldClass)) {
+	        	ModelObject obj = (ModelObject) getValueMethod.invoke(mData);
 	        	if (obj != null) {
-		        	a = new ViewerDTO((CommonObject)obj);
+		        	a = new ViewerDTO((ModelObject)obj);
 		        	((IDTO)a).addAccessChecker(mAccessChecker);
 	        	}
 	        } else {

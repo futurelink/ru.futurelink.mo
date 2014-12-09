@@ -26,9 +26,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonComposite;
 import ru.futurelink.mo.web.composites.IDragDropDecorator;
@@ -68,7 +68,7 @@ public abstract class CompositeController
 	 * @param session сессия приложения
 	 * @param dataClass класс данных модели
 	 */
-	protected CompositeController(ApplicationSession session, Class<? extends CommonObject> dataClass) {
+	protected CompositeController(ApplicationSession session, Class<? extends ICommonObject> dataClass) {
 		super(session, dataClass);
 	}
 	
@@ -79,7 +79,7 @@ public abstract class CompositeController
 	 * @param dataClass класс данных модели
 	 * @param compositeParams параметры передаваемые композиту
 	 */
-	public CompositeController(ICompositeController parentController, Class<? extends CommonObject> dataClass,
+	public CompositeController(ICompositeController parentController, Class<? extends ICommonObject> dataClass,
 			CompositeParams compositeParams) {
 		super(parentController.getSession(), dataClass);
 
@@ -98,7 +98,7 @@ public abstract class CompositeController
 	 * @param dataClass класс данных модели
 	 * @param container композит-контейнер для композита этого контроллера
 	 */
-	public CompositeController(ICompositeController parentController, Class<? extends CommonObject> dataClass, 
+	public CompositeController(ICompositeController parentController, Class<? extends ICommonObject> dataClass, 
 			Composite container, CompositeParams compositeParams) {
 		super(parentController.getSession(), dataClass);
 
@@ -662,7 +662,7 @@ public abstract class CompositeController
 	@Deprecated
 	public final CompositeController getUsecaseController(
 			String usecaseBundle,
-			Class<? extends CommonObject> dataClass,
+			Class<? extends ICommonObject> dataClass,
 			Composite container,
 			CompositeParams params) {
 

@@ -13,6 +13,7 @@ package ru.futurelink.mo.orm;
 
 import java.util.Date;
 
+import ru.futurelink.mo.orm.annotations.Accessors;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 
 /**
@@ -33,25 +34,31 @@ final public class HistoryResult extends ModelObject {
 		setObjectId(objectId);
 	}
 
-	private Date mDate;
-	public void setDate(Date date) { mDate = date; }
-	public Date getDate() { return mDate; }
+	@Accessors(getter = "getDate", setter = "setDate")
+	private Date date;
+	public void setDate(Date date) { this.date = date; }
+	public Date getDate() { return date; }
 
-	private String mOperation;
-	public void setOperation(String operation) { mOperation = operation; }
-	public String getOperation() { return mOperation; }
+	@Accessors(getter = "getOperation", setter = "setOperation")
+	private String operation;
+	public void setOperation(String operation) { this.operation = operation; }
+	public String getOperation() { return operation; }
 
 	/**
 	 * ID объекта
 	 */
-	private		String mId;	
-	public 		String getId() {	return mId;	}
-	public		void setId(String id) { mId = id; }
+	@Accessors(getter = "getId", setter = "setId")
+	private		String id;	
+	public 		String getId() {	return id;	}
+	public		void setId(String id) { this.id = id; }
 	
-	private		String mObjectId;
-	public		String getObjectId() { return mObjectId; }
-	public		void setObjectId(String objectId) { mObjectId = objectId; }
+	@Accessors(getter = "getObjectId", setter = "setObjectId")
+	private		String objectId;
+	public		String getObjectId() { return objectId; }
+	public		void setObjectId(String objectId) { this.objectId = objectId; }
 	
+	@Accessors(getter = "getDeleteFlag", setter = "setDeleteFlag")
+	private		Boolean deleteFlag;
 	public		Boolean	getDeleteFlag() { return false; }
 
 	@Override

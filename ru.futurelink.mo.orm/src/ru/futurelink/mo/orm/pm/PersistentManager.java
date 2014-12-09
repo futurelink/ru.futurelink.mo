@@ -28,11 +28,12 @@ import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.HistoryObject;
-import ru.futurelink.mo.orm.WorkLogSupport;
+import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
+import ru.futurelink.mo.orm.iface.IHistoryObject;
+import ru.futurelink.mo.orm.iface.IWorkLog;
 
 /**
  * Менеджер персистент объектов:
@@ -93,11 +94,13 @@ public class PersistentManager {
     			if (emfb != null) {    				 
     				// Переводим словарь в мап
     				Map<String, String> props = new HashMap<String, String>();
-    				Enumeration<String> keys = mProperties.keys();
-    				while (keys.hasMoreElements()) {
-    					String key = keys.nextElement();
-    			        props.put(key, (String) mProperties.get(key));
-    			    }    				
+    				if (mProperties != null) {
+    					Enumeration<String> keys = mProperties.keys();
+    					while (keys.hasMoreElements()) {
+    						String key = keys.nextElement();
+    						props.put(key, (String) mProperties.get(key));
+    					}
+    				}
     				return emfb.createEntityManagerFactory(props);
     			} else {
     				return null;
@@ -132,8 +135,8 @@ public class PersistentManager {
 	 * @return
 	 * @throws SaveException
 	 */
-	protected	Object save(CommonObject object, PersistentManagerSession session) throws SaveException {
-		int saveFlag = CommonObject.SAVE_CREATE;
+	protected	Object save(ICommonObject object, PersistentManagerSession session) throws SaveException {
+		int saveFlag = ModelObject.SAVE_CREATE;
 
 		// Перед сохранением сохраняем неизмененную копию объекта
 		// это актуально если объект сохраняется, а потом изменяется
@@ -141,7 +144,7 @@ public class PersistentManager {
 		if (object.getId() != null) {
 			object.setUnmodifiedObject(session.getOldEm().find(object.getClass(), object.getId()));
 			object.setModifyDate(Calendar.getInstance().getTime());
-			saveFlag = CommonObject.SAVE_MODIFY;
+			saveFlag = ModelObject.SAVE_MODIFY;
 		}
 		
 		try {
@@ -165,11 +168,11 @@ public class PersistentManager {
 			// Добавляем в ворклог данные о том, что элменет был изменен
 			// у добавим ссылку на элемент ворклога в элемент данных.
 			// Для элемента ворклога запись в ворклоге делать не надо!
-			WorkLogSupport workLogObject = null;
+			IWorkLog workLogObject = null;
 			if (PersistentManagerSessionUI.class.isAssignableFrom(session.getClass())) {
-				if (object.getWorkLogSupport()) {
-					if (!object.getClass().getSimpleName().equals("WorkLogSupport")) {
-						workLogObject = new WorkLogSupport(session);
+				if (object.getWorkLogEnabled()) {
+					if (!IWorkLog.class.isAssignableFrom(object.getClass())) {
+						workLogObject = object.createWorkLog();
 						workLogObject.setCreateDate(Calendar.getInstance().getTime());
 						workLogObject.setCreator(((PersistentManagerSessionUI)session).getUser());
 						if (object.getId() == null) {
@@ -215,12 +218,12 @@ public class PersistentManager {
 	 * @return
 	 * @throws SaveException
 	 */
-	protected Object saveWithHistory(HistoryObject object, String oldId, PersistentManagerSession session) 
+	protected Object saveWithHistory(IHistoryObject object, String oldId, PersistentManagerSession session) 
 		throws SaveException, OpenException {
 		// Записать ссылку на следующий объект в предыдущий
 		// Записать ссылку на предыдущий объект в следующий
 		// Создаем новый объект	
-		int saveFlag = CommonObject.SAVE_CREATE;
+		int saveFlag = ModelObject.SAVE_CREATE;
 
 		if (object != null) {
 			try {
@@ -245,11 +248,11 @@ public class PersistentManager {
 				// Добавляем в ворклог данные о том, что элменет был изменен
 				// у добавим ссылку на элемент ворклога в элемент данных.
 				// Для элемента ворклога запись в ворклоге делать не надо!
-				WorkLogSupport workLogObject = null;
+				IWorkLog workLogObject = null;
 				if (PersistentManagerSessionUI.class.isAssignableFrom(session.getClass())) {
-					if (object.getWorkLogSupport()) {				
-						if (!object.getClass().getName().equals("WorkLog")) {
-							workLogObject = new WorkLogSupport(session);
+					if (object.getWorkLogEnabled()) {				
+						if (!IWorkLog.class.isAssignableFrom(object.getClass())) {
+							workLogObject = object.createWorkLog();
 							workLogObject.setCreateDate(Calendar.getInstance().getTime());
 							workLogObject.setCreator(((PersistentManagerSessionUI)session).getUser());
 							workLogObject.setObjectId(newId);
@@ -263,7 +266,7 @@ public class PersistentManager {
 				session.getEm().merge(object);
 
 				// Проставляем устаревание старому объекту
-				HistoryObject oldObj = session.getEm().find(object.getClass(), oldId);
+				IHistoryObject oldObj = session.getEm().find(object.getClass(), oldId);
 				oldObj.setOutdated(true);
 				session.getEm().persist(oldObj);
 				
@@ -302,7 +305,7 @@ public class PersistentManager {
 	 * @param id
 	 * @return
 	 */
-	protected <T extends CommonObject> T open(Class<T> cls, String id, 
+	protected <T extends ICommonObject> T open(Class<T> cls, String id, 
 			PersistentManagerSession session) throws OpenException {
 		T obj = session.getEm().find(cls, id);
 		if (obj == null) throw new OpenException(id, "Элемент не найден.", null);
@@ -312,7 +315,7 @@ public class PersistentManager {
 		return  obj;
 	}
 
-	protected	Object delete(CommonObject object) {
+	protected	Object delete(ICommonObject object) {
 		return null;
 	}
 	

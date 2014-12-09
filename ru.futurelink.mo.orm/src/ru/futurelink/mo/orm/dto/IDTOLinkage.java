@@ -11,9 +11,9 @@
 
 package ru.futurelink.mo.orm.dto;
 
-import ru.futurelink.mo.orm.CommonObject;
 import ru.futurelink.mo.orm.exceptions.DTOException;
-import ru.futurelink.mo.orm.security.User;
+import ru.futurelink.mo.orm.iface.IModelObject;
+import ru.futurelink.mo.orm.iface.IUser;
 
 /**
  * Linkage interface for DTO.
@@ -40,7 +40,7 @@ public interface IDTOLinkage {
 	 * 
 	 * @param linkageItem
 	 */
-	public void setLinkedItem(CommonObject linkageItem);
+	public void setLinkedItem(IModelObject linkageItem);
 
 	/**
 	 * Get linked DTO on linked data object.
@@ -84,5 +84,5 @@ public interface IDTOLinkage {
 	 * 
 	 * @return
 	 */
-	public User getLinkageCreator();
+	public IUser getLinkageCreator();
 }

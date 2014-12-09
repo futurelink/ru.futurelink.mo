@@ -3,11 +3,11 @@
  */
 package ru.futurelink.mo.orm.pm;
 
-import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.HistoryObject;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
-import ru.futurelink.mo.orm.security.User;
+import ru.futurelink.mo.orm.iface.ICommonObject;
+import ru.futurelink.mo.orm.iface.IHistoryObject;
+import ru.futurelink.mo.orm.iface.IUser;
 
 /**
  * @author pavlov
@@ -16,8 +16,8 @@ import ru.futurelink.mo.orm.security.User;
 public class PersistentManagerSessionUI 
 	extends PersistentManagerSession {
 
-	private User					mUser;
-	private User					mAccessUser;
+	private IUser					mUser;
+	private IUser					mAccessUser;
 
 	/**
 	 * @param persistent
@@ -30,14 +30,14 @@ public class PersistentManagerSessionUI
 	 * Пользователь от имени которого совершаются действия
 	 * персистент-менеджера.
 	 */
-	public void setUser(User user) { mUser = user; }
-	public User getUser() { return mUser; } 
+	public void setUser(IUser user) { mUser = user; }
+	public IUser getUser() { return mUser; } 
 
 	/**
 	 * Пользователь, которому принадлжеат данные.
 	 */
-	public void setAccessUser(User user) { mAccessUser = user; }
-	public User getAccessUser() {
+	public void setAccessUser(IUser user) { mAccessUser = user; }
+	public IUser getAccessUser() {
 		if (mAccessUser == null) 
 			return mUser; 
 		else
@@ -45,7 +45,7 @@ public class PersistentManagerSessionUI
 	}
 
 	@Override
-	public Object save(CommonObject object) throws SaveException {
+	public Object save(ICommonObject object) throws SaveException {
 		if (getUser() == null) {
 			throw new SaveException("No user in persistent manager session!", null);
 		}
@@ -54,7 +54,7 @@ public class PersistentManagerSessionUI
 	}
 	
 	@Override
-	public Object saveWithHistory(HistoryObject object, String oldId)
+	public Object saveWithHistory(IHistoryObject object, String oldId)
 			throws SaveException, OpenException {
 		if (getUser() == null) {
 			throw new SaveException("No user in persistent manager session!", null);

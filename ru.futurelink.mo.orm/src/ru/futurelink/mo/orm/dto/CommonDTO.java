@@ -16,13 +16,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import ru.futurelink.mo.orm.CommonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.annotations.Accessors;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
-import ru.futurelink.mo.orm.security.User;
+import ru.futurelink.mo.orm.iface.ICommonObject;
+import ru.futurelink.mo.orm.iface.IModelObject;
+import ru.futurelink.mo.orm.iface.IUser;
 
 /**
  * @author pavlov_d
@@ -30,11 +34,19 @@ import ru.futurelink.mo.orm.security.User;
 public abstract class CommonDTO implements Serializable, IDTO {
 	private static final long serialVersionUID = 1L;
 
-	protected   ModelObject 		mData;
-	protected   IDTOAccessChecker	mAccessChecker;
+	protected	IModelObject 		mData;
+	protected	IDTOAccessChecker	mAccessChecker;
+	private		Logger				logger;
 	
-	public CommonDTO(ModelObject dataItem) {
+	public CommonDTO(IModelObject dataItem) {
 		mData = dataItem;
+	}
+
+	protected Logger logger() {
+		if (logger == null)
+			logger = LoggerFactory.getLogger(getClass());
+
+		return logger;
 	}
 	
 	public static List<?> fromResultList(List<?> resultList) {
@@ -56,7 +68,7 @@ public abstract class CommonDTO implements Serializable, IDTO {
      *
      * @return
      */
-	public Class<? extends ModelObject> getDataClass() {
+	public Class<? extends IModelObject> getDataClass() {
 		if (mData != null)
 			return mData.getClass();
 		else 
@@ -90,7 +102,7 @@ public abstract class CommonDTO implements Serializable, IDTO {
 	
 	@Override
 	public String getId() throws DTOException {	
-		Object idObj = getDataField(CommonObject.FIELD_ID);
+		Object idObj = getDataField(ModelObject.FIELD_ID);
 		if (idObj != null) {
 			return idObj.toString();
 		} else {
@@ -100,7 +112,7 @@ public abstract class CommonDTO implements Serializable, IDTO {
 	
 	@Override
 	public boolean getDeleteFlag() throws DTOException {
-		Object d = getDataField(CommonObject.FIELD_DELETEFLAG);
+		Object d = getDataField(ModelObject.FIELD_DELETEFLAG);
 		if (d != null) {
 			return Boolean.valueOf(d.toString());
 		} else {
@@ -121,13 +133,13 @@ public abstract class CommonDTO implements Serializable, IDTO {
 
 	@Override
 	public void setDeleteFlag(boolean deleteFlag) throws DTOException {
-		setDataField(CommonObject.FIELD_DELETEFLAG, deleteFlag);
+		setDataField(ModelObject.FIELD_DELETEFLAG, deleteFlag);
 	}
 	
 	@Override
-	public User getCreator() {
-		if ((mData != null) && CommonObject.class.isAssignableFrom(mData.getClass())) {
-			return ((CommonObject)mData).getCreator();
+	public IUser getCreator() {
+		if ((mData != null) && ICommonObject.class.isAssignableFrom(mData.getClass())) {
+			return ((ICommonObject)mData).getCreator();
 		}
 		return null;
 	}

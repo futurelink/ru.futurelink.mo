@@ -21,14 +21,15 @@ import javax.persistence.TypedQuery;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-import ru.futurelink.mo.orm.CommonObject;
-import ru.futurelink.mo.orm.HistoryObject;
+import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.EditorDTO;
 import ru.futurelink.mo.orm.dto.EditorDTOList;
 import ru.futurelink.mo.orm.dto.access.AllowAllChecker;
 import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.iface.ICommonObject;
+import ru.futurelink.mo.orm.iface.IHistoryObject;
 import ru.futurelink.mo.web.composites.CommonComposite;
 import ru.futurelink.mo.web.controller.CompositeController;
 import ru.futurelink.mo.web.controller.CompositeParams;
@@ -59,7 +60,7 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 	 */
 	@SuppressWarnings("unchecked")
 	public SimpleDataPickerController(CompositeController parentController,
-			Class<? extends CommonObject> dataClass, Composite container,
+			Class<? extends ICommonObject> dataClass, Composite container,
 			CompositeParams compositeParams) {
 		super(parentController, dataClass, container, compositeParams);
 		
@@ -93,12 +94,12 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 		logger().debug("Запрос данных списка для просмотра...");
 		TypedQuery<?> q2;
 		String queryString = "";
-		if (HistoryObject.class.isAssignableFrom(mDataClass)) {
+		if (IHistoryObject.class.isAssignableFrom(mDataClass)) {
 			queryString = 
-				"select d from "+mDataClass.getName()+" d where d.mDeleteFlag = 0 and d.mOutdated = 0";
+				"select d from "+mDataClass.getName()+" d where d.deleteFlag = 0 and d.mOutdated = 0";
 		} else {
 			queryString = 
-				"select d from "+mDataClass.getName()+" d where d.mDeleteFlag = 0";
+				"select d from "+mDataClass.getName()+" d where d.deleteFlag = 0";
 		}
 		
 		// If data picker is not public use only creator filtered records to select
@@ -146,7 +147,7 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 		}
 
 		mList.clear();
-		mList.addObjectList((List<? extends CommonObject>) q2.getResultList());
+		mList.addObjectList((List<? extends ModelObject>) q2.getResultList());
 		
 		handleDataQueryExecuted();
 	}

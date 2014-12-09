@@ -13,7 +13,7 @@ package ru.futurelink.mo.orm.dto.access;
 
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTOWithLinkage;
-import ru.futurelink.mo.orm.security.User;
+import ru.futurelink.mo.orm.iface.IUser;
 
 /**
  * @author pavlov
@@ -21,7 +21,7 @@ import ru.futurelink.mo.orm.security.User;
  */
 public class AllowOwnAndLinkedChecker extends AllowOwnChecker {
 
-	public AllowOwnAndLinkedChecker(User user) {
+	public AllowOwnAndLinkedChecker(IUser user) {
 		super(user);
 	}
 	

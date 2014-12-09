@@ -17,24 +17,18 @@ import java.util.Hashtable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.EventConstants;
-import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * @since 1.2
  */
-@SuppressWarnings("rawtypes")
 public class UseCaseActivator implements BundleActivator {	
-	private ServiceTracker 			mServiceTracker;
-	private Logger					mLogger;
-	private UseCaseRegister			mUsecaseRegister;
-	
-	private HashMap<String, UseCaseInfo>	mUsecaseList;
-	
+	private Logger						mLogger;
 	private UseCaseActivationThread		mActivationThread;
+	private HashMap<String, UseCaseInfo>	mUsecaseList;
 	
 	public UseCaseActivator() {
 		mLogger = LoggerFactory.getLogger(this.getClass());
@@ -46,13 +40,9 @@ public class UseCaseActivator implements BundleActivator {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void start(BundleContext context) throws Exception {
-	    mServiceTracker = new ServiceTracker(context, UseCaseRegister.class.getName(), null);
-	    mServiceTracker.open();
-
 	    // Run background usecase registration
-	    mActivationThread = new UseCaseActivationThread();
+	    mActivationThread = new UseCaseActivationThread(context);
 	    mActivationThread.start();
 	}
 
@@ -63,12 +53,13 @@ public class UseCaseActivator implements BundleActivator {
 			mActivationThread.interrupt();
 		}
 		
-		if (mUsecaseRegister != null) {
+		ServiceReference<?> ref = context.getServiceReference(UseCaseRegister.class);
+		UseCaseRegister usecaseRegister = (UseCaseRegister) context.getService(ref);
+		if (usecaseRegister != null) {
 			for (String mUsecaseName : mUsecaseList.keySet()) {
 				mLogger.info("Sending '{}' deactivation event to UseCaseRegister...", mUsecaseName);		
-				mUsecaseRegister.unregisterUsecase(mUsecaseName);
+				usecaseRegister.unregisterUsecase(mUsecaseName);
 			}
-			mServiceTracker.close();
 		} else {
 			mLogger.warn("Can't unregister usecase because usecase register is unavailable!");
 		}
@@ -80,22 +71,30 @@ public class UseCaseActivator implements BundleActivator {
 		return result;
 	}	
 	
-	class UseCaseActivationThread extends Thread {		
-		public UseCaseActivationThread() {}
+	class UseCaseActivationThread extends Thread {
+		private volatile BundleContext		context;
+
+		public UseCaseActivationThread(BundleContext context) {
+			this.context = context;
+		}
 		
 		@Override
 		public void run() {
 			// Wait while service is unavailable
+			UseCaseRegister	 usecaseRegister;
 			do {
-				mUsecaseRegister = (UseCaseRegister) mServiceTracker.getService();
-				try { Thread.sleep(3000); } catch (InterruptedException ex) {}
-				mLogger.info("Usecase register is not available at moment, retrying in 3 secs...");
-			} while(mUsecaseRegister == null);
+				ServiceReference<?> ref = context.getServiceReference(UseCaseRegister.class);
+				usecaseRegister = (UseCaseRegister) context.getService(ref);
+				if (usecaseRegister == null) {
+					try { Thread.sleep(3000); } catch (InterruptedException ex) {}
+					mLogger.info("Usecase register is not available at moment, retrying in 3 secs...");
+				}
+			} while(usecaseRegister == null);
 
 	    	// Register all usecases on this bundle
 	    	for (String mUsecaseName : mUsecaseList.keySet()) {
 	    		mLogger.info("Registering '{}' in UseCaseRegister...", mUsecaseName);
-	    		mUsecaseRegister.registerUsecase(mUsecaseList.get(mUsecaseName));
+	    		usecaseRegister.registerUsecase(mUsecaseList.get(mUsecaseName));
 	    	}
 		}
 	}

@@ -39,7 +39,7 @@ public class SimpleListDragListener implements DragSourceListener {
 				try {				
 					arg0.data = mComposite.getActiveData().getDataClass().getName() + 
 						"@" + 
-						mComposite.getActiveData().getDataField("mId", "getId", "setId").toString();
+						mComposite.getActiveData().getId().toString();
 				} catch (DTOException ex) {
 					arg0.data = new String("");
 					arg0.doit = false;

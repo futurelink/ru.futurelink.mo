@@ -97,6 +97,6 @@ public class CommonTableContentProvider  implements IStructuredContentProvider {
      * @throws DTOException
      */
     protected boolean getIsDisplayable(CommonDTO element) throws DTOException {
-    	return !(Boolean) element.getDataField("mDeleteFlag", "getDeleteFlag", null);
+    	return !(Boolean) element.getDeleteFlag();
     }
 }

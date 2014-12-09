@@ -13,7 +13,7 @@ package ru.futurelink.mo.web.topmenu;
 
 import org.eclipse.swt.widgets.Composite;
 
-import ru.futurelink.mo.orm.CommonObject;
+import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonComposite;
 import ru.futurelink.mo.web.controller.CompositeController;
@@ -22,11 +22,12 @@ import ru.futurelink.mo.web.controller.CompositeParams;
 abstract public class TopMenuController extends CompositeController {
 
 	public TopMenuController(ApplicationSession session,
-			Class<? extends CommonObject> dataClass) {
+			Class<? extends ICommonObject> dataClass) {
 		super(session, dataClass);
 	}
 
-	public TopMenuController(CompositeController parentController, Class<? extends CommonObject> dataClass, 
+	public TopMenuController(CompositeController parentController, 
+			Class<? extends ICommonObject> dataClass, 
 			Composite container, CompositeParams compositeParams) {
 		super(parentController, dataClass, container, compositeParams);
 	}
