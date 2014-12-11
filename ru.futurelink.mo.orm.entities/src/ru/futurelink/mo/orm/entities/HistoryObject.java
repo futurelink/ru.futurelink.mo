@@ -30,7 +30,7 @@ import ru.futurelink.mo.orm.annotations.DontCreateHistory;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.iface.IHistoryObject;
-import ru.futurelink.mo.orm.pm.PersistentManagerSession;
+import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 
 /**
  * Исторический объект.
@@ -50,7 +50,7 @@ public class HistoryObject
 	
 	protected HistoryObject() {}
 	
-	public HistoryObject(PersistentManagerSession session) {
+	public HistoryObject(IPersistentManagerSession session) {
 		super(session);
 	}
 	
