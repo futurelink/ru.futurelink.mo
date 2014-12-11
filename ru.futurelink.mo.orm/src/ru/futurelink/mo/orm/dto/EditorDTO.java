@@ -27,7 +27,6 @@ import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.orm.iface.IModelObject;
 import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
-import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 
 /**
  * Объект переноса данных.
@@ -64,11 +63,11 @@ public class EditorDTO extends CommonDTO {
 		return ((ICommonObject)mData).getPersistenceManagerSession();
 	}
 	
-	public static EditorDTO create(Class <? extends ModelObject> dataClass, PersistentManagerSession session, IDTOAccessChecker accessChecker) throws DTOException {
+	public static EditorDTO create(Class <? extends ModelObject> dataClass, IPersistentManagerSession session, IDTOAccessChecker accessChecker) throws DTOException {
 		Constructor<? extends ModelObject> cons = null;
 		ModelObject data = null;
 		try {
-			cons = dataClass.getConstructor(PersistentManagerSession.class);
+			cons = dataClass.getConstructor(IPersistentManagerSession.class);
 			data = cons.newInstance(session);
 		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new DTOException("Ошибка вызова create для EditorDTO.", e);
@@ -107,7 +106,7 @@ public class EditorDTO extends CommonDTO {
 	@Deprecated
 	public static Map<String, EditorDTO> fromResultList(
 			List<? extends ICommonObject> resultList, 
-			PersistentManagerSession pm, 
+			IPersistentManagerSession pm, 
 			Class<? extends CommonDTO> itemDTOClass,
 			IDTOAccessChecker accessChecker) throws DTOException {
 		Map<String, EditorDTO> list = new HashMap<String, EditorDTO>();
@@ -152,7 +151,7 @@ public class EditorDTO extends CommonDTO {
 	public static void fillResultList(
 			Map<String, ? extends CommonDTO> resultList,
 			List<?> sourceList, 
-			PersistentManagerSession pm, 
+			IPersistentManagerSession pm, 
 			Class<? extends CommonDTO> itemDTOClass,
 			IDTOAccessChecker accessChecker			
 		) throws DTOException  {

@@ -23,6 +23,7 @@ import org.eclipse.rap.rwt.RWT;
 
 import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.iface.IUser;
+import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 import ru.futurelink.mo.orm.pm.PersistentManager;
 import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 import ru.futurelink.mo.orm.pm.PersistentManagerSessionUI;
@@ -180,7 +181,7 @@ final public class ApplicationSession {
 	 * 
 	 * @return
 	 */
-	final public PersistentManagerSessionUI persistent() {
+	final public IPersistentManagerSession persistent() {
 		// If user is released by some reason, try to reset it from session variable
 		if (mPersistentSession.getUser() == null) {
 			logger().warn("Persistent manager has null user. Trying to reset from session.");

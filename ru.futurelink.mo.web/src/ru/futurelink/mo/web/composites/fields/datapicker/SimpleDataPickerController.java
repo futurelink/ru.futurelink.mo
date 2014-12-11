@@ -116,8 +116,12 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 				k++;
 				String cond = ""; 
 				for (int n = 0; n < mQueryConditions.get(fieldName).size(); n++) {
-					cond = cond + "d." + fieldName + " = :fieldData" + k + n;
-					additionalValues.put("fieldData" + k + n, mQueryConditions.get(fieldName).get(n));
+					if (mQueryConditions.get(fieldName).get(n) != null) {
+						cond = cond + "d." + fieldName + " = :fieldData" + k + n;
+						additionalValues.put("fieldData" + k + n, mQueryConditions.get(fieldName).get(n));
+					} else {
+						cond = cond + "d." + fieldName + " is null";
+					}
 					if (n < mQueryConditions.get(fieldName).size()-1)
 						cond = cond + " or ";
 				}
@@ -127,7 +131,7 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 			if (additionalConditions.size() > 0)
 				queryString = queryString + " and " + CommonDataPickerController.join(additionalConditions, " and ");
 		}
-		logger().debug("Допонительные условия для выбора из списка: {}", queryString);
+		logger().info("Допонительные условия для выбора из списка: {}", queryString);
 
 		// Выставляем сортировку, после того, как сформировали запрос
 		if ((mOrderBy != null) && (!mOrderBy.isEmpty())) {
