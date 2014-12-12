@@ -92,11 +92,7 @@
 
 	<distributionManagement>
 		<repository>
-			<id>fluvio-maven-repo</id>
-			<name>Fluvio Maven2 repo</name>
-			<url>http://maven.fluvio.ru/upload</url>
-			<username>${env.DEPLOY_USER}</username>
-			<password>${env.DEPLOY_PASSWORD}</password>			
+			<id>fluvio-maven-repo-upload</id>
 		</repository>
 	</distributionManagement>
 
