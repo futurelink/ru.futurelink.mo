@@ -3,15 +3,11 @@
         xmlns="http://maven.apache.org/SETTINGS/1.0.0"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
-         
-    <servers>
-        <server>
-           	<id>fluvio-maven-repo-upload</id>
-		<name>Fluvio Maven2 repo</name>
-		<url>http://maven.fluvio.ru/upload</url>
-		<username>${env.DEPLOY_USER}</username>
-		<password>${env.DEPLOY_PASSWORD}</password>
-        </server>
-    </servers>
-     
+	<servers>
+		<server>
+			<id>fluvio-maven-repo-upload</id>
+			<username>${env.DEPLOY_USER}</username>
+			<password>${env.DEPLOY_PASSWORD}</password>
+		</server>
+	</servers>
 </settings>

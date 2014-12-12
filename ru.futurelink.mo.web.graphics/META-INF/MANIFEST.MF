@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1418074711251
+Bnd-LastModified: 1418384446406
 Build-Jdk: 1.7.0_17
 Built-By: pavlov
 Bundle-ActivationPolicy: lazy
@@ -7,7 +7,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: MO Graphics package
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-SymbolicName: ru.futurelink.mo.web.graphics
-Bundle-Version: 0.0.1.11
+Bundle-Version: 0.0.1.12
 Created-By: Apache Maven Bundle Plugin
 Fragment-Host: ru.futurelink.mo.web
 Tool: Bnd-2.1.0.20130426-122213
