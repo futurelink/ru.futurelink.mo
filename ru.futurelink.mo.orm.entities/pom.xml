@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ru.futurelink.mo</groupId>
 	<artifactId>orm.entities</artifactId>
-	<version>0.0.1.8</version>
+	<version>0.0.1.9</version>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>

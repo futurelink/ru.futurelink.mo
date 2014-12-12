@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ru.futurelink.mo</groupId>
 	<artifactId>web.graphics</artifactId>
-	<version>0.0.1.11</version>
+	<version>0.0.1.12</version>
 	<name>MO Graphics package</name>
 	<packaging>bundle</packaging>
 	<build>

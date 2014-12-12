@@ -3,7 +3,7 @@
 	<groupId>ru.futurelink.mo</groupId>
 	<artifactId>web.register</artifactId>
 	<name>MO Usecase and entry points register services</name>
-	<version>1.0.0.0</version>
+	<version>1.0.0.1</version>
 	<packaging>bundle</packaging>
 	<build>
 		<sourceDirectory>src</sourceDirectory>

@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ru.futurelink.mo</groupId>
 	<artifactId>orm</artifactId>
-	<version>0.0.1.8</version>
+	<version>0.0.1.9</version>
 	<name>MO ORM for relational database</name>
 	<packaging>bundle</packaging>
 	<build>
