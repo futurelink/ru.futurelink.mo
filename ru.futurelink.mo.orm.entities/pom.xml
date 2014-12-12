@@ -80,6 +80,7 @@
 	<distributionManagement>
 		<repository>
 			<id>fluvio-maven-repo-upload</id>
+			<url>http://maven.fluvio.ru/upload</url>
 		</repository>
 	</distributionManagement>
 
