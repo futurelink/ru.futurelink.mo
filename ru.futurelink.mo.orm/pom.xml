@@ -175,6 +175,13 @@
 		</dependency>
 	</dependencies>
 
+	<repositories>
+		<repository>
+			<id>fluvio-maven-repo</id>
+			<url>https://fluvio.ru/maven</url>
+		</repository>
+	</repositories>
+
 	<distributionManagement>
 		<repository>
 			<id>fluvio-maven-repo</id>
