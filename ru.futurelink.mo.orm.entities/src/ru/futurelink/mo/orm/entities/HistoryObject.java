@@ -82,9 +82,9 @@ public class HistoryObject
 	@DontCreateHistory
 	@Column(name = "outdated")
 	@Accessors(getter = "getOutdated", setter = "setOutdated")
-	protected boolean mOutdated;
-	public void setOutdated(boolean outdated) { mOutdated = outdated; }
-	public boolean getOutdated() { return mOutdated; }
+	protected boolean outdated;
+	public void setOutdated(boolean outdated) { this.outdated = outdated; }
+	public boolean getOutdated() { return outdated; }
 	
 	/**
 	 * Получить объект предыдущего элемента, ищет объект по
@@ -138,7 +138,7 @@ public class HistoryObject
 					(fields.get(i).getAnnotation(Id.class) == null)) {
 					DontCreateHistory dchFlag = fields.get(i).getAnnotation(DontCreateHistory.class);
 					Transient transFlag = fields.get(i).getAnnotation(Transient.class);
-					if ((dchFlag == null) && (transFlag != null)) {
+					if ((dchFlag == null) && (transFlag == null)) {
 						fields.get(i).setAccessible(true);
 						try {
 							if (fields.get(i).get(getUnmodifiedObject()) != null) {

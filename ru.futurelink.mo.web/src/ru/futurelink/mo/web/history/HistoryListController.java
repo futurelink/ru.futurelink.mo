@@ -76,10 +76,11 @@ public class HistoryListController extends SimpleListController {
 			q1.setParameter("code", mCode);			
 			if (q1.getResultList().size() > 0) {
 				String objectId = q1.getResultList().get(0);
-				query =	"SELECT new ru.futurelink.mo.orm.HistoryResult(d.id, d.mModifyDate, d.mDescription, d.mObjectId) FROM WorkLogSupport d " + 
-						"WHERE d.mObjectClassName = :objectClassName AND " +
-						"d.mObjectId = :objectId "+
-						"order by d.mModifyDate desc";
+				query =	"SELECT new ru.futurelink.mo.orm.HistoryResult(d.id, d.mModifyDate, d.mDescription, d.mObjectId) "
+						+ "FROM WorkLogSupport d " 
+						+ "WHERE d.mObjectClassName = :objectClassName AND "
+						+ "d.mObjectId = :objectId "
+						+ "order by d.mModifyDate desc";
 
 				q2 = mSession.persistent().getEm().createQuery(query, getDataClass());
 				q2.setParameter("objectClassName", getDataClass().getName());

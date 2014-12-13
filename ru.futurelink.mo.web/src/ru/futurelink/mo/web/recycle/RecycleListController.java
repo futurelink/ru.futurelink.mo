@@ -56,7 +56,7 @@ public class RecycleListController extends SimpleListController {
 		logger().debug("Запрос данных корзины...");
 		TypedQuery<?> q2 = mSession.persistent().getEm().createQuery(
 				"SELECT d FROM "+getDataClass().getSimpleName()+" d " +
-				"where d.mCreator = :creator and d.deleteFlag = 1 and d.mOutdated in (0, null) order by d.id desc", 
+				"where d.mCreator = :creator and d.deleteFlag = 1 and d.outdated in (0, null) order by d.id desc", 
 				getDataClass());
 		q2.setParameter("creator", getSession().getDatabaseUser());
 		if (q2.getResultList().size() > 0) {			

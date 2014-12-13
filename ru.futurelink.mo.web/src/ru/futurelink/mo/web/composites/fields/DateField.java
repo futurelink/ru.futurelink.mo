@@ -81,7 +81,7 @@ public class DateField extends CommonField {
 	}
 	
 	public Date getDate() {
-		Calendar c = Calendar.getInstance(mParent.getSession().getUser().getTimeZone());
+		Calendar c = Calendar.getInstance();
 		c.set(getYear(), getMonth(), getDay(), 
 			((DateTime)mControl).getHours(), ((DateTime)mControl).getMinutes(), ((DateTime)mControl).getSeconds());
 		return c.getTime();
