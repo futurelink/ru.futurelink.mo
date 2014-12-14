@@ -14,6 +14,7 @@ package ru.futurelink.mo.web.controller;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.widgets.Composite;
@@ -53,7 +54,7 @@ public abstract class CommonItemController
 	public enum EditMode { DIALOG, CONTAINER };
 
 	private 	IPersistentManagerSession	mPersistentSession;
-	private		ArrayList<RelatedController> mRelatedControllers;
+	private		List<RelatedController> 	mRelatedControllers;
 
 	private		IDTO						mDTO;
 	private		IDTOAccessChecker			mChecker;
@@ -188,7 +189,8 @@ public abstract class CommonItemController
 	public void create() throws DTOException {
 		setDTO(
 				PersistentObjectFactory.getInstance().createEditorDTO(
-						mDataClass, mPersistentSession
+						mDataClass, EditorDTO.class, mPersistentSession,
+						new AllowOwnChecker(getSession().getUser())
 				)
 			);
 		doAfterCreate();

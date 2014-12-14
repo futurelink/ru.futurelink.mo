@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
 
 import ru.futurelink.mo.orm.dto.IEditorDTO;
+import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.orm.iface.IModelObject;
 import ru.futurelink.mo.orm.iface.IUser;
@@ -34,11 +35,35 @@ public class PersistentObjectFactory {
 	public static PersistentObjectFactory getInstance() { return INSTANCE; }
 
 	public IEditorDTO createEditorDTO(
-			Class<? extends IModelObject> dataClass,
-			IPersistentManagerSession persistentManagerSession) {
-		return null;		
+			Class<? extends ICommonObject> dataClass,
+			Class<? extends IEditorDTO> dtoClass,
+			IPersistentManagerSession persistentManagerSession,
+			IDTOAccessChecker accessChecker) {
+
+		ICommonObject object = createPersistentObject(dataClass, persistentManagerSession);
+		
+		// Try to create DTO object of given type
+		Constructor<? extends IEditorDTO> cons = null;
+		try {
+			cons = dtoClass.getConstructor(IModelObject.class);
+		} catch (NoSuchMethodException | SecurityException e) {
+			throw new RuntimeException(e);
+		}
+
+		IEditorDTO dto = null ;
+		try {
+			dto = cons.newInstance(object);
+		} catch (InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+
+		if (accessChecker != null)
+			dto.addAccessChecker(accessChecker);
+
+		return dto;		
 	}
-	
+
 	public ICommonObject createPersistentObject(
 			Class<? extends ICommonObject> clazz,
 			IPersistentManagerSession persistentManagerSession) {

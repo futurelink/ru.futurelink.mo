@@ -63,11 +63,11 @@ public class EditorDTO extends CommonDTO
 	}
 	
 	public static IEditorDTO create(
-			Class <? extends ModelObject> dataClass, 
+			Class <? extends ICommonObject> dataClass, 
 			IPersistentManagerSession session, 
 			IDTOAccessChecker accessChecker) throws DTOException {		
-		IEditorDTO dto = PersistentObjectFactory.getInstance().createEditorDTO(dataClass, session);;
-		dto.addAccessChecker(accessChecker);		
+		IEditorDTO dto = PersistentObjectFactory.getInstance().
+				createEditorDTO(dataClass, EditorDTO.class, session, accessChecker);	
 
 		return dto;		
 	}
