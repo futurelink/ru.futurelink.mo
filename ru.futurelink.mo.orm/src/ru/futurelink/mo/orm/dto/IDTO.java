@@ -17,6 +17,7 @@ import java.util.HashMap;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.iface.IModelObject;
 import ru.futurelink.mo.orm.iface.IUser;
 
 /**
@@ -31,6 +32,9 @@ import ru.futurelink.mo.orm.iface.IUser;
  *
  */
 public interface IDTO {
+
+	public Object getDataField(String fieldName) throws DTOException;
+
 	/**
      * Get data from model object. This method must be supplied with
      * getter and setter method names for model object to work properly.
@@ -110,6 +114,16 @@ public interface IDTO {
 	 */
 	public void save() throws DTOException, SaveException;
 	
+    /**
+     * Persistent manager commit wrapper method.
+     *
+     * In common case it just needs to call saveCommit() on data modelcc
+     * within this method.
+     *
+     * @throws SaveException
+     */	
+	public void saveCommit() throws SaveException;
+	
 	/**
 	 * Get model object ID. In common case the ID is the database ID of
      * record (object).
@@ -154,5 +168,10 @@ public interface IDTO {
 	 * 
 	 * @return
 	 */
-	public IDTOAccessChecker getAccessChecker();	
+	public IDTOAccessChecker getAccessChecker();
+
+	/**
+	 * @return
+	 */
+	public Class<? extends IModelObject> getDataClass();	
 }

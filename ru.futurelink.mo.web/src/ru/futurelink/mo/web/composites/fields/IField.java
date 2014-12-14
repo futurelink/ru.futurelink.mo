@@ -13,7 +13,7 @@ package ru.futurelink.mo.web.composites.fields;
 
 import org.eclipse.swt.events.ModifyListener;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.controller.CommonControllerListener;
 import ru.futurelink.mo.web.controller.CommonItemControllerListener;
@@ -53,14 +53,14 @@ public interface IField {
 	 * - если используется с конструктором в который передан DTO - возвращается сохраненный DTO.
 	 * @return
 	 */
-	public CommonDTO getDTO();
+	public IDTO getDTO();
 	
 	/**
 	 * Установить объект DTO для работы с полем.
 	 * 
 	 * @param dto
 	 */
-	public void setDTO(CommonDTO dto);
+	public void setDTO(IDTO dto);
 	
 	/**
 	 * Очистить поле до состояния по-умолчанию.

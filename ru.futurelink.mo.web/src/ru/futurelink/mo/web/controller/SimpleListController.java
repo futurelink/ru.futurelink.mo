@@ -20,8 +20,8 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableColumn;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
@@ -82,7 +82,7 @@ abstract public class SimpleListController
 	 * 
 	 * @param data
 	 */
-	public void handleItemDoubleClicked(CommonDTO data) {
+	public void handleItemDoubleClicked(IDTO data) {
 		if (data != null) {
 			if (params().get("itemEditMode") != CommonItemController.EditMode.CONTAINER) {
 				Object dlg = openEditDialog((EditorDTO)getActiveData());

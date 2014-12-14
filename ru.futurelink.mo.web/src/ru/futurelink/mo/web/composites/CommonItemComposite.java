@@ -13,7 +13,7 @@ package ru.futurelink.mo.web.composites;
 
 import org.eclipse.swt.widgets.Composite;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.fields.IField;
@@ -30,8 +30,8 @@ public class CommonItemComposite extends CommonDataComposite {
 
 	private static final long serialVersionUID = 1L;
 
-	private CommonDTO		mDTO;
-	private IField[]		mMandatoryFields;
+	private IDTO		mDTO;
+	private IField[]	mMandatoryFields;
 	
 	public CommonItemComposite(ApplicationSession session, Composite parent, int style, CompositeParams params) {
 		super(session, parent, style, params);
@@ -44,7 +44,7 @@ public class CommonItemComposite extends CommonDataComposite {
 	 * 
 	 * @param data
 	 */
-	public void attachDTO(CommonDTO data, Boolean refresh) throws DTOException {
+	public void attachDTO(IDTO data, Boolean refresh) throws DTOException {
 		mDTO = data;
 		if ((mDTO != null) && (refresh == true))
 			refresh();
@@ -63,7 +63,7 @@ public class CommonItemComposite extends CommonDataComposite {
 	 * Convinience method to make possible not to cast DTO to
      * CommonDTO.
 	 */
-	public CommonDTO getDTO() {
+	public IDTO getDTO() {
 		return mDTO;
 	}
 

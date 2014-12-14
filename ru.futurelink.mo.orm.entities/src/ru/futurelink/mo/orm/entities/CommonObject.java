@@ -55,13 +55,13 @@ public class CommonObject
 	 * есть объект может сохранить себя сам благодаря этому.
 	 */
 	@Transient
-	protected IPersistentManagerSession mPersistentManagerSession;	
+	protected IPersistentManagerSession persistentManagerSession;	
 	final public void setPersistentManagerSession(IPersistentManagerSession pm) {
-		mPersistentManagerSession = pm;
+		persistentManagerSession = pm;
 	}
 
 	final public IPersistentManagerSession getPersistenceManagerSession() {
-		return mPersistentManagerSession;
+		return persistentManagerSession;
 	}
 	
 	public static Query getSingleObjectSelectQuery(IPersistentManagerSession pms, Class<?> cls, Long id) {
@@ -83,11 +83,16 @@ public class CommonObject
 	 * @param pmSession
 	 */	
 	public CommonObject(IPersistentManagerSession pmSession) {
-		mPersistentManagerSession = pmSession;
+		persistentManagerSession = pmSession;
 		deleteFlag = false;
-		if (PersistentManagerSessionUI.class.isAssignableFrom(mPersistentManagerSession.getClass())) {
-			if (mCreator == null) mCreator = (User) ((PersistentManagerSessionUI)pmSession).getUser();
-			if (mAuthor == null) mAuthor = (User) ((PersistentManagerSessionUI)pmSession).getUser();
+
+		// Creation datetime in server time zone.
+		if (getCreateDate() == null) setCreateDate(Calendar.getInstance().getTime());
+
+		if (PersistentManagerSessionUI.class.isAssignableFrom(persistentManagerSession.getClass())) {
+			if (getOwner() == null) setOwner(((PersistentManagerSessionUI)persistentManagerSession).getAccessUser());
+			if (getCreator() == null) setCreator(((PersistentManagerSessionUI)persistentManagerSession).getUser());
+			if (getAuthor() == null) setAuthor(((PersistentManagerSessionUI)persistentManagerSession).getUser());
 		}
 	}
 
@@ -130,6 +135,18 @@ public class CommonObject
 	private		CommonObject 	mUnmodifiedObject;
 	public		ICommonObject 	getUnmodifiedObject() { return mUnmodifiedObject; }
 	public		void 			setUnmodifiedObject(ICommonObject object) { mUnmodifiedObject = (CommonObject) object; }
+
+	/**
+	 * Object owner
+	 */
+	@Index
+	@ManyToOne
+	@DontCreateHistory
+	@JoinColumn(name = "owner", referencedColumnName = "id")
+	@Accessors(getter = "getOwner", setter = "setOwner")
+	private		User	owner;
+	public 		IUser	getOwner() { return owner; }
+	public		void	setOwner(IUser creator) { this.owner = (User) owner; }  
 
 	/**
 	 * Object creator user
@@ -211,16 +228,10 @@ public class CommonObject
 	@Override
 	public 		Object save() throws SaveException {
 		mModifyDate = null;
-		if (mPersistentManagerSession == null) {
+		if (persistentManagerSession == null) {
             throw new SaveException("No persistent manager session on CommonObject!", null);
         }
-		
-		// Creation datetime in server time zone.
-		if (mCreateDate == null) setCreateDate(Calendar.getInstance().getTime());
-		if (PersistentManagerSessionUI.class.isAssignableFrom(mPersistentManagerSession.getClass())) {
-			if (getCreator() == null) setCreator(((PersistentManagerSessionUI)mPersistentManagerSession).getAccessUser());
-			if (getAuthor() == null) setAuthor(((PersistentManagerSessionUI)mPersistentManagerSession).getUser());
-		}
+
 		if (getCode() == null) { 
 			mCode = new CodeSupport();
 			//mCode.setObject(this);
@@ -232,7 +243,7 @@ public class CommonObject
 
 		Object result;
 		try {
-			 result = mPersistentManagerSession.save(this);
+			 result = persistentManagerSession.save(this);
 		} catch (Exception ex) {
 			throw new SaveException("Ошибка при сохранении элемента в save()", ex);
 		}
@@ -242,17 +253,17 @@ public class CommonObject
 
 	@Override
 	public void saveCommit() throws SaveException {
-		if (mPersistentManagerSession.transactionIsOpened()) {
-			mPersistentManagerSession.transactionCommit();
+		if (persistentManagerSession.transactionIsOpened()) {
+			persistentManagerSession.transactionCommit();
 		}
 	}
 	
 	public void refresh() {
-		mPersistentManagerSession.getEm().refresh(this);
+		persistentManagerSession.getEm().refresh(this);
 	}
 
 	public Logger logger() {
-		return mPersistentManagerSession.logger();
+		return persistentManagerSession.logger();
 	}
 	
 	/**
@@ -273,7 +284,7 @@ public class CommonObject
 	 * @throws LockException 
 	 */
 	public		Object edit() throws LockException {
-		UserLock.acquireLock(mPersistentManagerSession, getClass().getSimpleName(), getId());
+		UserLock.acquireLock(persistentManagerSession, getClass().getSimpleName(), getId());
 		mEditFlag = true;		
 		return null;
 	}
@@ -284,7 +295,7 @@ public class CommonObject
 	 * @throws LockException 
 	 */
 	public		void close() throws LockException {		
-		UserLock.releaseLock(mPersistentManagerSession, getClass().getSimpleName(), getId());
+		UserLock.releaseLock(persistentManagerSession, getClass().getSimpleName(), getId());
 		mUnmodifiedObject = null;
 		mEditFlag = false;
 	}
@@ -307,7 +318,7 @@ public class CommonObject
 	 */
 	@Override
 	public void forceUpdateField(String field, ICommonObject dataItem) {
-		Query q = mPersistentManagerSession.getEm().createQuery(
+		Query q = persistentManagerSession.getEm().createQuery(
 			"update "+getClass().getSimpleName()+" set "+field+" = :param where mId = :id"
 		);
 		q.setParameter("param", dataItem);

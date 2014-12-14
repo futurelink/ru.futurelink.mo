@@ -93,7 +93,7 @@ public class HistoryObject
 	 */
 	@Transient
 	public HistoryObject getPrevObject() {
-		HistoryObject obj = mPersistentManagerSession.getEm().find(HistoryObject.class, mPrevId);
+		HistoryObject obj = persistentManagerSession.getEm().find(HistoryObject.class, mPrevId);
 		return obj; 
 	}
 
@@ -104,7 +104,7 @@ public class HistoryObject
 	 */
 	@Transient
 	public HistoryObject getNextObject() {
-		Query q = mPersistentManagerSession.getEm().createQuery(
+		Query q = persistentManagerSession.getEm().createQuery(
 			"select obj from "+this.getClass().getSimpleName()+" obj where obj.prevId = :id"
 		);
 		q.setParameter("id", getId());
@@ -168,7 +168,7 @@ public class HistoryObject
 	@Override
 	public Object save() throws SaveException {
 		Object retVal = null;
-		if (mPersistentManagerSession == null) { 
+		if (persistentManagerSession == null) { 
 			throw new SaveException("No persistent manager on HistoryObject!", null); 
 		}
 
@@ -178,7 +178,7 @@ public class HistoryObject
 				// Перед сохранением сохраняем неизмененную копию объекта
 				// это актуально если объект сохраняется, а потом изменяется
 				// тот же экземпляр и снова сохраняется.
-				setUnmodifiedObject(mPersistentManagerSession.getOldEm().find(getClass(), oldId));
+				setUnmodifiedObject(persistentManagerSession.getOldEm().find(getClass(), oldId));
 
 				if (checkDontCreateHistory()) {
 					// Сохраняем элемент без создания исторического элемента,
@@ -186,7 +186,7 @@ public class HistoryObject
 					// элментов.
 					retVal = super.save();
 				} else {										
-					retVal = mPersistentManagerSession.saveWithHistory(this, oldId);
+					retVal = persistentManagerSession.saveWithHistory(this, oldId);
 				}
 			} else {
 				// Если объект создается в первый раз, то

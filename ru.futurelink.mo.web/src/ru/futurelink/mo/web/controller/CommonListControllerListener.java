@@ -11,7 +11,7 @@
 
 package ru.futurelink.mo.web.controller;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.controller.iface.ListDTOAccessor;
 import ru.futurelink.mo.web.exceptions.InitException;
@@ -59,14 +59,14 @@ public interface CommonListControllerListener extends CommonControllerListener, 
 	 * 
 	 * @param data
 	 */
-	public void itemSelected(CommonDTO data);
+	public void itemSelected(IDTO data);
 	
 	/**
 	 * То же что itemSelected, но для двойного клика.
 	 * 
 	 * @param data
 	 */
-	public void itemDoubleClicked(CommonDTO data);
+	public void itemDoubleClicked(IDTO data);
 	
 	/**
 	 * Обработка изменения фильтра списка.

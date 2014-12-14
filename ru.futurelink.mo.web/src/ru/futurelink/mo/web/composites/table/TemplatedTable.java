@@ -21,8 +21,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonComposite;
@@ -38,8 +38,8 @@ public abstract class TemplatedTable
 
 	private static final long serialVersionUID = 1L;
 
-	private 	CommonDTOList<? extends CommonDTO>	mData;
-	private		HashMap<CommonDTO, TableItem>			mIndex;
+	private 	CommonDTOList<? extends IDTO>			mData;
+	private		HashMap<IDTO, TableItem>				mIndex;
 	private		CommonTableListener 					mListener;
 	private		Table									mTable;
 
@@ -53,7 +53,7 @@ public abstract class TemplatedTable
 			int style, CompositeParams params) {
 		super(session, parent, style, params);
 		
-		mIndex = new HashMap<CommonDTO, TableItem>();
+		mIndex = new HashMap<IDTO, TableItem>();
 
 		GridLayout layout = new GridLayout();
 		layout.marginWidth = 0;
@@ -77,7 +77,7 @@ public abstract class TemplatedTable
 				try {
 					if (mListener != null) {
 						TableItem item = mTable.getItem(mTable.getSelectionIndex());
-						for (Entry<CommonDTO, TableItem> e : mIndex.entrySet()) {
+						for (Entry<IDTO, TableItem> e : mIndex.entrySet()) {
 							if (e.getValue().equals(item)) {
 								mListener.itemSelected(e.getKey());
 								break;
@@ -106,7 +106,7 @@ public abstract class TemplatedTable
 			public void mouseDoubleClick(MouseEvent arg0) {
 				if (mListener != null) {
 					TableItem item = mTable.getItem(mTable.getSelectionIndex());
-					for (Entry<CommonDTO, TableItem> e : mIndex.entrySet()) {
+					for (Entry<IDTO, TableItem> e : mIndex.entrySet()) {
 						if (e.getValue().equals(item)) {
 							mListener.itemDoubleClicked(e.getKey());
 							break;
@@ -118,17 +118,18 @@ public abstract class TemplatedTable
 
 		Template template = createTemplate();
 		if (template != null)
-			mTable.setData( RWT.ROW_TEMPLATE, template );		
+			mTable.setData( RWT.ROW_TEMPLATE, template );
+
 	}
 
 	@Override
-	public void setInput(CommonDTOList<? extends CommonDTO> data) {
+	public void setInput(CommonDTOList<? extends IDTO> data) {
 		mData = data;
 
 		if (mData != null) {
 			// Clear indexed items which are not in new data set
-			for(Iterator<CommonDTO> iter = mIndex.keySet().iterator(); iter.hasNext();){
-				CommonDTO currentDTO = iter.next();
+			for(Iterator<IDTO> iter = mIndex.keySet().iterator(); iter.hasNext();){
+				IDTO currentDTO = iter.next();
 				if (!mData.getDTOList().containsValue(currentDTO)) {
 					int index = mTable.indexOf(mIndex.get(currentDTO));
 					mTable.remove(index);	// Remove from table
@@ -139,7 +140,7 @@ public abstract class TemplatedTable
 			// When the input is set we link TableItems to CommonDTO items
 			// if they aren't linked.
 			for (Integer index : mData.getOrderList().keySet()) {
-				CommonDTO dto = mData.getDTOList().get(mData.getOrderList().get(index));
+				IDTO dto = mData.getDTOList().get(mData.getOrderList().get(index));
 				TableItem item;
 				if (mIndex.containsKey(dto)) {
 					item = mIndex.get(dto);
@@ -177,7 +178,7 @@ public abstract class TemplatedTable
 	}
 
 	@Override
-	public void selectByDTO(CommonDTO dto) {
+	public void selectByDTO(IDTO dto) {
 
 	}
 
@@ -204,7 +205,7 @@ public abstract class TemplatedTable
 	 * @param item
 	 * @param dto
 	 */
-	abstract protected void displayItem(TableItem item, CommonDTO dto);
+	abstract protected void displayItem(TableItem item, IDTO dto);
 
 	/**
 	 * Get table instance for internal use.

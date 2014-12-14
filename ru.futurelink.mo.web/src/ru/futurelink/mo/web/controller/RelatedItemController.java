@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.dto.access.AllowAllChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.OpenException;
@@ -170,7 +171,7 @@ public abstract class RelatedItemController
 	 * мы связаны.
 	 */
 	@Override
-	public void setDTO(CommonDTO dto) throws DTOException {
+	public void setDTO(IDTO dto) throws DTOException {
 		mRelatedController.getDTO().setDataField(
 				mFieldName, 
 				mFieldGetterName, 

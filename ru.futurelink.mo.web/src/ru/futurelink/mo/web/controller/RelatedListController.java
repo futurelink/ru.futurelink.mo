@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
@@ -88,7 +89,7 @@ public abstract class RelatedListController
 	 * 
 	 * @return объект DTO от основного контроллера
 	 */
-	protected final CommonDTO getRelatedDTO() {
+	protected final IDTO getRelatedDTO() {
 		return mRelatedController.getDTO();
 	}
 	
@@ -129,7 +130,7 @@ public abstract class RelatedListController
 		}
 
 		// Сохраняем все элементы из списка DTO композита
-		for (CommonDTO dto : getDTO().getDTOList().values()) {
+		for (IDTO dto : getDTO().getDTOList().values()) {
 			// Для исторических элементов надо пересвязать данные
 			logger().debug("Данные будут перепривязаны к главному элменту с ID=" + 
 					getRelatedDTO().getId());
@@ -148,14 +149,14 @@ public abstract class RelatedListController
 	 * 
 	 * @param item сохраняемый объект DTO
 	 */
-	public void doBeforeItemSave(CommonDTO item) throws DTOException, SaveException {}
+	public void doBeforeItemSave(IDTO item) throws DTOException, SaveException {}
 	
 	/**
 	 * Выполнять после сохранения элемент в момент сохранения всего списка.
 	 * 
 	 * @param item сохраняемый объект DTO
 	 */
-	public void doAfterItemSave(CommonDTO item) throws DTOException, SaveException {}
+	public void doAfterItemSave(IDTO item) throws DTOException, SaveException {}
 	
 	@Override
 	public void refresh(boolean refreshSubcontrollers) throws DTOException {

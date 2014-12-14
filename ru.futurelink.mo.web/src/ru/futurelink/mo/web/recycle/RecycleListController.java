@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableColumn;
 
 import ru.futurelink.mo.orm.ModelObject;
-import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.dto.ViewerDTO;
 import ru.futurelink.mo.orm.dto.ViewerDTOList;
 import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
@@ -124,16 +124,16 @@ public class RecycleListController extends SimpleListController {
 			public void delete() {}
 
 			@Override
-			public void itemSelected(CommonDTO data) {}
+			public void itemSelected(IDTO data) {}
 
 			@Override
-			public void itemDoubleClicked(CommonDTO data) {}
+			public void itemDoubleClicked(IDTO data) {}
 
 			@Override
 			public void filterChanged() {}
 
 			@Override
-			public CommonDTOList<? extends CommonDTO> getControllerDTO() throws DTOException {
+			public CommonDTOList<? extends IDTO> getControllerDTO() throws DTOException {
 				return getDTO();
 			}
 

@@ -13,7 +13,7 @@ package ru.futurelink.mo.web.controller.iface;
 
 import java.util.ArrayList;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
@@ -30,8 +30,8 @@ public interface IItemController
 
 	/* Методы для работы с DTO */
 
-	public CommonDTO getDTO();
-	public void setDTO(CommonDTO dto)  throws DTOException;
+	public IDTO getDTO();
+	public void setDTO(IDTO dto)  throws DTOException;
 
 	/* Методы манипуляции объъектом */
 

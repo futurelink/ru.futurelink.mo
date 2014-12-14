@@ -13,8 +13,8 @@ package ru.futurelink.mo.web.controller;
 
 import org.eclipse.swt.widgets.TableColumn;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.exceptions.InitException;
 
@@ -72,7 +72,7 @@ public class SimpleListControllerListener implements
 	}
 
 	@Override
-	public void itemSelected(CommonDTO data) {
+	public void itemSelected(IDTO data) {
 		if (data != null) {
 			mListController.setToolEnabled("edit", true);
 			mListController.setToolEnabled("delete", true);
@@ -88,7 +88,7 @@ public class SimpleListControllerListener implements
 	}
 
 	@Override
-	public void itemDoubleClicked(CommonDTO data) {
+	public void itemDoubleClicked(IDTO data) {
 		mListController.handleItemDoubleClicked(data);
 
 		// Передаем событие выще - контроллеру-обработчику
@@ -111,7 +111,7 @@ public class SimpleListControllerListener implements
 	public void filterChanged() {}
 
 	@Override
-	public CommonDTOList<? extends CommonDTO> getControllerDTO() throws DTOException {
+	public CommonDTOList<? extends IDTO> getControllerDTO() throws DTOException {
 		return mListController.getDTO();
 	}
 

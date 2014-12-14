@@ -9,16 +9,20 @@
  *    Pavlov Denis - initial API and implementation
  ******************************************************************************/
 
-package ru.futurelink.mo.web.controller.iface;
+package ru.futurelink.mo.orm.dto;
 
-import ru.futurelink.mo.orm.dto.CommonDTOList;
-import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 
 /**
  * @author pavlov
  *
  */
-public interface ListDTOAccessor {
-	public CommonDTOList<? extends IDTO> getControllerDTO() throws DTOException;
+public interface IEditorDTO extends IDTO {
+	public void delete(boolean hardDelete) throws DTOException;
+	public void recover() throws DTOException;
+	
+	public Long getCode();
+	public void forceUpdateField(String field, CommonDTO dto);
+	public void setDataField(String fieldName, String fieldGetterName,
+			String fieldSetterName, Object value, boolean force) throws DTOException;
 }

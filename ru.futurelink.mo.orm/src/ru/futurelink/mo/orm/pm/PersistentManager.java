@@ -148,13 +148,6 @@ public class PersistentManager {
 		}
 		
 		try {
-			// Создатель элемента - по сути его владелец, в данном случае,
-			// это пользователь в базе которого производится модификация.
-			if (PersistentManagerSessionUI.class.isAssignableFrom(session.getClass())) {
-				if (object.getCreator() == null) object.setCreator(((PersistentManagerSessionUI)session).getAccessUser());
-				if (object.getAuthor() == null) object.setAuthor(((PersistentManagerSessionUI)session).getUser());
-			}
-
 			object.onBeforeSave(saveFlag);			// Вызов перед сохранением объекта
 			
 			// If couldn't begin new transaction or get existing we
@@ -237,14 +230,7 @@ public class PersistentManager {
 				object.setId(newId);				// Сетим следующую ID
 				object.setModifyDate(Calendar.getInstance(TimeZone.getTimeZone("GMT")).getTime());
 				object.setPrevId(oldId);			// Сохраняем старую ID
-
-				// Создатель элемента - по сути его владелец, в данном случае,
-				// это пользователь в базе которого производится модификация.
-				if (PersistentManagerSessionUI.class.isAssignableFrom(session.getClass())) {
-					if (object.getCreator() == null) object.setCreator(((PersistentManagerSessionUI)session).getAccessUser());
-					if (object.getAuthor() == null) object.setAuthor(((PersistentManagerSessionUI)session).getUser());
-				}
-		
+	
 				// Добавляем в ворклог данные о том, что элменет был изменен
 				// у добавим ссылку на элемент ворклога в элемент данных.
 				// Для элемента ворклога запись в ворклоге делать не надо!

@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
@@ -29,6 +30,7 @@ import ru.futurelink.mo.orm.exceptions.ValidationException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.orm.iface.IModelObject;
 import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
+import ru.futurelink.mo.orm.pm.PersistentObjectFactory;
 import ru.futurelink.mo.web.composites.CommonItemComposite;
 import ru.futurelink.mo.web.controller.RelatedController.SaveMode;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
@@ -53,7 +55,7 @@ public abstract class CommonItemController
 	private 	IPersistentManagerSession	mPersistentSession;
 	private		ArrayList<RelatedController> mRelatedControllers;
 
-	private		CommonDTO					mDTO;
+	private		IDTO						mDTO;
 	private		IDTOAccessChecker			mChecker;
 	
 	private		EditMode					editMode;
@@ -114,7 +116,8 @@ public abstract class CommonItemController
 	 * 
 	 * @return
 	 */
-	public CommonDTO getDTO() {
+	@Override
+	public IDTO getDTO() {
 		return mDTO;
 	}
 
@@ -184,9 +187,9 @@ public abstract class CommonItemController
 	@Override
 	public void create() throws DTOException {
 		setDTO(
-				createDTO(
-						createDataElement()
-					)
+				PersistentObjectFactory.getInstance().createEditorDTO(
+						mDataClass, mPersistentSession
+				)
 			);
 		doAfterCreate();
 	}
@@ -221,7 +224,7 @@ public abstract class CommonItemController
 	 * @param dto
 	 * @throws DTOException
 	 */
-	public final void setDTONoRefresh(CommonDTO dto) throws DTOException {
+	public final void setDTONoRefresh(IDTO dto) throws DTOException {
 		mDTO = dto;
 		if (getComposite() != null)
 			((CommonItemComposite)getComposite()).attachDTO(mDTO, false);		
@@ -234,7 +237,7 @@ public abstract class CommonItemController
 	 * @param dto
 	 */
 	@Override
-	public void setDTO(CommonDTO dto)  throws DTOException {
+	public void setDTO(IDTO dto)  throws DTOException {
 		setDTONoRefresh(dto);
 		
 		refresh(true);

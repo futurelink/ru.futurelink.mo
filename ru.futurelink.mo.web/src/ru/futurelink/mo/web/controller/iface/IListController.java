@@ -11,7 +11,7 @@
 
 package ru.futurelink.mo.web.controller.iface;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 
 /**
@@ -37,12 +37,12 @@ public interface IListController
 	 * 
 	 * @param data
 	 */
-	public void setActiveData(CommonDTO data);
+	public void setActiveData(IDTO data);
 
 	/**
 	 * Получить выбранный элемент.
 	 * 
 	 * @return
 	 */
-	public CommonDTO getActiveData();
+	public IDTO getActiveData();
 }

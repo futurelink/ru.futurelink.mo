@@ -19,6 +19,7 @@ import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.dto.EditorDTOList;
 import ru.futurelink.mo.orm.dto.FilterDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
@@ -33,7 +34,7 @@ abstract public class CommonListController
 	implements IListController 
 {
 	private FilterDTO						mFilter;
-	private CommonDTOList<? extends CommonDTO>	 mDTO;
+	private CommonDTOList<? extends IDTO> mDTO;
 	
 	public CommonListController(ICompositeController parentController,
 			Class<? extends ICommonObject> dataClass, CompositeParams compositeParams) {
@@ -65,7 +66,11 @@ abstract public class CommonListController
 		// Всегда создаем пустой список DTO для контроллера,
 		// если надо, его всегда можно заменить своим списком.	
 		try {
-			setDTO(new EditorDTOList<CommonDTO>(getSession().persistent(), new AllowOwnChecker(getSession().getUser()), CommonDTO.class));
+			setDTO(
+				new EditorDTOList<CommonDTO>(
+						getSession().persistent(), new AllowOwnChecker(getSession().getUser()), CommonDTO.class
+				)
+			);
 		} catch (DTOException e) {
 			handleError("Ошибка инициализации контроллера при установке объекта DTO!", e);
 		}
@@ -99,7 +104,7 @@ abstract public class CommonListController
 	 * @param dto
 	 * @throws DTOException 
 	 */
-	protected synchronized void setDTO(CommonDTOList<? extends CommonDTO> dto) throws DTOException {
+	protected synchronized void setDTO(CommonDTOList<? extends IDTO> dto) throws DTOException {
 		removeDTO();	// Очищаем старый объект DTO
 		
 		mDTO = dto;
@@ -115,7 +120,7 @@ abstract public class CommonListController
 	 * @return
 	 * @throws DTOException 
 	 */
-	protected CommonDTOList<? extends CommonDTO> getDTO() throws DTOException {
+	protected CommonDTOList<? extends IDTO> getDTO() throws DTOException {
 		return mDTO;
 	}
 	
@@ -170,7 +175,7 @@ abstract public class CommonListController
 	 * @param data
 	 */
 	@Override
-	public void setActiveData(CommonDTO data) {
+	public void setActiveData(IDTO data) {
 		if (getComposite() != null)
 			((CommonListComposite)getComposite()).setActiveData(data);
 	}
@@ -181,7 +186,7 @@ abstract public class CommonListController
 	 * @return объект DTO текущего элемента данных
 	 */
 	@Override
-	public CommonDTO getActiveData() {
+	public IDTO getActiveData() {
 		if (getComposite() != null)
 			return ((CommonListComposite)getComposite()).getActiveData();
 		else return null;

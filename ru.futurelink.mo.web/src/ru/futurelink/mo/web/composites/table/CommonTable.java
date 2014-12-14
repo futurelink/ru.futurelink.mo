@@ -31,6 +31,7 @@ import ru.futurelink.mo.web.composites.IDragDropDecorator;
 import ru.futurelink.mo.web.controller.CompositeParams;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.security.IUserParams;
@@ -52,7 +53,7 @@ public abstract class CommonTable
 	public		CommonComposite							mTableBottom;
 	protected 	TableViewer								mTableViewer;
 	private 	IContentProvider 						mContentProvider;
-	private 	CommonDTOList<? extends CommonDTO>	mData;
+	private 	CommonDTOList<? extends IDTO>			mData;
 
 	private		CommonTableListener 					mListener;
 	private		IUserParams								mUserParams;
@@ -260,7 +261,7 @@ public abstract class CommonTable
 	 * 
 	 * @param data
 	 */
-	public final void setInput(CommonDTOList<? extends CommonDTO> data) {
+	public final void setInput(CommonDTOList<? extends IDTO> data) {
 		mData = data;
 
 		if((mTableViewer != null) && (!mTableViewer.getControl().isDisposed()))
@@ -317,7 +318,8 @@ public abstract class CommonTable
 	 * 
 	 * @param dto
 	 */
-	public void selectByDTO(CommonDTO dto) {
+	@Override
+	public void selectByDTO(IDTO dto) {
 		if (dto == null) {
 			mTableViewer.setSelection(null);
 			return;

@@ -15,7 +15,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonListComposite;
@@ -78,7 +78,7 @@ abstract public class CommonDataPickerComposite extends CommonListComposite {
 	}
 
 	@Override
-	public void selectByDTO(CommonDTO dto) {
+	public void selectByDTO(IDTO dto) {
 		
 	}
 

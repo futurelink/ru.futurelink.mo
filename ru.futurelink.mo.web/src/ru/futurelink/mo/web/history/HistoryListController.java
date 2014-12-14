@@ -18,7 +18,7 @@ import javax.persistence.TypedQuery;
 import org.eclipse.swt.widgets.Composite;
 
 import ru.futurelink.mo.orm.ModelObject;
-import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.dto.ViewerDTO;
 import ru.futurelink.mo.orm.dto.ViewerDTOList;
 import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
@@ -104,7 +104,7 @@ public class HistoryListController extends SimpleListController {
 
 	// Глушим даблклик по строке истории
 	@Override
-	public void handleItemDoubleClicked(CommonDTO data) {}
+	public void handleItemDoubleClicked(IDTO data) {}
 
 	@Override
 	protected void doBeforeInit() {

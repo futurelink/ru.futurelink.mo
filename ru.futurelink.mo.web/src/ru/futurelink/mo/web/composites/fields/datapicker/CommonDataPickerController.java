@@ -17,9 +17,9 @@ import java.util.Iterator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableColumn;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.dto.EditorDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.composites.CommonDataComposite;
@@ -108,7 +108,7 @@ abstract public class CommonDataPickerController
 	 * 
 	 * @param data
 	 */
-	public void handleItemDoubleClicked(CommonDTO data) {
+	public void handleItemDoubleClicked(IDTO data) {
 		handleOk();
 	}
 
@@ -180,7 +180,7 @@ abstract public class CommonDataPickerController
 			public void delete() {}
 
 			@Override
-			public void itemSelected(CommonDTO data) {
+			public void itemSelected(IDTO data) {
 				try {
 					if (data != null) {
 						setToolEnabled("save", true);
@@ -196,7 +196,7 @@ abstract public class CommonDataPickerController
 			}
 
 			@Override
-			public void itemDoubleClicked(CommonDTO data) {
+			public void itemDoubleClicked(IDTO data) {
 				if (data != null) {
 					handleItemDoubleClicked(data);
 				}
@@ -216,7 +216,7 @@ abstract public class CommonDataPickerController
 			public void filterChanged() {}
 
 			@Override
-			public CommonDTOList<? extends CommonDTO> getControllerDTO() throws DTOException {
+			public CommonDTOList<? extends IDTO> getControllerDTO() throws DTOException {
 				return getDTO();
 			}
 

@@ -107,7 +107,7 @@ public abstract class CommonDTOList<T extends IDTO> {
 	 * @param dtoItem
 	 * @throws DTOException
 	 */
-	public void removeDTOItem(T dtoItem) throws DTOException {
+	public void removeDTOItem(IDTO dtoItem) throws DTOException {
 		for (Integer index : mOrderList.keySet()) {
 			if (mOrderList.get(index).equals(dtoItem.getId())) {
 				mOrderList.remove(index);

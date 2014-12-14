@@ -11,13 +11,10 @@
 
 package ru.futurelink.mo.orm.dto;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
@@ -27,6 +24,7 @@ import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.orm.iface.IModelObject;
 import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
+import ru.futurelink.mo.orm.pm.PersistentObjectFactory;
 
 /**
  * Объект переноса данных.
@@ -47,7 +45,8 @@ import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
  * @since 0.1
  *
  */
-public class EditorDTO extends CommonDTO {
+public class EditorDTO extends CommonDTO
+	implements IEditorDTO {
 	private static final long serialVersionUID = 1L;
 
 	protected HashMap<String, Object[]> 	mChangesBuffer;
@@ -63,19 +62,14 @@ public class EditorDTO extends CommonDTO {
 		return ((ICommonObject)mData).getPersistenceManagerSession();
 	}
 	
-	public static EditorDTO create(Class <? extends ModelObject> dataClass, IPersistentManagerSession session, IDTOAccessChecker accessChecker) throws DTOException {
-		Constructor<? extends ModelObject> cons = null;
-		ModelObject data = null;
-		try {
-			cons = dataClass.getConstructor(IPersistentManagerSession.class);
-			data = cons.newInstance(session);
-		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new DTOException("Ошибка вызова create для EditorDTO.", e);
-		}
-		EditorDTO dto = new EditorDTO(data);
-		dto.addAccessChecker(accessChecker);
-		return dto;
-		
+	public static IEditorDTO create(
+			Class <? extends ModelObject> dataClass, 
+			IPersistentManagerSession session, 
+			IDTOAccessChecker accessChecker) throws DTOException {		
+		IEditorDTO dto = PersistentObjectFactory.getInstance().createEditorDTO(dataClass, session);;
+		dto.addAccessChecker(accessChecker);		
+
+		return dto;		
 	}
 
 	@Override
@@ -99,102 +93,6 @@ public class EditorDTO extends CommonDTO {
 	}
 	
 	/**
-	 * 
-	 * @param resultList
-	 * @return
-	 */
-	@Deprecated
-	public static Map<String, EditorDTO> fromResultList(
-			List<? extends ICommonObject> resultList, 
-			IPersistentManagerSession pm, 
-			Class<? extends CommonDTO> itemDTOClass,
-			IDTOAccessChecker accessChecker) throws DTOException {
-		Map<String, EditorDTO> list = new HashMap<String, EditorDTO>();
-		if ((resultList != null) && (resultList.size() > 0)) {
-			for (Object c : resultList) {
-				((ICommonObject)c).setPersistentManagerSession(pm);
-
-				// Создаем DTO рефлексией
-				try {
-					Constructor<? extends CommonDTO> ctr = itemDTOClass.getConstructor(ICommonObject.class);
-					EditorDTO dto = (EditorDTO)ctr.newInstance((ICommonObject)c);
-					if (dto != null) {
-						dto.addAccessChecker(accessChecker);
-						list.put(((ICommonObject)c).getId(), dto);
-					} else {
-						throw new DTOException("Ошибка, созданный DTO = null", null);
-					}
-				} catch (NoSuchMethodException | 
-						SecurityException | 
-						DTOException | 
-						InstantiationException | 
-						IllegalAccessException | 
-						IllegalArgumentException | 
-						InvocationTargetException e) {
-					throw new DTOException("Невозможно создать объект DTO в fromResultList.", e);
-				} 
-			}
-
-		}
-		return list;
-	}
-
-	/**
-	 * 
-	 * @param result
-	 * @param sourceList
-	 * @param pm
-	 * @param itemDTOClass
-	 * @param accessChecker
-	 */
-	@Deprecated
-	public static void fillResultList(
-			Map<String, ? extends CommonDTO> resultList,
-			List<?> sourceList, 
-			IPersistentManagerSession pm, 
-			Class<? extends CommonDTO> itemDTOClass,
-			IDTOAccessChecker accessChecker			
-		) throws DTOException  {
-		
-		@SuppressWarnings("unchecked")
-		Map<String, EditorDTO>localDTO = (Map<String, EditorDTO>) resultList;
-		
-		if ((sourceList == null) || (sourceList.size() == 0)) {
-			resultList.clear();
-			return;
-		} else {
-			for (Object c : sourceList) {
-				((ICommonObject)c).setPersistentManagerSession(pm);
-				
-				// Создаем DTO рефлексией
-				try {
-					Constructor<? extends CommonDTO> ctr = itemDTOClass.getConstructor(ICommonObject.class);
-					EditorDTO dto = (EditorDTO)ctr.newInstance((ICommonObject)c);
-					if (dto != null) {
-						dto.addAccessChecker(accessChecker);
-						localDTO.put(
-							((ICommonObject)c).getId(),
-							dto
-						);
-					} else {
-						throw new DTOException("Ошибка, созданный DTO = null", null);
-					}
-				} catch (NoSuchMethodException | 
-						SecurityException | 
-						DTOException | 
-						InstantiationException | 
-						IllegalAccessException | 
-						IllegalArgumentException | 
-						InvocationTargetException e) {
-					throw new DTOException("Невозможно создать объект DTO в fromResultList.", e);
-				} 
-			}
-			
-			resultList = localDTO;
-		}
-	}
-	
-	/**
 	 * Получить буфер изменений по объекту DTO.
 	 * 
 	 * @return
@@ -212,6 +110,7 @@ public class EditorDTO extends CommonDTO {
 		mChangesBuffer.clear();
 	}
 
+	@Override
 	public void delete(boolean hardDelete) throws DTOException {
 		if (mAccessChecker == null) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
@@ -224,6 +123,7 @@ public class EditorDTO extends CommonDTO {
 		}
 	}
 	
+	@Override
 	public void recover() throws DTOException {
 		setDataField(ModelObject.FIELD_DELETEFLAG, "getDeleteFlag", "setDeleteFlag", false, true);
 	}
@@ -235,6 +135,7 @@ public class EditorDTO extends CommonDTO {
 	 * @return
 	 * @throws DTOException 
 	 */
+	@Override
 	public ArrayList<String> getChangedData() throws DTOException {
 		ArrayList<String> changedList = new ArrayList<String>();
 		
@@ -279,6 +180,7 @@ public class EditorDTO extends CommonDTO {
 	 * @param dto
 	 * @throws DTOException
 	 */
+	
 	public static void applyChanges(IModelObject data, CommonDTO dto) throws DTOException {
 		if (dto.mAccessChecker == null) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
@@ -361,6 +263,7 @@ public class EditorDTO extends CommonDTO {
 	 * @param value
 	 * @throws DTOException
 	 */	
+	@Override
 	public void setDataField(String fieldName, String fieldGetterName, String fieldSetterName, Object value) throws DTOException {
 		setDataField(fieldName, fieldGetterName, fieldSetterName, value, false);
 	}
@@ -373,6 +276,7 @@ public class EditorDTO extends CommonDTO {
 	 * @param force насильно сохранить значение, не проверять на то, реально ли оно изменено
 	 * @throws DTOException
 	 */
+	@Override
 	public void setDataField(String fieldName, String fieldGetterName, String fieldSetterName, Object value, boolean force) throws DTOException {
 		if (mAccessChecker == null) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
@@ -449,6 +353,7 @@ public class EditorDTO extends CommonDTO {
 	 * @return
 	 * @throws DTOException
 	 */
+	@Override
 	public Object getDataField(String fieldName, String fieldGetterName, String fieldSetterName, boolean checkAccess) throws DTOException {
 		if (mAccessChecker == null && checkAccess) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
@@ -513,6 +418,7 @@ public class EditorDTO extends CommonDTO {
 		return a;
 	}
 	
+	@Override
 	public Long getCode() {
 		if (mData != null)
 			return ((ICommonObject)mData).getCode().getId();
@@ -526,6 +432,7 @@ public class EditorDTO extends CommonDTO {
 		mData = null;
 	}
 
+	@Override
 	public void forceUpdateField(String field, CommonDTO dto) {
 		((ICommonObject)mData).forceUpdateField(field, (ICommonObject)dto.mData);
 	}

@@ -16,6 +16,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Control;
 
 import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonComposite;
@@ -31,7 +32,7 @@ abstract public class CommonField implements IField {
 	protected String		mDataFieldGetter;
 	protected CommonItemControllerListener mParentControllerListener;
 	private	   CommonItemComposite		mDataComposite;
-	private	   CommonDTO				mDTO;
+	private	   IDTO						mDTO;
 	protected ModifyListener			mFieldModifyListener;
 	private	   boolean					mMandatoryFlag;
 	private	   boolean					mUseOnlyOneCondition = true;
@@ -89,7 +90,7 @@ abstract public class CommonField implements IField {
 	 * @return
 	 */
 	@Override
-	public CommonDTO getDTO() {
+	public IDTO getDTO() {
 		if ((mDataComposite == null) || (mDTO != null)) return mDTO;
 		if (mDataComposite.getDTO() != null) {
 			return mDataComposite.getDTO();
@@ -104,7 +105,7 @@ abstract public class CommonField implements IField {
 	 * @param dto
 	 */
 	@Override
-	public void setDTO(CommonDTO dto) {
+	public void setDTO(IDTO dto) {
 		mDTO = dto;
 	}
 	

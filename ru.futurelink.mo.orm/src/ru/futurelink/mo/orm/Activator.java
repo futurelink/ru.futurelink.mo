@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 
 import ru.futurelink.mo.orm.migration.MigrationEngine;
 import ru.futurelink.mo.orm.pm.PersistentManager;
+import ru.futurelink.mo.orm.pm.PersistentObjectFactory;
 
 /**
  * Активатор запускает процедуру миграции.
@@ -41,6 +42,10 @@ public class Activator implements BundleActivator {
 		this.context = ctx;
 
 		logger  = LoggerFactory.getLogger(this.getClass());
+
+		// Register persistent object factory service
+		context.registerService(PersistentObjectFactory.class, 
+				PersistentObjectFactory.getInstance(), null);
 
 		if (context.getServiceReference(PersistentManager.class) == null) {
 			new Thread() {
@@ -67,17 +72,21 @@ public class Activator implements BundleActivator {
 	}
 
 	@Override
-	public void stop(BundleContext arg0) throws Exception {
+	public void stop(BundleContext context) throws Exception {
 		logger.info("Removing PersistentManager and MigrationEngine services");
 
 		Collection<ServiceReference<MigrationEngine>> refs = null;
-		refs = arg0.getServiceReferences(MigrationEngine.class, null);
+		refs = context.getServiceReferences(MigrationEngine.class, null);
 		for (ServiceReference<?> ref : refs) {
-			arg0.ungetService(ref);
+			context.ungetService(ref);
 		}
 
-		if (arg0.getServiceReference(PersistentManager.class) != null) {
-			arg0.ungetService(arg0.getServiceReference(PersistentManager.class));
+		if (context.getServiceReference(PersistentManager.class) != null) {
+			context.ungetService(context.getServiceReference(PersistentManager.class));
+		}
+
+		if (context.getServiceReference(PersistentObjectFactory.class) != null) {
+			context.ungetService(context.getServiceReference(PersistentObjectFactory.class));
 		}
 
 		persistentManager = null;

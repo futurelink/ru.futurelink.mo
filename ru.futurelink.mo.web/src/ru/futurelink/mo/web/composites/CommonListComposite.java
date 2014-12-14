@@ -17,6 +17,7 @@ import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.dto.EditorDTOList;
 import ru.futurelink.mo.orm.dto.FilterDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
@@ -41,7 +42,7 @@ abstract public class CommonListComposite
 	private static final long serialVersionUID = 1L;
 	
 	protected CommonDTOList<? extends CommonDTO>	mDTO;
-	private CommonDTO								mActiveData;
+	private IDTO								mActiveData;
 	
 	public CommonListComposite(ApplicationSession session,
 			Composite parent, int style, CompositeParams params) {
@@ -87,7 +88,7 @@ abstract public class CommonListComposite
 	 * @return - CommonDTOList instance
 	 */
 	@Override
-	public CommonDTOList<? extends CommonDTO> getDTO() throws DTOException {
+	public CommonDTOList<? extends IDTO> getDTO() throws DTOException {
 		if (getControllerListener() != null) {
 			
 			// Если у нас обработчик контроллера не кастуется в обработчик контроллера списка,
@@ -124,7 +125,7 @@ abstract public class CommonListComposite
 	 * @param data element from CommonDTOList attached to list view
 	 */
 	@Override
-	public void setActiveData(CommonDTO data) {
+	public void setActiveData(IDTO data) {
 		mActiveData = data;
 	}
 
@@ -134,7 +135,7 @@ abstract public class CommonListComposite
 	 * @return
 	 */
 	@Override
-	public CommonDTO getActiveData() {
+	public IDTO getActiveData() {
 		return mActiveData;
 	}
 

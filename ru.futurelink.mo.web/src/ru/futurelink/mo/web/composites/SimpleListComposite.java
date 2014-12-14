@@ -18,8 +18,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableColumn;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.table.CommonTableListener;
@@ -94,14 +94,14 @@ public class SimpleListComposite extends CommonListComposite {
 			mTable = (ICommonTable) constr.newInstance(getSession(), this, SWT.NONE, null);
 			mTable.addTableListener(new CommonTableListener() {			
 				@Override
-				public void itemSelected(CommonDTO data) {
+				public void itemSelected(IDTO data) {
 					setActiveData(data);
 					if (getControllerListener() != null)
 						((CommonListControllerListener)getControllerListener()).itemSelected(data);
 				}
 				
 				@Override
-				public void itemDoubleClicked(CommonDTO data) {
+				public void itemDoubleClicked(IDTO data) {
 					if (getControllerListener() != null)
 						((CommonListControllerListener)getControllerListener()).itemDoubleClicked(data);
 				}
@@ -170,7 +170,7 @@ public class SimpleListComposite extends CommonListComposite {
 	}
 
 	@Override
-	public void selectByDTO(CommonDTO dto) {
+	public void selectByDTO(IDTO dto) {
 		mTable.selectByDTO(dto);
 	}
 
@@ -179,7 +179,7 @@ public class SimpleListComposite extends CommonListComposite {
 	}
 
 	@Override
-	public void setInput(CommonDTOList<? extends CommonDTO> input) {
+	public void setInput(CommonDTOList<? extends IDTO> input) {
 		if (mTable != null)
 			mTable.setInput(input);		
 	}

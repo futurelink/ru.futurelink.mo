@@ -68,6 +68,7 @@ public abstract class CommonDTO implements Serializable, IDTO {
      *
      * @return
      */
+	@Override
 	public Class<? extends IModelObject> getDataClass() {
 		if (mData != null)
 			return mData.getClass();
@@ -88,14 +89,7 @@ public abstract class CommonDTO implements Serializable, IDTO {
 		throw new SaveException("Saving is not implemented on CommonDTO.", null);
 	}
 
-    /**
-     * Persistent manager commit wrapper method.
-     *
-     * In common case it just needs to call saveCommit() on data modelcc
-     * within this method.
-     *
-     * @throws SaveException
-     */
+	@Override
 	public void saveCommit() throws SaveException {
 		throw new SaveException("Saving is not implemented on CommonDTO.", null);
 	}
@@ -169,6 +163,7 @@ public abstract class CommonDTO implements Serializable, IDTO {
      * @return
      * @throws DTOException
      */
+	@Override
  	public Object getDataField(String fieldName) throws DTOException {
 		Accessors accessors = getAccessors(fieldName);
 		if (accessors != null && accessors.getter() != null && accessors.setter() != null) {

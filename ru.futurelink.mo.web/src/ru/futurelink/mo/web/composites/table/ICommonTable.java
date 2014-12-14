@@ -13,8 +13,8 @@ package ru.futurelink.mo.web.composites.table;
 
 import org.eclipse.jface.viewers.IContentProvider;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 
 /**
@@ -29,7 +29,7 @@ public interface ICommonTable {
      *
      * @param data
      */
-	public void setInput(CommonDTOList<? extends CommonDTO> data);
+	public void setInput(CommonDTOList<? extends IDTO> data);
 
     /**
      * Get input data set.
@@ -42,7 +42,7 @@ public interface ICommonTable {
 	public void setRowHeight(Integer height);
 	
 	public void selectById(String id) throws DTOException;
-	public void selectByDTO(CommonDTO dto);
+	public void selectByDTO(IDTO dto);
 	
 	public void addTableListener(CommonTableListener listener);
 	public void initTable();
