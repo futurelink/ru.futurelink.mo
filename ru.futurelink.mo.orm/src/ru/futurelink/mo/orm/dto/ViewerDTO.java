@@ -56,7 +56,7 @@ public class ViewerDTO extends CommonDTO {
 	@Override
 	public Object getDataField(String fieldName, String fieldGetterName,
 			String fieldSetterName, boolean checkAccess) throws DTOException {
-		if (mAccessChecker == null && checkAccess) {
+		if (getAccessChecker() == null && checkAccess) {
 			throw new DTOException("Data access checker agent is not set to DTO, operation not allowed.", null);
 		}
 
@@ -73,7 +73,7 @@ public class ViewerDTO extends CommonDTO {
 	        	ModelObject obj = (ModelObject) getValueMethod.invoke(mData);
 	        	if (obj != null) {
 		        	a = new ViewerDTO((ModelObject)obj);
-		        	((IDTO)a).addAccessChecker(mAccessChecker);
+		        	((IDTO)a).addAccessChecker(getAccessChecker());
 	        	}
 	        } else {
 	        	a = getValueMethod.invoke(mData);

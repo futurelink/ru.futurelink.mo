@@ -39,7 +39,7 @@ public class EditorDTOWithLinkage extends EditorDTO
 	@Override
 	public void setLinkedItem(IModelObject linkageItem) {
 		mLinkageDTO = new EditorDTO(linkageItem);
-		mLinkageDTO.addAccessChecker(mAccessChecker);
+		mLinkageDTO.addAccessChecker(getAccessChecker());
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class EditorDTOWithLinkage extends EditorDTO
 
 	@Override
 	public void save() throws DTOException, SaveException {
-		if (mAccessChecker == null) {
+		if (getAccessChecker() == null) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}
 

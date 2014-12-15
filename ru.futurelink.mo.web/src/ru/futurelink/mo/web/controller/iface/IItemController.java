@@ -14,6 +14,7 @@ package ru.futurelink.mo.web.controller.iface;
 import java.util.ArrayList;
 
 import ru.futurelink.mo.orm.dto.IDTO;
+import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
@@ -33,6 +34,8 @@ public interface IItemController
 	public IDTO getDTO();
 	public void setDTO(IDTO dto)  throws DTOException;
 
+	public IDTOAccessChecker createAccessChecker();
+	
 	/* Методы манипуляции объъектом */
 
 	public void create() throws DTOException;

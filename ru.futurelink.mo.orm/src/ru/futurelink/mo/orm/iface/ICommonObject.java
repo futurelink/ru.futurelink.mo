@@ -26,7 +26,7 @@ public interface ICommonObject extends IModelObject {
 	public 		ICodeSupport getCode();
 
 	public 		IUser	getOwner();
-	public		void	setOwner(IUser creator);  
+	public		void	setOwner(IUser owner);  
 
 	public 		IUser	getCreator();
 	public		void	setCreator(IUser creator);  

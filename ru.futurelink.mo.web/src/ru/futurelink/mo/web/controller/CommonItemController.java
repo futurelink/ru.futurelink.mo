@@ -94,6 +94,7 @@ public abstract class CommonItemController
 	 * Можно переопределить на дочернем классе, если нужно
 	 * обеспечить доступ к элементам иным чем созданные этим пользователем. 
 	 */
+	@Override
 	public IDTOAccessChecker createAccessChecker() {
 		return new AllowOwnChecker(getSession().getUser());		
 	}

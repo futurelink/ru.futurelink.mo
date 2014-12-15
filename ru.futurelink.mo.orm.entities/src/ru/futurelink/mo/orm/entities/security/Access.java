@@ -26,7 +26,7 @@ import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 @Entity(name = "Access")
 @Table(name = "ACCESS")
 @NamedQueries({
-	@NamedQuery(name="Access.all", query="SELECT d FROM Access d where d.mCreator = :creator and d.deleteFlag = 0"),
+	@NamedQuery(name="Access.all", query="SELECT d FROM Access d where d.owner = :creator and d.deleteFlag = 0"),
 })
 public class Access extends CommonObject implements IUserAccess {
 	private static final long serialVersionUID = 1L;

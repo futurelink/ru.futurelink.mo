@@ -9,35 +9,16 @@
  *    Pavlov Denis - initial API and implementation
  ******************************************************************************/
 
-package ru.futurelink.mo.orm.dto.access;
-
-import ru.futurelink.mo.orm.dto.IDTO;
-import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
+package ru.futurelink.mo.orm.iface;
 
 /**
  * @author pavlov
  *
  */
-public class AllowAllChecker implements IDTOAccessChecker {
-
-	@Override
-	public boolean checkCreate(IDTO dto) {
-		return true;
-	}
-
-	@Override
-	public boolean checkRead(IDTO dto, String fieldName) {
-		return true;
-	}
-
-	@Override
-	public boolean checkWrite(IDTO dto, String fieldName) {
-		return true;
-	}
-
-	@Override
-	public boolean checkSave(IDTO dto) {
-		return true;
-	}
-
+public interface ISessionUserAccess {
+	public void setUser(IUser user);
+	public IUser getUser();
+	
+	public void setDatabaseUser(IUser user);
+	public IUser getDatabaseUser();
 }

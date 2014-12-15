@@ -82,7 +82,7 @@ abstract public class SimpleListController
 	 * 
 	 * @param data
 	 */
-	public void handleItemDoubleClicked(IDTO data) {
+	public void handleItemDoubleClicked(IDTO data) {		
 		if (data != null) {
 			if (params().get("itemEditMode") != CommonItemController.EditMode.CONTAINER) {
 				Object dlg = openEditDialog((EditorDTO)getActiveData());

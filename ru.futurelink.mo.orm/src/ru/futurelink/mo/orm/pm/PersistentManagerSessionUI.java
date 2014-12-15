@@ -50,9 +50,12 @@ public class PersistentManagerSessionUI
 			throw new SaveException("No user in persistent manager session!", null);
 		}
 
-		if (object.getOwner() == null) object.setOwner(getAccessUser());
-		if (object.getCreator() == null) object.setCreator(getAccessUser());
-		if (object.getAuthor() == null) object.setAuthor(getUser());
+		if ((object.getOwner() == null) || (object.getCreator() == null)) {
+			throw new SaveException("No owner or creator user in object being saved "
+					+ "from UI session!", null);
+		}
+		
+		object.setAuthor(getUser());
 
 		return super.save(object);
 	}
@@ -64,9 +67,12 @@ public class PersistentManagerSessionUI
 			throw new SaveException("No user in persistent manager session!", null);
 		}
 
-		if (object.getOwner() == null) object.setOwner(getAccessUser());
-		if (object.getCreator() == null) object.setCreator(getAccessUser());
-		if (object.getAuthor() == null) object.setAuthor(getUser());
+		if ((object.getOwner() == null) || (object.getCreator() == null)) {
+			throw new SaveException("No owner or creator user in object being saved "
+					+ "from UI session!", null);
+		}
+
+		object.setAuthor(getUser());
 		
 		return super.saveWithHistory(object, oldId);
 	}

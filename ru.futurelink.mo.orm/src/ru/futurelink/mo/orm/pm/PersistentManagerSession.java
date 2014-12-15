@@ -103,7 +103,7 @@ public class PersistentManagerSession
 	}
 
 	@Override
-	public Object save(ICommonObject object) throws SaveException {
+	public Object save(ICommonObject object) throws SaveException {		
 		return getPersistentManager().save(object, this);
 	}
 

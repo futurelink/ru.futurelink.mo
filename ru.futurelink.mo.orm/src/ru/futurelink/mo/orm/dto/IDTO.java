@@ -157,6 +157,13 @@ public interface IDTO {
 	public IUser getCreator();
 
 	/**
+	 * Get data owner user.
+     *
+	 * @return
+	 */
+	public IUser getOwner();
+
+	/**
 	 * Add access check agent to DTO.
 	 * 
 	 * @param checker

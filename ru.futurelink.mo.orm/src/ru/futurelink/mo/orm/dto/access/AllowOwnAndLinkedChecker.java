@@ -11,8 +11,8 @@
 
 package ru.futurelink.mo.orm.dto.access;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTOWithLinkage;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.iface.IUser;
 
 /**
@@ -26,7 +26,7 @@ public class AllowOwnAndLinkedChecker extends AllowOwnChecker {
 	}
 	
 	@Override
-	public boolean checkRead(CommonDTO dto, String fieldName) {
+	public boolean checkRead(IDTO dto, String fieldName) {
 
 		if (dto != null && 	EditorDTOWithLinkage.class.isAssignableFrom(dto.getClass())) {			
 			if (((EditorDTOWithLinkage)dto).getLinkageCreator().getId().equals(getUser().getId())) return true;
@@ -36,7 +36,7 @@ public class AllowOwnAndLinkedChecker extends AllowOwnChecker {
 	}
 
 	@Override
-	public boolean checkWrite(CommonDTO dto, String fieldName) {
+	public boolean checkWrite(IDTO dto, String fieldName) {
 
 		if (dto != null && 	EditorDTOWithLinkage.class.isAssignableFrom(dto.getClass())) {			
 			if (((EditorDTOWithLinkage)dto).getLinkageCreator().getId().equals(getUser().getId())) return true;

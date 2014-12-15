@@ -35,7 +35,7 @@ public abstract class CommonDTO implements Serializable, IDTO {
 	private static final long serialVersionUID = 1L;
 
 	protected	IModelObject 		mData;
-	protected	IDTOAccessChecker	mAccessChecker;
+	private		IDTOAccessChecker	mAccessChecker;
 	private		Logger				logger;
 	
 	public CommonDTO(IModelObject dataItem) {
@@ -134,6 +134,14 @@ public abstract class CommonDTO implements Serializable, IDTO {
 	public IUser getCreator() {
 		if ((mData != null) && ICommonObject.class.isAssignableFrom(mData.getClass())) {
 			return ((ICommonObject)mData).getCreator();
+		}
+		return null;
+	}
+
+	@Override
+	public IUser getOwner() {
+		if ((mData != null) && ICommonObject.class.isAssignableFrom(mData.getClass())) {
+			return ((ICommonObject)mData).getOwner();
 		}
 		return null;
 	}

@@ -11,7 +11,7 @@
 
 package ru.futurelink.mo.orm.dto.access;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.iface.IUser;
 
 /**
@@ -34,44 +34,44 @@ public class AllowOwnChecker implements IDTOAccessChecker {
 	public IUser getUser() { return mUser; }
 	
 	@Override
-	public boolean checkRead(CommonDTO dto, String fieldName) {
+	public boolean checkRead(IDTO dto, String fieldName) {
 		if ("admin".equals(mUser.getLogin())) return true;
 
-		if (dto != null && dto.getCreator() != null) {
-			if (dto.getCreator().getId().equals(mUser.getId())) return true;
+		if (dto != null && dto.getOwner() != null) {
+			if (dto.getOwner().getId().equals(mUser.getId())) return true;
 			return false;
 		}
 		return true;
 	}
 
 	@Override
-	public boolean checkWrite(CommonDTO dto, String fieldName) {
+	public boolean checkWrite(IDTO dto, String fieldName) {
 		if ("admin".equals(mUser.getLogin())) return true;
 
-		if (dto != null && dto.getCreator() != null) {
-			if (dto.getCreator().getId().equals(mUser.getId())) return true;
+		if (dto != null && dto.getOwner() != null) {
+			if (dto.getOwner().getId().equals(mUser.getId())) return true;
 			return false;
 		}
 		return true;
 	}
 
 	@Override
-	public boolean checkSave(CommonDTO dto) {
+	public boolean checkSave(IDTO dto) {
 		if ("admin".equals(mUser.getLogin())) return true;
 
-		if (dto != null && dto.getCreator() != null) {
-			if (dto.getCreator().getId().equals(mUser.getId())) return true;
+		if (dto != null && dto.getOwner() != null) {
+			if (dto.getOwner().getId().equals(mUser.getId())) return true;
 			return false;
 		}
 		return true;
 	}
 
 	@Override
-	public boolean checkCreate(CommonDTO dto) {
+	public boolean checkCreate(IDTO dto) {
 		if ("admin".equals(mUser.getLogin())) return true;
 
-		if (dto != null && dto.getCreator() != null) {
-			if (dto.getCreator().getId().equals(mUser.getId())) return true;
+		if (dto != null && dto.getOwner() != null) {
+			if (dto.getOwner().getId().equals(mUser.getId())) return true;
 			return false;
 		}
 		return true;

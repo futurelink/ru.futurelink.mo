@@ -74,14 +74,14 @@ public class EditorDTO extends CommonDTO
 
 	@Override
 	public void save() throws DTOException, SaveException {
-		if (mAccessChecker == null) {
+		if (getAccessChecker() == null) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}
 
 		EditorDTO.applyChanges(mData, this);
 
 		// Проверка права на сохранение объекта
-		if (!mAccessChecker.checkSave(this)) {
+		if (!getAccessChecker().checkSave(this)) {
 			throw new DTOAccessException("У вас нет права на сохранение этого элемента.", null);
 		}
 		((ModelObject)mData).save();
@@ -112,7 +112,7 @@ public class EditorDTO extends CommonDTO
 
 	@Override
 	public void delete(boolean hardDelete) throws DTOException {
-		if (mAccessChecker == null) {
+		if (getAccessChecker() == null) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}
 
@@ -182,11 +182,11 @@ public class EditorDTO extends CommonDTO
 	 */
 	
 	public static void applyChanges(IModelObject data, CommonDTO dto) throws DTOException {
-		if (dto.mAccessChecker == null) {
+		if (dto.getAccessChecker() == null) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}
 
-		if (!dto.mAccessChecker.checkSave(dto)) {
+		if (!dto.getAccessChecker().checkSave(dto)) {
 			throw new DTOAccessException("У вас нет права на сохранение этого элемента.", null);
 		}
 
@@ -278,11 +278,11 @@ public class EditorDTO extends CommonDTO
 	 */
 	@Override
 	public void setDataField(String fieldName, String fieldGetterName, String fieldSetterName, Object value, boolean force) throws DTOException {
-		if (mAccessChecker == null) {
+		if (getAccessChecker() == null) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}
 
-		if (!mAccessChecker.checkWrite(this, fieldName)) {
+		if (!getAccessChecker().checkWrite(this, fieldName)) {
 			throw new DTOAccessException("У вас нет права на изменение этого элемента.", null);
 		}
 		
@@ -355,11 +355,11 @@ public class EditorDTO extends CommonDTO
 	 */
 	@Override
 	public Object getDataField(String fieldName, String fieldGetterName, String fieldSetterName, boolean checkAccess) throws DTOException {
-		if (mAccessChecker == null && checkAccess) {
+		if (getAccessChecker() == null && checkAccess) {
 			throw new DTOAccessException("Не установлен агент проверки прав доступа, операция невозможна", null);
 		}
 
-		if (checkAccess && !mAccessChecker.checkRead(this, fieldName)) {
+		if (checkAccess && !getAccessChecker().checkRead(this, fieldName)) {
 			DTOAccessException ex = new DTOAccessException("У вас нет права на получение данных из этого элемента.", null);
 			ex.setAccessData("EditorDTO get data from field: name is "+fieldName+" getter is "+fieldGetterName);
 			throw ex;
@@ -387,7 +387,7 @@ public class EditorDTO extends CommonDTO
 	        	if (obj != null) {
 	        		obj.setPersistentManagerSession(getPersistenceManagerSession());
 		        	a = new EditorDTO((ModelObject)obj);
-		        	((CommonDTO)a).addAccessChecker(mAccessChecker);
+		        	((CommonDTO)a).addAccessChecker(getAccessChecker());
 	        	}
 	        } else {
 	        	a = getValueMethod.invoke(mData);

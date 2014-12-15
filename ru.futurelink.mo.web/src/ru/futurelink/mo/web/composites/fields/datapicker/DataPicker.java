@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Text;
 
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.FilterDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.app.ApplicationSession;
@@ -207,9 +208,9 @@ public class DataPicker extends CommonField implements IField {
 	 *  
 	 * @return
 	 */
-	public CommonDTO getSelectedDTO() throws DTOException {
+	public IDTO getSelectedDTO() throws DTOException {
 		if (getDTO() != null)
-			return (CommonDTO) getDTO().getDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter);
+			return (IDTO) getDTO().getDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter);
 		else
 			return null;
 	}
@@ -255,7 +256,7 @@ public class DataPicker extends CommonField implements IField {
 		if (!mDisplayFieldName.isEmpty() && !mDisplayFieldGetterName.isEmpty()) {
 			if (getSelectedDTO() != null)
 				mEdit.setText(
-					getSelectedDTO().getDataFieldAsString(mDisplayFieldName, mDisplayFieldGetterName, "")
+					((CommonDTO)getSelectedDTO()).getDataFieldAsString(mDisplayFieldName, mDisplayFieldGetterName, "")
 				);
 			else
 				//mEdit.setText(getLocaleString("noValue"));

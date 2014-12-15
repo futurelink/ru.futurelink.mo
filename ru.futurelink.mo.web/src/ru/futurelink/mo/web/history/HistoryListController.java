@@ -58,9 +58,9 @@ public class HistoryListController extends SimpleListController {
 		String query;
 		TypedQuery<?> q2 = null;
 		if (IHistoryObject.class.isAssignableFrom(getDataClass())) {
-			query =	"SELECT new ru.futurelink.mo.orm.HistoryResult(d.id, d.mModifyDate, d.mWorkLog.mDescription, d.id) FROM " + 
+			query =	"SELECT new ru.futurelink.mo.orm.HistoryResult(d.id, d.mModifyDate, d.mWorkLog.mDescription, d.id, d.mAuthor) FROM " + 
 				getDataClass().getSimpleName()+" d " +
-				"where d.mCreator = :creator and d.mCode.id = :code " +
+				"where d.owner = :creator and d.mCode.id = :code " +
 				"order by d.mModifyDate desc";
 
 			q2 = mSession.persistent().getEm().createQuery(query, getDataClass());
@@ -71,12 +71,12 @@ public class HistoryListController extends SimpleListController {
 			TypedQuery<String> q1 = mSession.persistent().getEm().createQuery(
 					"SELECT d.id FROM " +
 					getDataClass().getSimpleName()+" d "+
-					"WHERE d.mCreator = :creator AND d.mCode.id = :code", String.class);
+					"WHERE d.owner = :creator AND d.mCode.id = :code", String.class);
 			q1.setParameter("creator", getSession().getDatabaseUser());
 			q1.setParameter("code", mCode);			
 			if (q1.getResultList().size() > 0) {
 				String objectId = q1.getResultList().get(0);
-				query =	"SELECT new ru.futurelink.mo.orm.HistoryResult(d.id, d.mModifyDate, d.mDescription, d.mObjectId) "
+				query =	"SELECT new ru.futurelink.mo.orm.HistoryResult(d.id, d.mModifyDate, d.mDescription, d.mObjectId, d.mAuthor) "
 						+ "FROM WorkLogSupport d " 
 						+ "WHERE d.mObjectClassName = :objectClassName AND "
 						+ "d.mObjectId = :objectId "

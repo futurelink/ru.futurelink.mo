@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.swt.widgets.Composite;
 
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.dto.ViewerDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
@@ -37,8 +38,9 @@ public class HistoryListTable extends CommonTable {
 	@Override
 	public void createTableColumns() {
 		addColumn(getLocaleString("date"), 150, createLabelProvider(0));
-		addColumn(getLocaleString("id"), 150, createLabelProvider(1));
+		addColumn(getLocaleString("id"), 250, createLabelProvider(1));
 		addColumn(getLocaleString("action"), 200, createLabelProvider(2));
+		addColumn(getLocaleString("author"), 150, createLabelProvider(3));
 	}
 
 	@Override
@@ -66,9 +68,10 @@ public class HistoryListTable extends CommonTable {
 
 	    @Override
 	    public String getText( Object element ) {
-	      ViewerDTO dto = (ViewerDTO)element;
-	      String result = "-";
-	      switch( columnIndex ) {
+	    	IDTO dto = (IDTO)element;
+	    	String result = "-";
+	    	
+	    	switch( columnIndex ) {
 	        case 0:
 	        	try {
 	        		if (dto.getDataField("date") != null) {
@@ -85,7 +88,7 @@ public class HistoryListTable extends CommonTable {
 	        case 1:
 	        	try {
 	        		if (dto.getDataField("objectId") != null) {
-	        			result = dto.getDataField("mObjectId", "getObjectId", null).toString();
+	        			result = dto.getDataField("objectId").toString();
 	        		}
 	        	} catch (DTOException ex) {
 	        		result = ex.toString();
@@ -95,14 +98,26 @@ public class HistoryListTable extends CommonTable {
 	        case 2:
 	        	try {
 	        		if (dto.getDataField("operation") != null) {
-	        			result = dto.getDataField("id", "getOperation", "setOperation").toString();
+	        			result = dto.getDataField("operation").toString();
 	        		}
 	        	} catch (DTOException ex) {
 	        		result = ex.toString();
 	        	}
 	        	break;
-	      }
-	      return result;
+	        case 3:
+	        	try {
+	        		IDTO authorDTO = (IDTO) dto.getDataField("author");
+	        		if (authorDTO != null) {
+	        			result = authorDTO.getDataField("mUserName") != null ? 
+	        				authorDTO.getDataField("mUserName").toString() :
+	        				authorDTO.getDataField("mLogin").toString();
+	        		}
+	        	} catch (DTOException ex) {
+	        		result = ex.toString();
+	        	}
+	        	break;
+	    	}
+	    	return result;
 	    }
 	}
 

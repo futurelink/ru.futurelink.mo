@@ -11,7 +11,7 @@
 
 package ru.futurelink.mo.orm.dto.access;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 
 /**
  * Интерфейс проверяльщика прав доступа для объекта DTO.
@@ -21,21 +21,21 @@ import ru.futurelink.mo.orm.dto.CommonDTO;
  */
 public interface IDTOAccessChecker {
 	
-	public boolean checkCreate(CommonDTO dto);
+	public boolean checkCreate(IDTO dto);
 
 	/**
 	 * Проверка права на чтение объекта, получение данных.
 	 * @param dto
 	 * @return
 	 */
-	public boolean checkRead(CommonDTO dto, String fieldName);
+	public boolean checkRead(IDTO dto, String fieldName);
 	
 	/**
 	 * Проверка права на изменение объекта.
 	 * @param dto
 	 * @return
 	 */
-	public boolean checkWrite(CommonDTO dto, String fieldName);
+	public boolean checkWrite(IDTO dto, String fieldName);
 	
 	/**
 	 * Проверка права на сохранение объкета.
@@ -43,5 +43,5 @@ public interface IDTOAccessChecker {
 	 * @param dto
 	 * @return
 	 */
-	public boolean checkSave(CommonDTO dto);
+	public boolean checkSave(IDTO dto);
 }

@@ -104,9 +104,9 @@ public class User
 	
 	public String getGrantedUsersCount() {
 		Query q = getPersistenceManagerSession().getEm().createQuery(
-				"select count(d) from Access d where d.mCreator = :creator and d.deleteFlag = 0"
+				"select count(d) from Access d where d.owner = :owner and d.deleteFlag = 0"
 			);
-		q.setParameter("creator", this);
+		q.setParameter("owner", this);
 		if (q.getResultList().size() > 0) {
 			logger().debug("Количество: {}", q.getSingleResult());
 			return q.getSingleResult().toString();

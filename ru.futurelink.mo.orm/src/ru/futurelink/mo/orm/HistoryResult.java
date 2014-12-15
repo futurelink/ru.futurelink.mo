@@ -15,6 +15,7 @@ import java.util.Date;
 
 import ru.futurelink.mo.orm.annotations.Accessors;
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.iface.IUser;
 
 /**
  * Результирующий класс модели для отображения списка истории
@@ -27,11 +28,12 @@ final public class HistoryResult extends ModelObject {
 
 	private static final long serialVersionUID = 1L;
 
-	public HistoryResult(String id, Date date, String operation, String objectId) {
+	public HistoryResult(String id, Date date, String operation, String objectId, IUser author) {
 		setId(id);
 		setDate(date);
 		setOperation(operation);
 		setObjectId(objectId);
+		setAuthor(author);
 	}
 
 	@Accessors(getter = "getDate", setter = "setDate")
@@ -60,6 +62,11 @@ final public class HistoryResult extends ModelObject {
 	@Accessors(getter = "getDeleteFlag", setter = "setDeleteFlag")
 	private		Boolean deleteFlag;
 	public		Boolean	getDeleteFlag() { return false; }
+
+	@Accessors(getter = "getAuthor", setter = "setAuthor")
+	private		IUser	author;
+	public		void	setAuthor(IUser author) { this.author = author; }
+	public		IUser	getAuthor() { return author; }
 
 	@Override
 	public void setDeleteFlag(Boolean deleteFlag) {}

@@ -104,7 +104,7 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 		
 		// If data picker is not public use only creator filtered records to select
 		if (!mPublic) {
-			 queryString += " and d.mCreator = :creator";
+			 queryString += " and d.owner = :creator";
 		}
 		
 		// Перелопатим допусловия первый раз...

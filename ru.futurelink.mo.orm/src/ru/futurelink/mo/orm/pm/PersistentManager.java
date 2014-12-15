@@ -229,7 +229,7 @@ public class PersistentManager {
 				
 				object.setId(newId);				// Сетим следующую ID
 				object.setModifyDate(Calendar.getInstance(TimeZone.getTimeZone("GMT")).getTime());
-				object.setPrevId(oldId);			// Сохраняем старую ID
+				object.setPrevId(oldId);			// Сохраняем старую ID				
 	
 				// Добавляем в ворклог данные о том, что элменет был изменен
 				// у добавим ссылку на элемент ворклога в элемент данных.

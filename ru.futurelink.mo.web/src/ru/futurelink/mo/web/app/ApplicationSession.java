@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.rap.rwt.RWT;
 
 import ru.futurelink.mo.orm.exceptions.SaveException;
+import ru.futurelink.mo.orm.iface.ISessionUserAccess;
 import ru.futurelink.mo.orm.iface.IUser;
 import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 import ru.futurelink.mo.orm.pm.PersistentManager;
@@ -36,7 +37,8 @@ import ru.futurelink.mo.orm.security.IUserParamsAccessor;
  * @author pavlov
  *
  */
-final public class ApplicationSession {
+final public class ApplicationSession
+	implements ISessionUserAccess {
 	private PersistentManagerSessionUI 	mPersistentSession;
 
 	private String				mLogin = "";
@@ -127,6 +129,7 @@ final public class ApplicationSession {
 	 * 
 	 * @param user
 	 */
+	@Override
 	final public void setUser(IUser user) {
 		RWT.getUISession().getHttpSession().setAttribute("user", user);
 		
@@ -142,6 +145,7 @@ final public class ApplicationSession {
 	 * 
 	 * @return current session user or null if no user logged in
 	 */
+	@Override
 	final public IUser getUser() {
 		return (IUser) RWT.getUISession().getHttpSession().getAttribute("user");
 	}
@@ -151,6 +155,7 @@ final public class ApplicationSession {
      *
      * @param user
      */
+	@Override
 	final public void setDatabaseUser(IUser user) {
 		mDatabaseUser = user;
 		mPersistentSession.setAccessUser(user);
@@ -162,6 +167,7 @@ final public class ApplicationSession {
      *
      * @return
      */
+	@Override
 	final public IUser getDatabaseUser() {
 		if (mDatabaseUser != null) {
 			return mDatabaseUser;

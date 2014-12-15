@@ -146,7 +146,7 @@ public class CommonObject
 	@Accessors(getter = "getOwner", setter = "setOwner")
 	private		User	owner;
 	public 		IUser	getOwner() { return owner; }
-	public		void	setOwner(IUser creator) { this.owner = (User) owner; }  
+	public		void	setOwner(IUser owner) { this.owner = (User) owner; }  
 
 	/**
 	 * Object creator user
