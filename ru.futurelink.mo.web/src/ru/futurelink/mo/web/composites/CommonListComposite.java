@@ -26,7 +26,7 @@ import ru.futurelink.mo.web.controller.iface.IListComposite;
 import ru.futurelink.mo.web.controller.iface.ListDTOAccessor;
 
 /**
- * <p>Composite to work with listed data sets.</p>
+ * <p>Composite to work with list data sets.</p>
  *
  * <p>This composite has CommonDTOList object which contains a set of DTO objects, each of them is an
  * item of the data list to deal with.</p>
@@ -40,16 +40,16 @@ abstract public class CommonListComposite
 	implements IListComposite {
 
 	private static final long serialVersionUID = 1L;
-	
-	protected CommonDTOList<? extends CommonDTO>	mDTO;
-	private IDTO								mActiveData;
+
+	protected CommonDTOList<? extends IDTO>	dto;
+	private IDTO								activeData;
 	
 	public CommonListComposite(ApplicationSession session,
 			Composite parent, int style, CompositeParams params) {
 		super(session, parent, style, params);
 
         // Create default editor DTO list with default access checker
-		mDTO = new EditorDTOList<CommonDTO>(getSession().persistent(),
+		dto = new EditorDTOList<CommonDTO>(getSession().persistent(),
             new AllowOwnChecker(getSession().getUser()), CommonDTO.class
         );
 	}
@@ -60,8 +60,8 @@ abstract public class CommonListComposite
 	 * @param data коллекция CommonDTO
 	 * @throws DTOException 
 	 */
-	protected void attachDTO(CommonDTOList<? extends CommonDTO> data) throws DTOException {
-		mDTO = data;				
+	protected void attachDTO(CommonDTOList<? extends IDTO> data) throws DTOException {
+		dto = data;				
 		refresh();
 	}
 
@@ -70,8 +70,8 @@ abstract public class CommonListComposite
 	 * @throws DTOException 
 	 */
 	protected void removeDTO() throws DTOException {
-		if (mDTO != null) {		
-			mDTO = null;			
+		if (dto != null) {		
+			dto = null;			
 			refresh();
 		}
 	}
@@ -102,7 +102,7 @@ abstract public class CommonListComposite
 			}
 		}
 
-		return mDTO;
+		return dto;
 	}
 
 	/**
@@ -126,7 +126,7 @@ abstract public class CommonListComposite
 	 */
 	@Override
 	public void setActiveData(IDTO data) {
-		mActiveData = data;
+		activeData = data;
 	}
 
 	/**
@@ -136,7 +136,7 @@ abstract public class CommonListComposite
 	 */
 	@Override
 	public IDTO getActiveData() {
-		return mActiveData;
+		return activeData;
 	}
 
 }

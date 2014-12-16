@@ -32,20 +32,20 @@ import ru.futurelink.mo.web.app.ApplicationSession;
 public class CommonPopup extends Dialog {
 
 	private static final long serialVersionUID = 1L;
-	private CommonComposite 	mAttachedComposite;
-	private Object				mResult;
-	private Control				mLastFocusedControl;
+	private CommonComposite 	attachedComposite;
+	private Object				result;
+	private Control			lastFocusedControl;
 	
 	public CommonPopup(ApplicationSession session, Shell parent, int style) {
 		super(parent, style);
 	}
 
 	public void setResult(Object result) {
-		mResult = result;
+		this.result = result;
 	}
 	
 	public Object getResult() {
-		return mResult;
+		return result;
 	}
 
 	final public Shell getShell() {
@@ -75,15 +75,15 @@ public class CommonPopup extends Dialog {
 	 * @param composite
 	 */
 	public void attachComposite(CommonComposite composite) {
-		mAttachedComposite = composite;
+		attachedComposite = composite;
 
-		mAttachedComposite.setParent(shell);
-		mAttachedComposite.layout();
+		attachedComposite.setParent(shell);
+		attachedComposite.layout();
 
 		//mAttachedComposite.setOwnerDialog(this);
 		
 		// Если уничтожается содержимое, закрываем диалог
-		mAttachedComposite.addDisposeListener(new DisposeListener() {			
+		attachedComposite.addDisposeListener(new DisposeListener() {			
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -104,21 +104,21 @@ public class CommonPopup extends Dialog {
 		shell = new UnfocusableShell(getParent(), SWT.RESIZE);
 		
 		// Этот костыль нужен на случай если шелл будет принимать фокус
-		mLastFocusedControl = getShell().getDisplay().getFocusControl();
+		lastFocusedControl = getShell().getDisplay().getFocusControl();
 		
 		FillLayout layout = new FillLayout();
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 
 		shell.setLayout(layout);
-		if ((mAttachedComposite != null) && (!mAttachedComposite.isDisposed())) {
-			mAttachedComposite.setParent(shell);
-			mAttachedComposite.layout();
+		if ((attachedComposite != null) && (!attachedComposite.isDisposed())) {
+			attachedComposite.setParent(shell);
+			attachedComposite.layout();
 		}
 		shell.pack();
 		shell.open();
 			
-		mLastFocusedControl.setFocus();
+		lastFocusedControl.setFocus();
 	
 		return 0;
 	}

@@ -38,7 +38,7 @@ public class RecycleListComposite extends SimpleListComposite {
 	}
 	
 	protected void setTableContentProvider(IContentProvider provider) {
-		mTable.setContentProvider(provider);
+		table.setContentProvider(provider);
 	}
 	
 }

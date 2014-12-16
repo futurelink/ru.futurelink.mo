@@ -19,7 +19,6 @@ import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.swt.widgets.Composite;
 
 import ru.futurelink.mo.orm.dto.IDTO;
-import ru.futurelink.mo.orm.dto.ViewerDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.table.CommonTable;

@@ -25,7 +25,7 @@ import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.EditorDTO;
 import ru.futurelink.mo.orm.dto.EditorDTOList;
 import ru.futurelink.mo.orm.dto.access.AllowAllChecker;
-import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
+import ru.futurelink.mo.orm.dto.access.AllowOwnAndAccessedChecker;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
@@ -81,7 +81,7 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 		if (mPublic) {
 			accessChecker = new AllowAllChecker();
 		} else {
-			accessChecker = new AllowOwnChecker(getSession().getUser());
+			accessChecker = new AllowOwnAndAccessedChecker(getSession());
 		}
 		
 		mList = new EditorDTOList<EditorDTO>(getSession().persistent(), accessChecker, EditorDTO.class);		
@@ -102,9 +102,9 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 				"select d from "+mDataClass.getName()+" d where d.deleteFlag = 0";
 		}
 		
-		// If data picker is not public use only creator filtered records to select
+		// If data picker is not public select records filtered by owner only 
 		if (!mPublic) {
-			 queryString += " and d.owner = :creator";
+			 queryString += " and d.owner = :owner";
 		}
 		
 		// Перелопатим допусловия первый раз...
@@ -131,15 +131,15 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 			if (additionalConditions.size() > 0)
 				queryString = queryString + " and " + CommonDataPickerController.join(additionalConditions, " and ");
 		}
-		logger().info("Допонительные условия для выбора из списка: {}", queryString);
+		logger().info("Additional query conditions: {}", queryString);
 
-		// Выставляем сортировку, после того, как сформировали запрос
+		// Add ordering after query is created
 		if ((mOrderBy != null) && (!mOrderBy.isEmpty())) {
 			queryString += " order by d."+mOrderBy;
 		}
 
 		q2 = mSession.persistent().getEm().createQuery(queryString, mDataClass);
-		if (!mPublic) q2.setParameter("creator", getSession().getDatabaseUser());
+		if (!mPublic) q2.setParameter("owner", getSession().getDatabaseUser());
 		if (additionalValues.size() > 0) {
 			for (String key : additionalValues.keySet()) {
 				q2.setParameter(key, additionalValues.get(key));
@@ -147,7 +147,7 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 		}
 		
 		if (q2.getResultList().size() > 0) {
-			logger().debug("Количество элементов: {}", q2.getResultList().size());
+			logger().debug("Records quantity: {}", q2.getResultList().size());
 		}
 
 		mList.clear();

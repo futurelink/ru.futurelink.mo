@@ -44,7 +44,7 @@ abstract public class CommonDataPickerController
 	extends CommonListController
 	implements IListEditController {
 
-	private EditorDTO				mActiveData;
+	private IDTO mActiveData;
 
 	public CommonDataPickerController(CompositeController parentController,
 			Class<? extends ICommonObject> dataClass, Composite container,
@@ -66,8 +66,8 @@ abstract public class CommonDataPickerController
 	public void handleCreate() throws DTOException {	
 		Class<?> controllerClass = (Class<?>) params().get("itemControllerClass");
 		if (controllerClass != null) {
-			logger().info("Запущено создание элмента из датапикера");
-			logger().info("Класс контроллера: {}", controllerClass.getSimpleName());
+			logger().info("Creation from picker executed");
+			logger().info("Item controller class is {}", controllerClass.getSimpleName());
 			
 			CompositeParams itemDialogParams = (params().get("itemDialogParams") != null) ? 
 					(CompositeParams) params().get("itemDialogParams") : new CompositeParams();
@@ -84,11 +84,11 @@ abstract public class CommonDataPickerController
 
 	@Override
 	public void handleEdit() throws DTOException {
-		mActiveData = (EditorDTO) ((CommonListComposite)getComposite()).getActiveData();		
+		mActiveData = ((CommonListComposite)getComposite()).getActiveData();		
 		Class<?> controllerClass = (Class<?>) params().get("itemControllerClass");
 		if ((controllerClass != null) && (getActiveData() != null)) {
-			logger().info("Запущен просмотр элмента из датапикера");
-			logger().info("Класс контроллера: {}", controllerClass.getSimpleName());
+			logger().info("View from picker executed");
+			logger().info("Item controller class is {}", controllerClass.getSimpleName());
 			
 			CompositeParams itemDialogParams = (params().get("itemDialogParams") != null) ? 
 					(CompositeParams) params().get("itemDialogParams") : new CompositeParams();
@@ -104,7 +104,7 @@ abstract public class CommonDataPickerController
 	}
 
 	/**
-	 * По двойному клику - выбираем элемент.
+	 * Double click handler behaves as OK button
 	 * 
 	 * @param data
 	 */
@@ -113,7 +113,7 @@ abstract public class CommonDataPickerController
 	}
 
 	/**
-	 * Выбираем элемент и диспозим оконошко.
+	 * Select item and dispose window
 	 */
 	public void handleOk() {
 		try {
@@ -121,12 +121,11 @@ abstract public class CommonDataPickerController
 			if (mActiveData != null) {
 				logger().debug("dataPicker complete data: {}",
 						mActiveData.getDataField("id", "getId", "setId"));
-
-				// Закрыть окно
-				getComposite().dispose();				
 			}
 		} catch (DTOException ex) {
-			handleError("Ошибка выбора элемента", ex);
+			handleError("Element selection error", ex);
+		} finally {
+			getComposite().dispose();
 		}
 	}
 
@@ -137,16 +136,18 @@ abstract public class CommonDataPickerController
 		try {
 			handleDataQuery();
 		} catch (DTOException ex) {
-			handleError("Ошибка получения списка выбора.", ex);
+			getComposite().dispose();
+
+			handleError("List selection error", ex);
 		}
 	}
 
 	/**
-	 * Получить выбранный элемент.
+	 * Get selected data item
 	 * 
-	 * @return DTO выбранного элемента
+	 * @return selected item's DTO 
 	 */
-	final public EditorDTO getActiveData() {
+	final public IDTO getActiveData() {
 		return mActiveData;
 	}
 
@@ -247,13 +248,13 @@ abstract public class CommonDataPickerController
 
 	@Override
 	public void handleDataQueryExecuted() throws DTOException {	
-		// Запрещаем все кнопки и контролы на тулбаре (по-умолчанию).
+		// Disable all buttons on toolbar by default
 		if (getComposite() != null) {
 			((CommonDataComposite)getComposite()).disableToolbar();
 			((CommonListComposite)getComposite()).refresh();
 
-			// Если элемент остается выбранным, то нужно
-			// разрешить и редактирование и выбор.
+			// If there is an active record
+			// we enable saving and editing
 			mActiveData = (EditorDTO) ((CommonListComposite)getComposite()).getActiveData();
 			if (mActiveData != null) {
 				setToolEnabled("save", true);

@@ -47,9 +47,9 @@ public abstract class CommonDataComposite extends CommonComposite
 
     enum        ToolBarPosition    { TOP, BOTTOM };
 
-	private		Label 				mCaptionLabel;
-	protected 	CommonToolbar 		mToolbar;
-	protected 	CommonComposite 	mWorkspace;
+	private		Label 				captionLabel;
+	protected 	CommonToolbar 		toolbar;
+	protected 	CommonComposite 	workspace;
 	
 	public CommonDataComposite(ApplicationSession session, Composite parent, int style, CompositeParams params) {
 		super(session, parent, style, params);	
@@ -77,17 +77,17 @@ public abstract class CommonDataComposite extends CommonComposite
 			throw new InitException(ex.getMessage());
 		}
 
-		if (mToolbar != null) {
-			mToolbar.setLayoutData(
+		if (toolbar != null) {
+			toolbar.setLayoutData(
 					new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL)
 				);
-			mToolbar.pack();
+			toolbar.pack();
 		}
-		if (mWorkspace != null) {
-			mWorkspace.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | 
+		if (workspace != null) {
+			workspace.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | 
 					GridData.VERTICAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL | 
 					GridData.GRAB_VERTICAL));
-			mWorkspace.pack();
+			workspace.pack();
 		}	
 		
 		layout();
@@ -99,7 +99,7 @@ public abstract class CommonDataComposite extends CommonComposite
 	 * @param caption
 	 */
 	final public void setCaption(String caption) {
-		mCaptionLabel.setText(caption);
+		captionLabel.setText(caption);
 		if (!caption.equals("")) {
 			setCaptionLabelVisible(true);
 		} else {
@@ -118,9 +118,9 @@ public abstract class CommonDataComposite extends CommonComposite
 		gd.horizontalAlignment = GridData.FILL;
 		if (!visible) { gd.exclude = true; }
 		
-		mCaptionLabel.getParent().setVisible(visible);
-		mCaptionLabel.getParent().pack();
-		mCaptionLabel.getParent().setLayoutData(gd);
+		captionLabel.getParent().setVisible(visible);
+		captionLabel.getParent().pack();
+		captionLabel.getParent().setLayoutData(gd);
 		layout();
 	}
 	
@@ -145,11 +145,11 @@ public abstract class CommonDataComposite extends CommonComposite
 		cg.numColumns = 1;
 		c.setLayout(cg);
 		
-		mCaptionLabel = new Label(c, SWT.NONE);
-		FontData[] fD = mCaptionLabel.getFont().getFontData(); fD[0].setHeight(20);
-		mCaptionLabel.setFont( new Font(mCaptionLabel.getDisplay(), fD[0]));
-		mCaptionLabel.setForeground(new Color(c.getDisplay(), 255, 255, 255));
-		mCaptionLabel.setLayoutData(gd);
+		captionLabel = new Label(c, SWT.NONE);
+		FontData[] fD = captionLabel.getFont().getFontData(); fD[0].setHeight(20);
+		captionLabel.setFont( new Font(captionLabel.getDisplay(), fD[0]));
+		captionLabel.setForeground(new Color(c.getDisplay(), 255, 255, 255));
+		captionLabel.setLayoutData(gd);
 
 		setCaptionLabelVisible(false);
 	}
@@ -159,12 +159,12 @@ public abstract class CommonDataComposite extends CommonComposite
 
         // Default toolbar location is on top of workspace
         if (getParam("toolbarPosition") != ToolBarPosition.BOTTOM)
-            mToolbar = createToolbar();
+            toolbar = createToolbar();
 
-        mWorkspace = createWorkspace();
+        workspace = createWorkspace();
 
         if (getParam("toolbarPosition") == ToolBarPosition.BOTTOM)
-            mToolbar = createToolbar();
+            toolbar = createToolbar();
 
 		// Если не получилось создать рабочее пространство
 		// отменяем создание всего.
@@ -182,7 +182,7 @@ public abstract class CommonDataComposite extends CommonComposite
 	 * @return
 	 */
 	public CommonToolbar getToolbar() {
-		return mToolbar;
+		return toolbar;
 	}
 
     /**
@@ -191,15 +191,15 @@ public abstract class CommonDataComposite extends CommonComposite
      * @return
      */
 	public CommonComposite getWorkspace() {
-		return mWorkspace;
+		return workspace;
 	}
 	
 	/**
 	 * Disable whole toolbar by disabling all of its controls.
 	 */
 	public void disableToolbar() {
-		if (mToolbar != null)
-			mToolbar.setControlsEnabled(false);		
+		if (toolbar != null)
+			toolbar.setControlsEnabled(false);		
 	}
 
     /**
@@ -209,8 +209,8 @@ public abstract class CommonDataComposite extends CommonComposite
      * @param enabled
      */
 	public void setToolEnabled(String toolName, boolean enabled) {
-		if (mToolbar != null)
-			mToolbar.setControlEnabled(toolName, enabled);
+		if (toolbar != null)
+			toolbar.setControlEnabled(toolName, enabled);
 	}
 	
 	/**

@@ -324,8 +324,14 @@ public abstract class CompositeController
 		}
 
 		// Показать месседжбокс нннада
-		if (getComposite() != null) {
-			MessageBox msg = new MessageBox(getComposite().getShell(), SWT.ICON_ERROR);
+		Composite parent = null;
+		if (getComposite() != null && !getComposite().isDisposed()) {
+			parent = getComposite();
+		} else if(getContainer() != null && !getContainer().isDisposed()) {
+			parent = getContainer();
+		}
+		if (parent != null) {
+			MessageBox msg = new MessageBox(parent.getShell(), SWT.ICON_ERROR);
 			msg.setText(getComposite().getLocaleString("systemError"));
 			msg.setMessage(errorText+"\n"+
 				(exception != null ? exception.getMessage() : ""));
@@ -427,9 +433,10 @@ public abstract class CompositeController
 			return;
 		}
 		
+		CommonDataPickerController c = null;
 		d.setText(getComposite().getLocaleString("selection"));				
 		try {		
-			CommonDataPickerController c = (CommonDataPickerController) constr.newInstance(
+			c = (CommonDataPickerController) constr.newInstance(
 					(CompositeController) mThisController,
 					picker.getDataClass(),
 					d.getShell(),
@@ -447,29 +454,36 @@ public abstract class CompositeController
 						add("public", picker.getPublic())
 						);
 			c.init();
-			d.attachComposite(c.getComposite());
-			if (getSession().getMobileMode()) {
-				// In mobile mode we use fullscreen list sizing
-				d.setSize(CommonDialog.FULL);
-			} else {
-				// In desktop mode we use screen-relative list sizing
-				d.setSize(CommonDialog.LARGE);
-			}
-			d.open();
+			// If there was an error in composite creation it must do nothing
+			if (c.getComposite() != null && !c.getComposite().isDisposed()) {
+				d.attachComposite(c.getComposite());
+				if (getSession().getMobileMode()) {
+					// In mobile mode we use fullscreen list sizing
+					d.setSize(CommonDialog.FULL);
+				} else {
+					// In desktop mode we use screen-relative list sizing
+					d.setSize(CommonDialog.LARGE);
+				}
+				d.open();
 			
-			// Пикеру просетили элемент DTO чтобы он уже отобразил данные на своем поле
-			if ((d.getResult() != null) && (d.getResult().equals("save"))) {
-				try {
-					picker.setSelectedDTO(c.getActiveData());
-					picker.refresh();
-				} catch (DTOException ex) {
-					// TODO handle this error!
+				// Пикеру просетили элемент DTO чтобы он уже отобразил данные на своем поле
+				if ((d.getResult() != null) && (d.getResult().equals("save"))) {
+					try {
+						picker.setSelectedDTO(c.getActiveData());
+						picker.refresh();
+					} catch (DTOException ex) {
+						// TODO handle this error!
+					}
 				}
 			}
 		} catch (IllegalArgumentException ex) {
 			handleError("Ошибка создания диалога выбора из справочника.", ex);
 		} catch (InvocationTargetException | IllegalAccessException | InstantiationException | InitException ex) {
 			handleError("Ошибка создания диалога выбора из справочника.", ex);
+		} finally {
+			constr = null;
+			c = null;
+			d = null;			
 		}
 	}
 

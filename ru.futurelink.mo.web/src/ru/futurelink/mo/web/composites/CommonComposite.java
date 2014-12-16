@@ -48,13 +48,13 @@ public class CommonComposite
 
 	private static final long serialVersionUID = 1L;
 
-	private ApplicationSession mSession;
-	private ResourceBundle	mStrings;
-	private ResourceBundle	mLocalStrings;
-	private ResourceBundle	mLocalErrorStrings;
-	private ResourceBundle	mErrorStrings;
-	private CommonDialog		mOwnerDialog;	// Диалоговое окно - если открыто в диалоге
-	private CompositeParams		mParams;
+	private ApplicationSession session;
+	private ResourceBundle	strings;
+	private ResourceBundle	localStrings;
+	private ResourceBundle	localErrorStrings;
+	private ResourceBundle	errorStrings;
+	private CommonDialog		ownerDialog;	// Диалоговое окно - если открыто в диалоге
+	private CompositeParams		params;
 
 	private CommonControllerListener	mListener;
 	private Logger				mLogger;
@@ -66,20 +66,20 @@ public class CommonComposite
 
 		mLogger = LoggerFactory.getLogger(getClass());
 
-		mSession = session;
-		mParams	 = params;	
-		mStrings = ResourceBundle.getBundle("locale/main", getLocale(), new UTF8Control());
-		mErrorStrings = ResourceBundle.getBundle("locale/errors", getLocale(), new UTF8Control());
+		this.params	 = params;
+		this.session = session;
+		strings = ResourceBundle.getBundle("locale/main", getLocale(), new UTF8Control());
+		errorStrings = ResourceBundle.getBundle("locale/errors", getLocale(), new UTF8Control());
 
 		try {
-			mLocalStrings = ResourceBundle.getBundle("locale/main", getLocale(), 
+			localStrings = ResourceBundle.getBundle("locale/main", getLocale(), 
 				getClass().getClassLoader(), new UTF8Control());
 		} catch(Exception e) {
 			mLogger.warn(getErrorString("noLocaleStrings"), getLocale().getLanguage());
 		}
 
 		try {
-			mLocalErrorStrings = ResourceBundle.getBundle("locale/errors", 
+			localErrorStrings = ResourceBundle.getBundle("locale/errors", 
 				getLocale(), getClass().getClassLoader(), new UTF8Control());
 		} catch (Exception e) {
 			// Ignore that exception
@@ -124,8 +124,8 @@ public class CommonComposite
 	 */
 	@Override
 	final public Locale getLocale() {
-		if (mSession != null) {
-			return mSession.getLocale();
+		if (session != null) {
+			return session.getLocale();
 		}
 		return null;
 	}
@@ -137,7 +137,7 @@ public class CommonComposite
 	 */
 	@Override
 	final public ApplicationSession getSession() {
-		return mSession;
+		return session;
 	}
 	
 	/**
@@ -150,7 +150,7 @@ public class CommonComposite
 	 */
 	@Deprecated
 	final public ResourceBundle getStrings() {
-		return mStrings;
+		return strings;
 	}
 
     /**
@@ -164,19 +164,19 @@ public class CommonComposite
      */
     @Override
 	final public String getLocaleString(String stringName) {    	
-		if (mLocalStrings != null) {
+		if (localStrings != null) {
 			try {
-				return mLocalStrings.getString(stringName);
+				return localStrings.getString(stringName);
 			} catch (MissingResourceException e) {
 				try {
-					return mStrings.getString(stringName);
+					return strings.getString(stringName);
 				} catch (MissingResourceException e2) {
 					return stringName;
 				}
 			}
 		} else {
 			try {
-				return mStrings.getString(stringName);
+				return strings.getString(stringName);
 			} catch (MissingResourceException e2) {
 				return stringName;
 			}
@@ -192,19 +192,19 @@ public class CommonComposite
      */
     @Override
     final public String getErrorString(String stringName) {
-    	if (mLocalErrorStrings != null) {
+    	if (localErrorStrings != null) {
 			try {
-				return mLocalErrorStrings.getString(stringName);
+				return localErrorStrings.getString(stringName);
 			} catch (MissingResourceException e) {
 				try {
-					return mErrorStrings.getString(stringName);
+					return errorStrings.getString(stringName);
 				} catch (MissingResourceException e2) {
 					return stringName;
 				}
 			}
 		} else {
 			try {
-				return mErrorStrings.getString(stringName);
+				return errorStrings.getString(stringName);
 			} catch (MissingResourceException e2) {
 				return stringName;
 			}
@@ -235,7 +235,7 @@ public class CommonComposite
 	
 	@Override
 	final public void setStrings(ResourceBundle bundle) {
-		mStrings = bundle;
+		strings = bundle;
 	}
 	
 	/**
@@ -283,7 +283,7 @@ public class CommonComposite
 	 */
 	@Override
 	public final void setOwnerDialog(CommonDialog dialog) {
-		mOwnerDialog = dialog;
+		ownerDialog = dialog;
 	}
 	
 	/**
@@ -298,8 +298,8 @@ public class CommonComposite
 	 * @param result
 	 */
 	final protected void setOwnerDialogResult(Object result) {
-		if (mOwnerDialog != null)
-			mOwnerDialog.setResult(result);
+		if (ownerDialog != null)
+			ownerDialog.setResult(result);
 	}
 	
 	/**
@@ -314,8 +314,8 @@ public class CommonComposite
 	 * @return parameter value
 	 */
 	protected Object getParam(String paramName) {
-		if (mParams != null) 
-			return mParams.get(paramName);
+		if (params != null) 
+			return params.get(paramName);
 		return null;
 	}
 

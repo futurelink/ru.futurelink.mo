@@ -13,7 +13,7 @@ package ru.futurelink.mo.web.composites.dialogs;
 
 import org.eclipse.swt.SWT;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.OpenException;
 import ru.futurelink.mo.web.app.ApplicationSession;
@@ -61,7 +61,7 @@ public class CommonItemDialog {
 		mListController = controller;
 	}
 	
-	public Object open(CommonDTO data) {
+	public Object open(IDTO data) {
 		mController = mListController.createItemController(mListController, mDialog.getShell(), new CompositeParams());
 		if (mController == null) {
 			return -1;

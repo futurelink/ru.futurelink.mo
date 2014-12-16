@@ -109,17 +109,17 @@ public class SimpleDataPickerComposite
 				}
 			});
 
-			mWorkspace = (CommonComposite) mTable; // В воркспейсе - одна таблица
+			workspace = (CommonComposite) mTable; // В воркспейсе - одна таблица
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}		
 
 		// Пакуем таблицу в качестве воркспейса
-		if (mWorkspace != null) {
-			mWorkspace.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | 
+		if (workspace != null) {
+			workspace.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | 
 					GridData.VERTICAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL | 
 					GridData.GRAB_VERTICAL));
-			mWorkspace.pack();
+			workspace.pack();
 		}	
 
 		return (CommonComposite) mTable;

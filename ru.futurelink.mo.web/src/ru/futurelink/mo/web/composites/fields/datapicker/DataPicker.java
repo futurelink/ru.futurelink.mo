@@ -220,7 +220,7 @@ public class DataPicker extends CommonField implements IField {
 	 * 
 	 * @param data
 	 */
-	public void setSelectedDTO(CommonDTO data) throws DTOException {
+	public void setSelectedDTO(IDTO data) throws DTOException {
 		// Только если реально данные изменились на уровне объекта
 		/*if (((data != null) && !data.equals(mSelectedData)) || 
 			((data == null) && (mSelectedData != null))) {
@@ -247,9 +247,9 @@ public class DataPicker extends CommonField implements IField {
 				e.display = mControl.getDisplay();
 				mModifyListener.modifyText(new ModifyEvent(e)); // Отправляем событие
 			}
-		//}			
+		//}
 	}
-	
+
 	@Override
 	public void refresh() throws DTOException {
 		// Display selected item display field value

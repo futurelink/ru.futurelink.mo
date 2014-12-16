@@ -65,8 +65,8 @@ public class SimpleListComposite extends CommonListComposite {
 
 	private static final long serialVersionUID = 1L;
 
-	protected	ICommonTable	mTable;
-	private		Class<?>	mTableClass;
+	protected	ICommonTable	table;
+	private		Class<?>		tableClass;
 	
 	public SimpleListComposite(ApplicationSession session, Composite parent, int style, CompositeParams params) {
 		super(session, parent, style, params);
@@ -80,19 +80,19 @@ public class SimpleListComposite extends CommonListComposite {
 
 	@Override
 	protected CommonComposite createWorkspace() throws CreationException {
-		mTableClass = (Class<?>) getParam("tableClass");
-		if (mTableClass == null) {
+		tableClass = (Class<?>) getParam("tableClass");
+		if (tableClass == null) {
 			throw new CreationException(getErrorString("noTableClassInSimpleList"));
 		}
 
 		try {
-			Constructor<?> constr = mTableClass.getConstructor(
+			Constructor<?> constr = tableClass.getConstructor(
 					ApplicationSession.class, 
 					Composite.class, 
 					int.class, 
 					CompositeParams.class);
-			mTable = (ICommonTable) constr.newInstance(getSession(), this, SWT.NONE, null);
-			mTable.addTableListener(new CommonTableListener() {			
+			table = (ICommonTable) constr.newInstance(getSession(), this, SWT.NONE, null);
+			table.addTableListener(new CommonTableListener() {			
 				@Override
 				public void itemSelected(IDTO data) {
 					setActiveData(data);
@@ -131,13 +131,13 @@ public class SimpleListComposite extends CommonListComposite {
 			getControllerListener().sendError(getErrorString("creationErrorInSimpleList"), ex);
 		}		
 
-		return (CommonComposite)mTable;
+		return (CommonComposite)table;
 	}
 
 	// Создание колонок таблицы надо вызывать отдельно, чтобы был уже привязан
 	// обработчик событий от таблицы.
 	public void createTableColumns() {
-		((ICommonTable)mTable).createTableColumns();
+		((ICommonTable)table).createTableColumns();
 	}
 
 	@Override
@@ -166,22 +166,22 @@ public class SimpleListComposite extends CommonListComposite {
 
 	@Override
 	public void selectById(String id) throws DTOException {
-		mTable.selectById(id);
+		table.selectById(id);
 	}
 
 	@Override
 	public void selectByDTO(IDTO dto) {
-		mTable.selectByDTO(dto);
+		table.selectByDTO(dto);
 	}
 
 	public ICommonTable getTable() {
-		return mTable;
+		return table;
 	}
 
 	@Override
 	public void setInput(CommonDTOList<? extends IDTO> input) {
-		if (mTable != null)
-			mTable.setInput(input);		
+		if (table != null)
+			table.setInput(input);		
 	}
 
 }

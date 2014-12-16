@@ -30,8 +30,8 @@ public class CommonItemComposite extends CommonDataComposite {
 
 	private static final long serialVersionUID = 1L;
 
-	private IDTO		mDTO;
-	private IField[]	mMandatoryFields;
+	private IDTO		dto;
+	private IField[]	mandatoryFields;
 	
 	public CommonItemComposite(ApplicationSession session, Composite parent, int style, CompositeParams params) {
 		super(session, parent, style, params);
@@ -45,8 +45,8 @@ public class CommonItemComposite extends CommonDataComposite {
 	 * @param data
 	 */
 	public void attachDTO(IDTO data, Boolean refresh) throws DTOException {
-		mDTO = data;
-		if ((mDTO != null) && (refresh == true))
+		dto = data;
+		if ((dto != null) && (refresh == true))
 			refresh();
 	}
 
@@ -54,9 +54,9 @@ public class CommonItemComposite extends CommonDataComposite {
 	 * Unlink and clear linked EditorDTO.
 	 */
 	public void removeDTO() {
-		if (mDTO != null)
-			mDTO.clear();
-		mDTO = null;
+		if (dto != null)
+			dto.clear();
+		dto = null;
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class CommonItemComposite extends CommonDataComposite {
      * CommonDTO.
 	 */
 	public IDTO getDTO() {
-		return mDTO;
+		return dto;
 	}
 
 	/**
@@ -86,8 +86,8 @@ public class CommonItemComposite extends CommonDataComposite {
 	@Override
 	protected void createContents() {
 		createCaptionLabel();
-		mWorkspace = createWorkspace();		
-		mToolbar = createToolbar();
+		workspace = createWorkspace();		
+		toolbar = createToolbar();
 	}
 
     /**
@@ -118,8 +118,8 @@ public class CommonItemComposite extends CommonDataComposite {
 	 * @return
 	 */
 	public boolean getIsMandatoryFilled() {
-		if (mMandatoryFields != null)
-			for (IField field : mMandatoryFields) {
+		if (mandatoryFields != null)
+			for (IField field : mandatoryFields) {
 				if (field.isEmpty()) return false;
 			}
 		return true;
@@ -133,13 +133,13 @@ public class CommonItemComposite extends CommonDataComposite {
 	 * @param fields
 	 */
 	protected void setMandatoryFields(IField[] fields) {
-		if (mMandatoryFields != null) {
-			for (IField field : mMandatoryFields) {
+		if (mandatoryFields != null) {
+			for (IField field : mandatoryFields) {
 				field.setMandatory(false);
 			}			
 		}
 
-		mMandatoryFields = fields;
+		mandatoryFields = fields;
 		for (IField field : fields) {
 			field.setMandatory(true);
 		}

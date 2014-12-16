@@ -182,18 +182,10 @@ public abstract class CommonItemController
 		}		
 	}
 
-	/**
-	 * Создание нового объекта данных через контроллер.
-	 * 
-	 */
 	@Override
 	public void create() throws DTOException {
-		setDTO(
-				PersistentObjectFactory.getInstance().createEditorDTO(
-						mDataClass, EditorDTO.class, mPersistentSession,
-						new AllowOwnChecker(getSession().getUser())
-				)
-			);
+		setDTO(PersistentObjectFactory.getInstance().createEditorDTO(
+				mDataClass, EditorDTO.class, mPersistentSession, mChecker));
 		doAfterCreate();
 	}
 
