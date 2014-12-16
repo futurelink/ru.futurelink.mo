@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.eclipse.swt.widgets.Composite;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
 import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
@@ -130,7 +129,7 @@ public abstract class CommonItemController
 	 * @param data элемент данных
 	 * @return объект DTO
 	 */
-	protected CommonDTO createDTO(IModelObject data) throws DTOException {
+	protected IDTO createDTO(IModelObject data) throws DTOException {
 		if (ICommonObject.class.isAssignableFrom(data.getClass()) &&
 				((ICommonObject)data).getPersistenceManagerSession() == null) 
 				((ICommonObject)data).setPersistentManagerSession(mPersistentSession);
@@ -147,7 +146,7 @@ public abstract class CommonItemController
 	 * @param data элемент данных
 	 * @return объект DTO
 	 */
-	protected CommonDTO openDTO(IModelObject data) throws DTOException {
+	protected IDTO openDTO(IModelObject data) throws DTOException {
 		if (ICommonObject.class.isAssignableFrom(data.getClass()) &&
 			((ICommonObject)data).getPersistenceManagerSession() == null) 
 			((ICommonObject)data).setPersistentManagerSession(mPersistentSession);

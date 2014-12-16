@@ -84,12 +84,12 @@ public class EditorDTO extends CommonDTO
 		if (!getAccessChecker().checkSave(this)) {
 			throw new DTOAccessException("У вас нет права на сохранение этого элемента.", null);
 		}
-		((ModelObject)mData).save();
+		mData.save();
 	}
 
 	@Override
 	public void saveCommit() throws SaveException {
-		((ModelObject)mData).saveCommit();
+		mData.saveCommit();
 	}
 	
 	/**
