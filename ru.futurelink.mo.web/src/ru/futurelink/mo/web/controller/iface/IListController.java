@@ -35,7 +35,7 @@ public interface IListController
 	 * 
 	 * @param accessChecker
 	 */
-	public void setAccessCheker(IDTOAccessChecker accessChecker);
+	public void setAccessChecker(IDTOAccessChecker accessChecker);
 	
 	/**
 	 * Обработка запроса данных для списка.

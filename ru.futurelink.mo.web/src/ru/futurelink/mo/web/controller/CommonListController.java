@@ -12,10 +12,6 @@
 package ru.futurelink.mo.web.controller;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -24,7 +20,6 @@ import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.dto.EditorDTOList;
 import ru.futurelink.mo.orm.dto.FilterDTO;
 import ru.futurelink.mo.orm.dto.IDTO;
-import ru.futurelink.mo.orm.dto.access.AccessChecker;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
@@ -46,14 +41,14 @@ abstract public class CommonListController
 			Class<? extends ICommonObject> dataClass, CompositeParams compositeParams) {
 		super(parentController, dataClass, compositeParams);
 		
-		accessChecker = createAccessChecker();
+		setAccessChecker(createAccessChecker());
 	}
 
 	public CommonListController(ICompositeController parentController,
 			Class<? extends ICommonObject> dataClass, Composite container, CompositeParams compositeParams) {
 		super(parentController, dataClass, container, compositeParams);
 		
-		accessChecker = createAccessChecker();
+		setAccessChecker(createAccessChecker());
 	}
 
 	/**
@@ -73,50 +68,8 @@ abstract public class CommonListController
 	}
 	
 	@Override	
-	public void setAccessCheker(IDTOAccessChecker accessChecker) {
+	public void setAccessChecker(IDTOAccessChecker accessChecker) {
 		this.accessChecker = accessChecker;
-	}
-	
-	private IDTOAccessChecker createAccessChecker() {
-		// If there is an annotation of AccessChecker, try to create checker instance
-		if (getClass().getAnnotation(AccessChecker.class) != null) {
-			Class<? extends IDTOAccessChecker> checkerClass = 
-				getClass().getAnnotation(AccessChecker.class).checker();
-
-			IDTOAccessChecker checker = null; 
-			try {
-				checker = checkerClass.newInstance();
-			} catch (InstantiationException | IllegalAccessException ex) {
-				logger().error("Cannot create IDTOAccessChecker from annotation @AccessChecker", ex);
-			}
-
-			// Initialize access checker with param methods,
-			// if execution is impossible use nulls as init params..
-			String[] methods = getClass().getAnnotation(AccessChecker.class).params();
-			List<Object> methParams = new ArrayList<Object>();
-			for (String method : methods) {
-				try {
-					Method meth = getClass().getMethod(method);
-					methParams.add(meth.invoke(this));
-				} catch (NoSuchMethodException | SecurityException ex) {
-					methParams.add(null);
-					logger().error("No such method method {} on {}, so NULL will be used", 
-							method, getClass().getSimpleName());
-				} catch (IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException ex) {
-					methParams.add(null);
-					logger().error("Could not execute method {} on {}, so NULL will be used", 
-							method, getClass().getSimpleName());
-				}
-			}
-			
-			// And call init with execution results
-			checker.init(methParams.toArray());
-			
-			return checker;
-		}
-		
-		return null;
 	}
 	
 	@Override

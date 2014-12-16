@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Composite;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.EditorDTO;
 import ru.futurelink.mo.orm.dto.IDTO;
-import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.OpenException;
@@ -30,6 +29,7 @@ import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.orm.exceptions.ValidationException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.orm.iface.IModelObject;
+import ru.futurelink.mo.orm.iface.IUser;
 import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 import ru.futurelink.mo.orm.pm.PersistentObjectFactory;
 import ru.futurelink.mo.web.composites.CommonItemComposite;
@@ -56,8 +56,8 @@ public abstract class CommonItemController
 	private 	IPersistentManagerSession	mPersistentSession;
 	private		List<RelatedController> 	mRelatedControllers;
 
-	private		IDTO						mDTO;
-	private		IDTOAccessChecker			mChecker;
+	private		IDTO						dto;
+	private		IDTOAccessChecker			accessChecker;
 	
 	private		EditMode					editMode;
 	
@@ -68,7 +68,7 @@ public abstract class CommonItemController
 		mRelatedControllers = new ArrayList<RelatedController>();
 		mPersistentSession = getSession().persistent();
 
-		mChecker = createAccessChecker();
+		setAccessCheker(createAccessChecker());
 	}
 
 	public CommonItemController(ICompositeController parentController, Class<? extends ICommonObject> dataClass,
@@ -78,7 +78,7 @@ public abstract class CommonItemController
 		mRelatedControllers = new ArrayList<RelatedController>();
 		mPersistentSession = getSession().persistent();
 
-		mChecker = createAccessChecker();
+		setAccessCheker(createAccessChecker());
 	}
 
 	public void setEditMode(EditMode mode) {
@@ -88,17 +88,17 @@ public abstract class CommonItemController
 	public EditMode getEditMode() {
 		return editMode;
 	}
-	
-	/**
-	 * Метод создающий проверялку прав доступа.
-	 * Можно переопределить на дочернем классе, если нужно
-	 * обеспечить доступ к элементам иным чем созданные этим пользователем. 
-	 */
-	@Override
-	public IDTOAccessChecker createAccessChecker() {
-		return new AllowOwnChecker(getSession().getUser());		
-	}
 
+	@Override
+	public IDTOAccessChecker getAccessChecker() {
+		return accessChecker;
+	}
+	
+	@Override
+	public void setAccessCheker(IDTOAccessChecker accessChecker) {
+		this.accessChecker = accessChecker;		
+	}
+	
 	@Override
 	protected void doAfterCreateComposite() {
 		if ((getComposite() != null) &&
@@ -120,7 +120,7 @@ public abstract class CommonItemController
 	 */
 	@Override
 	public IDTO getDTO() {
-		return mDTO;
+		return dto;
 	}
 
 	/**
@@ -136,7 +136,7 @@ public abstract class CommonItemController
 				((ICommonObject)data).setPersistentManagerSession(mPersistentSession);
 		
 		EditorDTO dto = new EditorDTO((IModelObject)data);
-		dto.addAccessChecker(mChecker);
+		dto.addAccessChecker(accessChecker);
 		return dto;
 	}
 
@@ -153,7 +153,7 @@ public abstract class CommonItemController
 			((ICommonObject)data).setPersistentManagerSession(mPersistentSession);
 
 		EditorDTO dto = new EditorDTO((IModelObject)data);
-		dto.addAccessChecker(mChecker);
+		dto.addAccessChecker(accessChecker);
 		return dto;
 	}
 
@@ -185,7 +185,7 @@ public abstract class CommonItemController
 	@Override
 	public void create() throws DTOException {
 		setDTO(PersistentObjectFactory.getInstance().createEditorDTO(
-				mDataClass, EditorDTO.class, mPersistentSession, mChecker));
+				mDataClass, EditorDTO.class, mPersistentSession, accessChecker));
 		doAfterCreate();
 	}
 
@@ -220,9 +220,9 @@ public abstract class CommonItemController
 	 * @throws DTOException
 	 */
 	public final void setDTONoRefresh(IDTO dto) throws DTOException {
-		mDTO = dto;
+		this.dto = dto;
 		if (getComposite() != null)
-			((CommonItemComposite)getComposite()).attachDTO(mDTO, false);		
+			((CommonItemComposite)getComposite()).attachDTO(dto, false);		
 	}
 	
 	/**
@@ -473,6 +473,24 @@ public abstract class CommonItemController
 		if ((getComposite() != null) && CommonItemComposite.class.isAssignableFrom(getComposite().getClass()))
 			((CommonItemComposite)getComposite()).removeDTO();
 		super.uninit();
+	}
+	
+	/**
+	 * Get session user.
+	 * 
+	 * @return
+	 */
+	final public IUser getSessionUser() {
+		return getSession().getUser();
+	}
+	
+	/**
+	 * Get session database access user.
+	 * 
+	 * @return
+	 */
+	final public IUser getDatabaseUser() {
+		return getSession().getDatabaseUser();
 	}
 	
 	/**

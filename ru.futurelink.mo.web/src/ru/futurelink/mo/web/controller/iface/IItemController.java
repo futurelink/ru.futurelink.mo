@@ -34,8 +34,20 @@ public interface IItemController
 	public IDTO getDTO();
 	public void setDTO(IDTO dto)  throws DTOException;
 
-	public IDTOAccessChecker createAccessChecker();
+	/**
+	 * Get access checker agent.
+	 * 
+	 * @return
+	 */
+	public IDTOAccessChecker getAccessChecker();
 	
+	/**
+	 * Set access checker agent.
+	 * 
+	 * @param accessChecker
+	 */
+	public void setAccessCheker(IDTOAccessChecker accessChecker);
+
 	/* Методы манипуляции объъектом */
 
 	public void create() throws DTOException;

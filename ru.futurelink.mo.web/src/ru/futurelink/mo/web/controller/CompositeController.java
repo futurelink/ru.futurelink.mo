@@ -13,6 +13,9 @@ package ru.futurelink.mo.web.controller;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.rap.rwt.RWT;
@@ -26,7 +29,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 
+import ru.futurelink.mo.orm.dto.access.AccessChecker;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
+import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.app.ApplicationSession;
@@ -127,6 +132,48 @@ public abstract class CompositeController
 		} else {
 			mCompositeParams = params;
 		}*/
+	}
+
+	protected final IDTOAccessChecker createAccessChecker() {
+		// If there is an annotation of AccessChecker, try to create checker instance
+		if (getClass().getAnnotation(AccessChecker.class) != null) {
+			Class<? extends IDTOAccessChecker> checkerClass = 
+				getClass().getAnnotation(AccessChecker.class).checker();
+
+			IDTOAccessChecker checker = null; 
+			try {
+				checker = checkerClass.newInstance();
+			} catch (InstantiationException | IllegalAccessException ex) {
+				logger().error("Cannot create IDTOAccessChecker from annotation @AccessChecker", ex);
+			}
+
+			// Initialize access checker with param methods,
+			// if execution is impossible use nulls as init params..
+			String[] methods = getClass().getAnnotation(AccessChecker.class).params();
+			List<Object> methParams = new ArrayList<Object>();
+			for (String method : methods) {
+				try {
+					Method meth = getClass().getMethod(method);
+					methParams.add(meth.invoke(this));
+				} catch (NoSuchMethodException | SecurityException ex) {
+					methParams.add(null);
+					logger().error("No such method method {} on {}, so NULL will be used", 
+							method, getClass().getSimpleName());
+				} catch (IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException ex) {
+					methParams.add(null);
+					logger().error("Could not execute method {} on {}, so NULL will be used", 
+							method, getClass().getSimpleName());
+				}
+			}
+			
+			// And call init with execution results
+			checker.init(methParams.toArray());
+			
+			return checker;
+		}
+		
+		return null;
 	}
 
 	/**
