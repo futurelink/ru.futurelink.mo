@@ -12,6 +12,7 @@
 package ru.futurelink.mo.web.controller.iface;
 
 import ru.futurelink.mo.orm.dto.IDTO;
+import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 
 /**
@@ -21,6 +22,21 @@ import ru.futurelink.mo.orm.exceptions.DTOException;
 public interface IListController
 	extends IController
 {
+	
+	/**
+	 * Get access checker agent.
+	 * 
+	 * @return
+	 */
+	public IDTOAccessChecker getAccessChecker();
+	
+	/**
+	 * Set access checker agent.
+	 * 
+	 * @param accessChecker
+	 */
+	public void setAccessCheker(IDTOAccessChecker accessChecker);
+	
 	/**
 	 * Обработка запроса данных для списка.
 	 */

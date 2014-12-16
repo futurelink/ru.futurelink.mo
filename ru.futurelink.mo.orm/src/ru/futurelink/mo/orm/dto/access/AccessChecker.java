@@ -11,44 +11,39 @@
 
 package ru.futurelink.mo.orm.dto.access;
 
-import ru.futurelink.mo.orm.dto.IDTO;
-import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author pavlov
  *
  */
-public class AllowAllChecker implements IDTOAccessChecker {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface AccessChecker {
 
 	/**
+	 * Access checker class.
 	 * 
+	 * @return
 	 */
-	public AllowAllChecker() {
-	}
+	Class<? extends IDTOAccessChecker> checker();	
 	
-	@Override
-	public void init(Object... args) {
-		
-	}
+	/**
+	 * Access checker name.
+	 * 
+	 * @return
+	 */
+	String			name();
 	
-	@Override
-	public boolean checkCreate(IDTO dto) {
-		return true;
-	}
-
-	@Override
-	public boolean checkRead(IDTO dto, String fieldName) {
-		return true;
-	}
-
-	@Override
-	public boolean checkWrite(IDTO dto, String fieldName) {
-		return true;
-	}
-
-	@Override
-	public boolean checkSave(IDTO dto) {
-		return true;
-	}
+	/**
+	 * Parameters for checker initialization. The array contains
+	 * method names which return values used in initialization.
+	 * 
+	 * @return
+	 */
+	String[]		params();
 
 }

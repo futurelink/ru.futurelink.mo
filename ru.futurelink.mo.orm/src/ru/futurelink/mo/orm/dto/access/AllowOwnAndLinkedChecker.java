@@ -21,6 +21,10 @@ import ru.futurelink.mo.orm.iface.IUser;
  */
 public class AllowOwnAndLinkedChecker extends AllowOwnChecker {
 
+	public AllowOwnAndLinkedChecker() {
+		super();
+	}
+
 	public AllowOwnAndLinkedChecker(IUser user) {
 		super(user);
 	}

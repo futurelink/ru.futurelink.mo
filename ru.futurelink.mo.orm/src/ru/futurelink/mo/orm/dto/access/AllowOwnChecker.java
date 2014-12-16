@@ -27,8 +27,19 @@ public class AllowOwnChecker implements IDTOAccessChecker {
 
 	private IUser mUser;
 	
+	public AllowOwnChecker() {}
+	
 	public AllowOwnChecker(IUser user) {
 		mUser = user;
+	}
+	
+	@Override
+	public void init(Object... args) {
+		if (args[0] != null && IUser.class.isAssignableFrom(args[0].getClass())) {
+			mUser = (IUser) args[0];
+		} else {
+			throw new RuntimeException("Can not initialize "+getClass().getSimpleName()+", invalid arguments!");
+		}
 	}
 	
 	public IUser getUser() { return mUser; }

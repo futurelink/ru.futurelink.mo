@@ -21,11 +21,30 @@ import ru.futurelink.mo.orm.iface.ISessionUserAccess;
 public class AllowOwnAndAccessedChecker implements IDTOAccessChecker {
 
 	private ISessionUserAccess userAccess;
-	
+
+	public AllowOwnAndAccessedChecker() {}
+
 	/**
 	 * 
 	 */
 	public AllowOwnAndAccessedChecker(ISessionUserAccess userAccess) {
+		this.userAccess = userAccess;
+	}
+
+	@Override
+	public void init(Object... args) {
+		if (args[0] != null && ISessionUserAccess.class.isAssignableFrom(args[0].getClass())) {
+			setSession((ISessionUserAccess) args[0]);
+		} else {
+			throw new RuntimeException("Can not initialize "+getClass().getSimpleName()+", invalid arguments!");
+		}
+	}
+	
+	public ISessionUserAccess getSession() {
+		return userAccess;
+	}
+
+	public void setSession(ISessionUserAccess userAccess) {
 		this.userAccess = userAccess;
 	}
 	
@@ -50,6 +69,8 @@ public class AllowOwnAndAccessedChecker implements IDTOAccessChecker {
 	}
 
 	private boolean checkOwnerAndAccessed(IDTO dto) {
+		if (userAccess == null) return false;
+		
 		if ((dto != null) && (dto.getOwner() != null)) {
 			// If there is user in session, check it
 			if ((userAccess.getUser() != null) && 

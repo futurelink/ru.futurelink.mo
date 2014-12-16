@@ -12,6 +12,10 @@
 package ru.futurelink.mo.web.controller;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -20,7 +24,8 @@ import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.dto.EditorDTOList;
 import ru.futurelink.mo.orm.dto.FilterDTO;
 import ru.futurelink.mo.orm.dto.IDTO;
-import ru.futurelink.mo.orm.dto.access.AllowOwnChecker;
+import ru.futurelink.mo.orm.dto.access.AccessChecker;
+import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.composites.CommonDataComposite;
@@ -33,17 +38,22 @@ abstract public class CommonListController
 	extends CompositeController
 	implements IListController 
 {
-	private FilterDTO						mFilter;
-	private CommonDTOList<? extends IDTO> mDTO;
+	private FilterDTO						filterDTO;
+	private CommonDTOList<? extends IDTO> dto;
+	private IDTOAccessChecker				accessChecker;
 	
 	public CommonListController(ICompositeController parentController,
 			Class<? extends ICommonObject> dataClass, CompositeParams compositeParams) {
-		super(parentController, dataClass, compositeParams);	
+		super(parentController, dataClass, compositeParams);
+		
+		accessChecker = createAccessChecker();
 	}
 
 	public CommonListController(ICompositeController parentController,
 			Class<? extends ICommonObject> dataClass, Composite container, CompositeParams compositeParams) {
 		super(parentController, dataClass, container, compositeParams);
+		
+		accessChecker = createAccessChecker();
 	}
 
 	/**
@@ -58,17 +68,69 @@ abstract public class CommonListController
 	}
 	
 	@Override
+	public IDTOAccessChecker getAccessChecker() {
+		return accessChecker;
+	}
+	
+	@Override	
+	public void setAccessCheker(IDTOAccessChecker accessChecker) {
+		this.accessChecker = accessChecker;
+	}
+	
+	private IDTOAccessChecker createAccessChecker() {
+		// If there is an annotation of AccessChecker, try to create checker instance
+		if (getClass().getAnnotation(AccessChecker.class) != null) {
+			Class<? extends IDTOAccessChecker> checkerClass = 
+				getClass().getAnnotation(AccessChecker.class).checker();
+
+			IDTOAccessChecker checker = null; 
+			try {
+				checker = checkerClass.newInstance();
+			} catch (InstantiationException | IllegalAccessException ex) {
+				logger().error("Cannot create IDTOAccessChecker from annotation @AccessChecker", ex);
+			}
+
+			// Initialize access checker with param methods,
+			// if execution is impossible use nulls as init params..
+			String[] methods = getClass().getAnnotation(AccessChecker.class).params();
+			List<Object> methParams = new ArrayList<Object>();
+			for (String method : methods) {
+				try {
+					Method meth = getClass().getMethod(method);
+					methParams.add(meth.invoke(this));
+				} catch (NoSuchMethodException | SecurityException ex) {
+					methParams.add(null);
+					logger().error("No such method method {} on {}, so NULL will be used", 
+							method, getClass().getSimpleName());
+				} catch (IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException ex) {
+					methParams.add(null);
+					logger().error("Could not execute method {} on {}, so NULL will be used", 
+							method, getClass().getSimpleName());
+				}
+			}
+			
+			// And call init with execution results
+			checker.init(methParams.toArray());
+			
+			return checker;
+		}
+		
+		return null;
+	}
+	
+	@Override
 	public void init() throws InitException {
 		// Создаем пустой объект фильтра
-		if (mFilter == null)
-			mFilter = new FilterDTO();		
+		if (filterDTO == null)
+			filterDTO = new FilterDTO();		
 
 		// Всегда создаем пустой список DTO для контроллера,
 		// если надо, его всегда можно заменить своим списком.	
 		try {
 			setDTO(
 				new EditorDTOList<CommonDTO>(
-						getSession().persistent(), new AllowOwnChecker(getSession().getUser()), CommonDTO.class
+						getSession().persistent(), getAccessChecker(), CommonDTO.class
 				)
 			);
 		} catch (DTOException e) {
@@ -82,8 +144,8 @@ abstract public class CommonListController
 	public void uninit() {
 		logger().debug("Очистка DTO списка");
 		
-		mDTO = null;
-		mFilter = null;
+		dto = null;
+		filterDTO = null;
 		/*try {
 			((CommonListComposite)getComposite()).refresh();
 		} catch (DTOException e) {
@@ -107,8 +169,8 @@ abstract public class CommonListController
 	protected synchronized void setDTO(CommonDTOList<? extends IDTO> dto) throws DTOException {
 		removeDTO();	// Очищаем старый объект DTO
 		
-		mDTO = dto;
-		
+		this.dto = dto;
+
 		// Обновляем список
 		if (getComposite() != null)
 			((CommonListComposite)getComposite()).refresh();
@@ -121,7 +183,7 @@ abstract public class CommonListController
 	 * @throws DTOException 
 	 */
 	protected CommonDTOList<? extends IDTO> getDTO() throws DTOException {
-		return mDTO;
+		return dto;
 	}
 	
 	/**
@@ -133,9 +195,9 @@ abstract public class CommonListController
 	 * 
 	 */
 	protected synchronized void removeDTO() throws DTOException {
-		if (mDTO != null) {
-			mDTO.clear();
-			mDTO = null;	// Удаляем DTO
+		if (dto != null) {
+			dto.clear();
+			dto = null;	// Удаляем DTO
 		}
 
 		// Обновляем композит
@@ -155,8 +217,8 @@ abstract public class CommonListController
 	 */
 	public synchronized void clearDTO() throws DTOException {
 		// Уничтожаем содержимое списка в контроллере
-		if (mDTO != null) {
-			mDTO.clear();
+		if (dto != null) {
+			dto.clear();
 			
 			// Обновляем список
 			if (getComposite() != null)
@@ -198,7 +260,7 @@ abstract public class CommonListController
 	 * @return
 	 */
 	public FilterDTO getFilter() {
-		return mFilter;
+		return filterDTO;
 	}
 
 	/**
@@ -207,7 +269,7 @@ abstract public class CommonListController
 	 * @param filter
 	 */
 	public void setFilter(FilterDTO filter) {
-		mFilter = filter;
+		filterDTO = filter;
 	}
 	
 	/**

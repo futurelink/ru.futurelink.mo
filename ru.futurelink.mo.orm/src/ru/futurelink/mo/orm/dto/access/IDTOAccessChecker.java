@@ -21,6 +21,17 @@ import ru.futurelink.mo.orm.dto.IDTO;
  */
 public interface IDTOAccessChecker {
 	
+	/**
+	 * 
+	 * @param args
+	 */
+	public void init(Object... args);
+
+	/**
+	 * 
+	 * @param dto
+	 * @return
+	 */
 	public boolean checkCreate(IDTO dto);
 
 	/**
