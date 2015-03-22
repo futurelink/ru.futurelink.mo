@@ -32,15 +32,10 @@ import org.eclipse.swt.widgets.MessageBox;
 import ru.futurelink.mo.orm.dto.access.AccessChecker;
 import ru.futurelink.mo.orm.dto.access.DTOAccessException;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
-import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonComposite;
 import ru.futurelink.mo.web.composites.IDragDropDecorator;
-import ru.futurelink.mo.web.composites.dialogs.CommonDialog;
-import ru.futurelink.mo.web.composites.fields.datapicker.CommonDataPickerController;
-import ru.futurelink.mo.web.composites.fields.datapicker.DataPicker;
-import ru.futurelink.mo.web.composites.fields.datapicker.SimpleDataPickerController;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
 import ru.futurelink.mo.web.controller.iface.IControllerRefreshHandler;
 import ru.futurelink.mo.web.exceptions.CreationException;
@@ -452,86 +447,6 @@ public abstract class CompositeController
 		l.setText(message);
 		
 		return c;
-	}
-
-	/**
-	 * Обработка открытия окна выбора из базы данных посредством
-	 * поля DataPicker.
-	 * 
-	 * @param picker
-	 */
-	public void handleOpenDataPickerDialog(DataPicker picker) {
-		CommonDialog d = new CommonDialog(getSession(), getComposite().getShell(), SWT.NONE);		
-		Class<? extends CommonDataPickerController> pickerControllerClass = picker.getPickerController();
-		if (pickerControllerClass == null) {
-			pickerControllerClass = SimpleDataPickerController.class;
-		}
-
-		// Вытащим конструктор окна выбора
-		Constructor<?> constr;
-		try {
-			constr = pickerControllerClass.getConstructor(
-					CompositeController.class,
-					Class.class,
-					Composite.class,
-					CompositeParams.class);
-		} catch (NoSuchMethodException | SecurityException ex1) {
-			handleError("Ошибка получения конструктора для окна выбора из списка.", ex1);
-			return;
-		}
-		
-		CommonDataPickerController c = null;
-		d.setText(getComposite().getLocaleString("selection"));				
-		try {		
-			c = (CommonDataPickerController) constr.newInstance(
-					(CompositeController) mThisController,
-					picker.getDataClass(),
-					d.getShell(),
-					(new CompositeParams()).
-					
-						// Параметры выборки пикера
-						add("tableClass", picker.getTableClass()).
-						add("queryConditions", picker.getQueryConditions()).
-						add("orderBy", picker.getOrderBy()).
-						
-						// Параметры, которые касаются возможностей пикера
-						add("itemControllerClass", picker.getItemControllerClass()).
-						add("itemDialogParams", picker.getItemDialogParams()).
-						add("allowCreate", picker.getAllowCreate()).
-						add("public", picker.getPublic())
-						);
-			c.init();
-			// If there was an error in composite creation it must do nothing
-			if (c.getComposite() != null && !c.getComposite().isDisposed()) {
-				d.attachComposite(c.getComposite());
-				if (getSession().getMobileMode()) {
-					// In mobile mode we use fullscreen list sizing
-					d.setSize(CommonDialog.FULL);
-				} else {
-					// In desktop mode we use screen-relative list sizing
-					d.setSize(CommonDialog.LARGE);
-				}
-				d.open();
-			
-				// Пикеру просетили элемент DTO чтобы он уже отобразил данные на своем поле
-				if ((d.getResult() != null) && (d.getResult().equals("save"))) {
-					try {
-						picker.setSelectedDTO(c.getActiveData());
-						picker.refresh();
-					} catch (DTOException ex) {
-						// TODO handle this error!
-					}
-				}
-			}
-		} catch (IllegalArgumentException ex) {
-			handleError("Ошибка создания диалога выбора из справочника.", ex);
-		} catch (InvocationTargetException | IllegalAccessException | InstantiationException | InitException ex) {
-			handleError("Ошибка создания диалога выбора из справочника.", ex);
-		} finally {
-			constr = null;
-			c = null;
-			d = null;			
-		}
 	}
 
 	/**

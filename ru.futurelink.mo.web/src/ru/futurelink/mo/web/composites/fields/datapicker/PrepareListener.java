@@ -9,9 +9,12 @@
  *    Pavlov Denis - initial API and implementation
  ******************************************************************************/
 
-package ru.futurelink.mo.web.controller;
+package ru.futurelink.mo.web.composites.fields.datapicker;
 
-public interface CommonItemEditControllerListener extends CommonItemControllerListener {
-	public void saveButtonClicked();
-	public void cancelButtonClicked();	
+/**
+ * @author pavlov
+ *
+ */
+public interface PrepareListener {
+	public void prepare();
 }

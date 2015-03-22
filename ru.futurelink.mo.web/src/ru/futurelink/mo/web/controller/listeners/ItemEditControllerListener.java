@@ -49,12 +49,7 @@ public class ItemEditControllerListener implements
 	public void dataChangeFinished(IField editor) throws DTOException {
 		handleSaveButton();
 	}
-	
-	@Override
-	public void openDataPickerDialog(DataPicker picker) {
-		mController.handleOpenDataPickerDialog(picker);
-	}
-				
+			
 	@Override
 	public void saveButtonClicked() {
 		try {

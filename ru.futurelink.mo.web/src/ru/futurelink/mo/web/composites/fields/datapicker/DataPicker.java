@@ -11,6 +11,8 @@
 
 package ru.futurelink.mo.web.composites.fields.datapicker;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,10 +42,13 @@ import ru.futurelink.mo.orm.iface.ICommonObject;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonComposite;
 import ru.futurelink.mo.web.composites.CommonItemComposite;
+import ru.futurelink.mo.web.composites.dialogs.CommonDialog;
 import ru.futurelink.mo.web.composites.fields.CommonField;
 import ru.futurelink.mo.web.controller.CommonItemController;
 import ru.futurelink.mo.web.controller.CommonItemControllerListener;
+import ru.futurelink.mo.web.controller.CompositeController;
 import ru.futurelink.mo.web.controller.CompositeParams;
+import ru.futurelink.mo.web.exceptions.InitException;
 
 /**
  * Простейший контрол выбора элемента из списка.
@@ -60,7 +65,7 @@ public class DataPicker extends CommonField {
 	private Label	mClearButton;
 	
 	private ModifyListener 			mModifyListener;
-	private SelectionListener		mDataPickListener;
+	private PrepareListener			mPrepareListener;
 	
 	private Class<? extends ICommonObject> 		mDataClass;
 	private Class<?>								mTableClass;
@@ -180,22 +185,12 @@ public class DataPicker extends CommonField {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void mouseUp(MouseEvent arg0) {}
-			
-			@Override
-			public void mouseDown(MouseEvent arg0) {
-				if (mDataPickListener != null) {			
-					Event e = new Event();
-					e.data = arg0.data;
-					e.stateMask = arg0.stateMask;
-					e.widget = arg0.widget;
-					e.display = arg0.display;
-					e.x = arg0.x;
-					e.y = arg0.y;
-					SelectionEvent se = new SelectionEvent(e);
-					mDataPickListener.widgetSelected(se);
-				}
+			public void mouseUp(MouseEvent arg0) {
+				openSelectionDialog();
 			}
+
+			@Override
+			public void mouseDown(MouseEvent arg0) {}
 			
 			@Override
 			public void mouseDoubleClick(MouseEvent arg0) {}
@@ -314,20 +309,16 @@ public class DataPicker extends CommonField {
 		mModifyListener = null;
 	}
 
-	/**
-	 * Привязать обработчик кнопки выбора данных.
-	 * 
-	 * @param listener
-	 */
-	final public void setDataPickListener(SelectionListener listener) {
-		mDataPickListener = listener;
+	final public void addPrepareListener(PrepareListener listener) {
+		mPrepareListener = listener;
 	}
 	
-	/**
-	 * Remove data pick listener.
-	 */
-	final public void removeDataPickListener() {
-		mDataPickListener = null;
+	final public void removePrepareListener() {
+		mPrepareListener = null;
+	}
+	
+	final public PrepareListener getPrepareListener() {
+		return mPrepareListener;
 	}
 	
 	/**
@@ -511,4 +502,89 @@ public class DataPicker extends CommonField {
 			return null;
 		}
 	}
+	
+	/**
+	 * Обработка открытия окна выбора из базы данных посредством
+	 * поля DataPicker.
+	 * 
+	 * @param picker
+	 */
+	public void openSelectionDialog() {
+		CommonDialog d = new CommonDialog(getSession(), getParentController().getComposite().getShell(), SWT.NONE);		
+		Class<? extends CommonDataPickerController> pickerControllerClass = getPickerController();
+		if (pickerControllerClass == null) {
+			pickerControllerClass = SimpleDataPickerController.class;
+		}
+
+		// Вытащим конструктор окна выбора
+		Constructor<?> constr;
+		try {
+			constr = pickerControllerClass.getConstructor(
+					CompositeController.class,
+					Class.class,
+					Composite.class,
+					CompositeParams.class);
+		} catch (NoSuchMethodException | SecurityException ex1) {
+			getParentController().handleError("Ошибка получения конструктора для окна выбора из списка.", ex1);
+			return;
+		}
+
+		// Prepare data for list selection
+		if (getPrepareListener() != null)
+			getPrepareListener().prepare();
+		
+		CommonDataPickerController c = null;
+		d.setText(((CommonComposite)getParentController().getComposite()).getLocaleString("selection"));				
+		try {		
+			c = (CommonDataPickerController) constr.newInstance(
+					(CompositeController)getParentController(),
+					getDataClass(),
+					d.getShell(),
+					(new CompositeParams()).
+
+						// Параметры выборки пикера
+						add("tableClass", getTableClass()).
+						add("queryConditions", getQueryConditions()).
+						add("orderBy", getOrderBy()).
+
+						// Параметры, которые касаются возможностей пикера
+						add("itemControllerClass", getItemControllerClass()).
+						add("itemDialogParams", getItemDialogParams()).
+						add("allowCreate", getAllowCreate()).
+						add("public", getPublic())
+						);
+			c.init();
+			// If there was an error in composite creation it must do nothing
+			if (c.getComposite() != null && !c.getComposite().isDisposed()) {
+				d.attachComposite(c.getComposite());
+				if (getSession().getMobileMode()) {
+					// In mobile mode we use fullscreen list sizing
+					d.setSize(CommonDialog.FULL);
+				} else {
+					// In desktop mode we use screen-relative list sizing
+					d.setSize(CommonDialog.LARGE);
+				}
+				d.open();
+			
+				// Пикеру просетили элемент DTO чтобы он уже отобразил данные на своем поле
+				if ((d.getResult() != null) && (d.getResult().equals("save"))) {
+					try {
+						setSelectedDTO(c.getActiveData());
+						refresh();
+					} catch (DTOException ex) {
+						// TODO handle this error!
+					}
+				}
+			}
+		} catch (IllegalArgumentException ex) {
+			getParentController().handleError("Ошибка создания диалога выбора из справочника.", ex);
+		} catch (InvocationTargetException | IllegalAccessException | InstantiationException | InitException ex) {
+			getParentController().handleError("Ошибка создания диалога выбора из справочника.", ex);
+		} finally {
+			constr = null;
+			c = null;
+			d = null;			
+		}
+	}
+	
 }

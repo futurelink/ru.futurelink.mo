@@ -21,7 +21,7 @@ import javax.persistence.Transient;
 import ru.futurelink.mo.orm.entities.CommonObject;
 import ru.futurelink.mo.orm.iface.IUser;
 import ru.futurelink.mo.orm.iface.IUserAccess;
-import ru.futurelink.mo.orm.pm.PersistentManagerSession;
+import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 
 @Entity(name = "Access")
 @Table(name = "ACCESS")
@@ -35,7 +35,7 @@ public class Access extends CommonObject implements IUserAccess {
 
 	}
 
-	public Access(PersistentManagerSession manager) {
+	public Access(IPersistentManagerSession manager) {
 		super(manager);
 	}
 	
