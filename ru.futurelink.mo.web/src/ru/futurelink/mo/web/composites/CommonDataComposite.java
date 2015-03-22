@@ -166,8 +166,6 @@ public abstract class CommonDataComposite extends CommonComposite
         if (getParam("toolbarPosition") == ToolBarPosition.BOTTOM)
             toolbar = createToolbar();
 
-		// Если не получилось создать рабочее пространство
-		// отменяем создание всего.
 		/*if (mWorkspace == null) {
 			if ((mToolbar != null) && (!mToolbar.isDisposed()))
 				mToolbar.dispose();

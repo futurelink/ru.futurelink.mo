@@ -38,8 +38,8 @@ public class TextButton extends CommonField {
 			CommonItemComposite dataComposite) {
 		super(session, parent, style, params, dataComposite);
 
-		mControl = new Button(mParent, SWT.PUSH);
-		((Button)mControl).addSelectionListener(new SelectionListener() {		
+		control = new Button(parent, SWT.PUSH);
+		((Button)control).addSelectionListener(new SelectionListener() {		
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -59,18 +59,18 @@ public class TextButton extends CommonField {
 	}
 
 	public String getText() {
-		return ((Text)mControl).getText();
+		return ((Text)control).getText();
 	}
 	
 	public void setText(String text) throws DTOException {
-		if (!((Button)mControl).getText().equals(text)) {
-			((Button)mControl).setText(text);
+		if (!((Button)control).getText().equals(text)) {
+			((Button)control).setText(text);
 		}
 	}
 
 	@Override
 	public void refresh() throws DTOException {
-		Object f = getDTO().getDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter);
+		Object f = getDTO().getDataField(dataFieldName, dataFieldGetter, dataFieldSetter);
 		setText(f != null ? f.toString() : "");
 	}
 

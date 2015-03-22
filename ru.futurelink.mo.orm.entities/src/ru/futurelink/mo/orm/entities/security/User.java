@@ -29,9 +29,9 @@ import ru.futurelink.mo.orm.pm.IPersistentManagerSession;
 @Entity(name = "User")
 @Table(name = "USERS")
 @NamedQueries({
-	@NamedQuery(name="User.login", query="SELECT u FROM User u where u.mLogin = :login and u.mPassword = :password"),
-	@NamedQuery(name="User.findUserByLogin", query="SELECT u FROM User u where u.mLogin = :login"),
-	@NamedQuery(name="User.findUserByEmail", query="SELECT u FROM User u where u.mEmail = :email")
+	@NamedQuery(name="User.login", query="SELECT u FROM User u where u.mLogin = :login and u.mPassword = :password and u.deleteFlag = 0"),
+	@NamedQuery(name="User.findUserByLogin", query="SELECT u FROM User u where u.mLogin = :login and u.deleteFlag = 0"),
+	@NamedQuery(name="User.findUserByEmail", query="SELECT u FROM User u where u.mEmail = :email and u.deleteFlag = 0")
 })
 public class User 
 	extends CommonObject 

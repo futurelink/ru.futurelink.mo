@@ -21,7 +21,7 @@ import ru.futurelink.mo.orm.exceptions.DTOException;
  * @author Futurelink
  *
  */
-public class CommonTableContentProvider  implements IStructuredContentProvider {
+public class CommonContentProvider  implements IStructuredContentProvider {
 	private static final long serialVersionUID = 1L;
 
 	private Object[] 			elements;
@@ -35,7 +35,7 @@ public class CommonTableContentProvider  implements IStructuredContentProvider {
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		undisplayed = new HashSet<CommonDTO>();
 		displayedCount = 0;
-
+		
 		if(newInput == null) {
 			// Возвращается пустой массив, если
 			// если передать нулевой input.
@@ -86,7 +86,9 @@ public class CommonTableContentProvider  implements IStructuredContentProvider {
 		displayedCount = counter;
 	}
 	
-    public void dispose() {}
+    public void dispose() {
+    	elements = null;
+    }
     
     /**
      * Метод определения надо ли показывать элемент в таблице. Нужно переопределить

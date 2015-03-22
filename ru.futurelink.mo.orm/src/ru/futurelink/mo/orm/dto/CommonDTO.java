@@ -173,6 +173,8 @@ public abstract class CommonDTO implements Serializable, IDTO {
      */
 	@Override
  	public Object getDataField(String fieldName) throws DTOException {
+		if (fieldName == null) return null;
+
 		Accessors accessors = getAccessors(fieldName);
 		if (accessors != null && accessors.getter() != null && accessors.setter() != null) {
 			return getDataField(fieldName, accessors.getter(), accessors.setter());
@@ -260,6 +262,8 @@ public abstract class CommonDTO implements Serializable, IDTO {
      * @throws DTOException
      */
 	private Accessors getAccessors(String fieldName) throws DTOException {
+		if (fieldName == null) return null;
+
 		Accessors accessors = null;
 		try {
 			accessors = mData.getAccessors(fieldName);

@@ -48,35 +48,35 @@ public class LimitDayField extends CommonField {
 		super(session, parent, style | SWT.BORDER, params, dataComposite);
 		
 		mLimitDay = new LimitDay();
-		mControl = new CommonComposite(mParent.getSession(), mParent, SWT.BORDER | SWT.READ_ONLY, null);
+		control = new CommonComposite(parent.getSession(), parent, SWT.BORDER | SWT.READ_ONLY, null);
 
 		GridLayout layout = new GridLayout(2, false);
-		((CommonComposite)mControl).setLayout(layout);
+		((CommonComposite)control).setLayout(layout);
 		
-		b1 = new Button(((CommonComposite)mControl), SWT.RADIO);
+		b1 = new Button(((CommonComposite)control), SWT.RADIO);
 		b1.setData("dayOfMonth");
-		b1.setText(((CommonComposite)mControl).getLocaleString("limitTypeByDayOfMonth"));
+		b1.setText(((CommonComposite)control).getLocaleString("limitTypeByDayOfMonth"));
 		b1.addSelectionListener(typeSelectionListener);
 
-		b2 = new Button(((CommonComposite)mControl), SWT.RADIO);
+		b2 = new Button(((CommonComposite)control), SWT.RADIO);
 		b2.setData("dayOfWeek");
-		b2.setText(((CommonComposite)mControl).getLocaleString("limitTypeByDayOfWeek"));
+		b2.setText(((CommonComposite)control).getLocaleString("limitTypeByDayOfWeek"));
 		b2.addSelectionListener(typeSelectionListener);
 
-		Label l = new Label(((CommonComposite)mControl), SWT.NONE);
-		l.setText(((CommonComposite)mControl).getLocaleString("limitTypeDayOfMonth"));
+		Label l = new Label(((CommonComposite)control), SWT.NONE);
+		l.setText(((CommonComposite)control).getLocaleString("limitTypeDayOfMonth"));
 
-		cmb = new Combo(((CommonComposite)mControl), SWT.BORDER | SWT.READ_ONLY);
+		cmb = new Combo(((CommonComposite)control), SWT.BORDER | SWT.READ_ONLY);
 		cmb.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 		for (int i = 1; i < 32; i++) {
 			cmb.add(String.valueOf(i));
 		}
 		cmb.addSelectionListener(mDataSelectionListener);
 		
-		Label l2 = new Label(((CommonComposite)mControl), SWT.NONE);
-		l2.setText(((CommonComposite)mControl).getLocaleString("limitTypeDayOfWeek"));
+		Label l2 = new Label(((CommonComposite)control), SWT.NONE);
+		l2.setText(((CommonComposite)control).getLocaleString("limitTypeDayOfWeek"));
 		
-		Composite c = new Composite(((CommonComposite)mControl), SWT.NONE);
+		Composite c = new Composite(((CommonComposite)control), SWT.NONE);
 		GridLayout sgd =new GridLayout(2, true);
 		sgd.marginWidth = 0;
 		sgd.marginHeight = 0;
@@ -85,17 +85,17 @@ public class LimitDayField extends CommonField {
 
 		cmb2 = new Combo(c, SWT.BORDER | SWT.READ_ONLY);
 		cmb2.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		cmb2.add(((CommonComposite)mControl).getLocaleString("counterFirst"));
-		cmb2.add(((CommonComposite)mControl).getLocaleString("counterSecond"));
-		cmb2.add(((CommonComposite)mControl).getLocaleString("counterThird"));
-		cmb2.add(((CommonComposite)mControl).getLocaleString("counterForth"));
-		cmb2.add(((CommonComposite)mControl).getLocaleString("counterLast"));
+		cmb2.add(((CommonComposite)control).getLocaleString("counterFirst"));
+		cmb2.add(((CommonComposite)control).getLocaleString("counterSecond"));
+		cmb2.add(((CommonComposite)control).getLocaleString("counterThird"));
+		cmb2.add(((CommonComposite)control).getLocaleString("counterForth"));
+		cmb2.add(((CommonComposite)control).getLocaleString("counterLast"));
 		cmb2.addSelectionListener(mDataSelectionListener);
 							
 		cmb3 = new Combo(c, SWT.BORDER | SWT.READ_ONLY);
 		cmb3.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 		for (int i = 0; i < 7; i++) {
-			cmb3.add(((CommonComposite)mControl).getLocaleString("day"+weekDays[i]));
+			cmb3.add(((CommonComposite)control).getLocaleString("day"+weekDays[i]));
 		}
 		cmb3.addSelectionListener(mDataSelectionListener);
 
@@ -109,7 +109,7 @@ public class LimitDayField extends CommonField {
 		@Override
 		public void widgetSelected(SelectionEvent arg0) {
 			try {
-				getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, getLimitDay());
+				getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, getLimitDay());
 				((CommonItemControllerListener)getControllerListener()).dataChanged(null);
 			} catch (DTOException ex) {
 				getControllerListener().sendError("Ошибка изменения типа пограничного дня.", ex);
@@ -198,12 +198,12 @@ public class LimitDayField extends CommonField {
 
 	@Override
 	public void setEditable(boolean isEditable) {
-		((CommonComposite)mControl).setEnabled(isEditable);
+		((CommonComposite)control).setEnabled(isEditable);
 	}
 
 	@Override
 	public void refresh() throws DTOException {
-		Object f = getDTO().getDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter);
+		Object f = getDTO().getDataField(dataFieldName, dataFieldGetter, dataFieldSetter);
 		setLimitDay((LimitDay)f);
 	}
 

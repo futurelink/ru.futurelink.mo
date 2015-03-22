@@ -13,6 +13,7 @@ package ru.futurelink.mo.web.composites.fields;
 
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import ru.futurelink.mo.orm.dto.CommonDTO;
@@ -24,40 +25,60 @@ import ru.futurelink.mo.web.composites.CommonItemComposite;
 import ru.futurelink.mo.web.controller.CommonControllerListener;
 import ru.futurelink.mo.web.controller.CommonItemControllerListener;
 import ru.futurelink.mo.web.controller.CompositeParams;
+import ru.futurelink.mo.web.controller.iface.ICompositeController;
 
 abstract public class CommonField implements IField {
-	protected Control 		mControl;
-	protected String		mDataFieldName;
-	protected String		mDataFieldSetter;
-	protected String		mDataFieldGetter;
-	protected CommonItemControllerListener mParentControllerListener;
-	private	   CommonItemComposite		mDataComposite;
-	private	   IDTO						mDTO;
-	protected ModifyListener			mFieldModifyListener;
-	private	   boolean					mMandatoryFlag;
-	private	   boolean					mUseOnlyOneCondition = true;
-	protected CommonComposite			mParent;
-
+	protected Control 		control;
+	protected String		dataFieldName;
+	protected String		dataFieldSetter;
+	protected String		dataFieldGetter;
+	protected CommonItemControllerListener parentControllerListener;
+	private	   CommonItemComposite		dataComposite;
+	private	   IDTO						dto;
+	protected ModifyListener			fieldModifyListener;
+	private	   boolean					mandatoryFlag;
+	private	   boolean					useOnlyOneCondition = true;
+	protected Composite					parent;
+	private ApplicationSession			session;
+	
+	private ICompositeController		parentController;
+		
 	public CommonField(ApplicationSession session, CommonComposite parent, int style,
 			CompositeParams params, CommonItemComposite dataComposite) {		
-		mParent = parent;
-		mDataComposite = dataComposite;
+		this.parent = parent;
+		this.dataComposite = dataComposite;
+		this.session = session;
 	}
 
 	public CommonField(ApplicationSession session, CommonComposite parent, int style,
 			CompositeParams params, CommonDTO dto) {
-		mParent = parent;		
-		mDTO = dto;
+		this.parent = parent;		
+		this.dto = dto;
+		this.session = session;
 	}
 
+	public void setParentController(ICompositeController controller) {
+		parentController = controller;
+	}
+	
+	public ICompositeController getParentController() {
+		return parentController;
+	}
+	
+	public Composite getParentComposite() {
+		if (parentController != null)
+			return parentController.getComposite();
+		return parent;
+	}
+	
 	public void addModifyListener(ModifyListener listener) {
-		mFieldModifyListener = listener;
+		fieldModifyListener = listener;
 	}
 
 	public void setDataField(String dataField, String dataFieldGetter, String dataFieldSetter) {		
-		mDataFieldName = dataField;
-		mDataFieldGetter = dataFieldGetter;
-		mDataFieldSetter = dataFieldSetter;
+		dataFieldName = dataField;
+		this.dataFieldGetter = dataFieldGetter;
+		this.dataFieldSetter = dataFieldSetter;
 	}
 
 	/**
@@ -66,8 +87,8 @@ abstract public class CommonField implements IField {
 	 */
 	@Override
 	public CommonControllerListener getControllerListener() {
-		if (mDataComposite != null)
-			return mDataComposite.getControllerListener();
+		if (dataComposite != null)
+			return dataComposite.getControllerListener();
 		return null;
 	}
 	
@@ -75,7 +96,7 @@ abstract public class CommonField implements IField {
 	 * Установить полю ссылку на обработчик роительского контроллера.
 	 */
 	public void setParentControllerListener(CommonItemControllerListener listener) {
-		mParentControllerListener = listener;
+		parentControllerListener = listener;
 	}
 
 	/**
@@ -91,9 +112,9 @@ abstract public class CommonField implements IField {
 	 */
 	@Override
 	public IDTO getDTO() {
-		if ((mDataComposite == null) || (mDTO != null)) return mDTO;
-		if (mDataComposite.getDTO() != null) {
-			return mDataComposite.getDTO();
+		if ((dataComposite == null) || (dto != null)) return dto;
+		if (dataComposite.getDTO() != null) {
+			return dataComposite.getDTO();
 		} else {
 			return null;
 		}
@@ -106,7 +127,7 @@ abstract public class CommonField implements IField {
 	 */
 	@Override
 	public void setDTO(IDTO dto) {
-		mDTO = dto;
+		this.dto = dto;
 	}
 	
 	/**
@@ -132,7 +153,7 @@ abstract public class CommonField implements IField {
 	 */
 	@Override
 	public final void setMandatory(boolean isMandatory) {
-		mMandatoryFlag = isMandatory;
+		mandatoryFlag = isMandatory;
 	}
 	
 	/**
@@ -142,59 +163,65 @@ abstract public class CommonField implements IField {
 	 */
 	@Override
 	public final boolean getMandatory() {
-		return mMandatoryFlag;
+		return mandatoryFlag;
 	}
 
 	@Override
 	public void setEditable(boolean isEditable) {
-		mControl.setEnabled(isEditable);
+		control.setEnabled(isEditable);
 	}
 
 	@Override
 	public boolean getEditable() {
-		return mControl.getEnabled();
+		return control.getEnabled();
 	}
 	
 	@Override
 	public String getDataFieldName() {
-		return mDataFieldName;
+		return dataFieldName;
 	}
 
 	@Override
 	public String getDataFieldGetter() {
-		return mDataFieldGetter;
+		return dataFieldGetter;
 	}
 
 	@Override
 	public String getDataFieldSetter() {
-		return mDataFieldSetter;
+		return dataFieldSetter;
 	}
 		
 	public boolean getUseOnlyOneCondition() {
-		return mUseOnlyOneCondition;
+		return useOnlyOneCondition;
 	}
 	
 	public void setUseOnlyOneCondition(boolean useOnlyOneCondition) {
-		mUseOnlyOneCondition = useOnlyOneCondition;
+		this.useOnlyOneCondition = useOnlyOneCondition;
 	}
 
 	public void setFont(Font font) {
-		mControl.setFont(font);
+		control.setFont(font);
 	}
 	
 	public Control getControl() {
-		return mControl;
+		return control;
 	}
 	
 	public void setFocus() {
-		mControl.setFocus();
+		control.setFocus();
 	}
 
 	public void setEnabled(boolean enabled) {
-		mControl.setEnabled(enabled);
+		control.setEnabled(enabled);
 	}
 	
 	public void setLayoutData(Object layoutData) {
-		mControl.setLayoutData(layoutData);
+		control.setLayoutData(layoutData);
+	}
+	
+	public ApplicationSession getSession() {
+		if (parentController != null)
+			return parentController.getSession();
+		return session;
 	}
 }

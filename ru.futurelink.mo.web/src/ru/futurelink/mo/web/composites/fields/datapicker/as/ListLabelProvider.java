@@ -9,25 +9,35 @@
  *    Pavlov Denis - initial API and implementation
  ******************************************************************************/
 
-package ru.futurelink.mo.web.recycle;
+package ru.futurelink.mo.web.composites.fields.datapicker.as;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
+import org.eclipse.jface.viewers.LabelProvider;
+
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
-import ru.futurelink.mo.web.composites.table.CommonContentProvider;
 
 /**
- * Провайдер для корзины - показывает элементы с deleteFlag > 0, в отличие от
- * обычного провайдера.  
- * 
  * @author pavlov
  *
  */
-public class RecycleTableContentProvider extends CommonContentProvider {
+public class ListLabelProvider extends LabelProvider {
 	private static final long serialVersionUID = 1L;
 
-	@Override
-	protected boolean getIsDisplayable(CommonDTO element) throws DTOException {
-		return true;
+	private String displayColumnName;
+	
+	public ListLabelProvider(String displayColumnName) {
+		this.displayColumnName = displayColumnName;
 	}
 	
+	@Override
+	public String getText(Object element) {		
+		try {
+			Object field = ((IDTO)element).getDataField(displayColumnName);
+			if (field != null)
+				return field.toString();
+			return "-";
+		} catch (DTOException ex) {
+			return ex.toString();
+		}
+	}
 }

@@ -42,7 +42,7 @@ abstract public class CommonListComposite
 	private static final long serialVersionUID = 1L;
 
 	protected CommonDTOList<? extends IDTO>	dto;
-	private IDTO								activeData;
+	private IDTO							activeData;
 	
 	public CommonListComposite(ApplicationSession session,
 			Composite parent, int style, CompositeParams params) {

@@ -44,8 +44,8 @@ public class DateField extends CommonField {
 	}
 
 	protected void createControls(int style) {
-		mControl = new DateTime(mParent, SWT.DROP_DOWN | SWT.BORDER | (style & SWT.READ_ONLY));
-		((DateTime)mControl).addSelectionListener(new SelectionListener() {			
+		control = new DateTime(parent, SWT.DROP_DOWN | SWT.BORDER | (style & SWT.READ_ONLY));
+		((DateTime)control).addSelectionListener(new SelectionListener() {			
 			private static final long serialVersionUID = 1L;
 			@Override
 			public void widgetDefaultSelected(SelectionEvent arg0) {	}
@@ -53,12 +53,12 @@ public class DateField extends CommonField {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				try {
-					Calendar c = Calendar.getInstance(mParent.getSession().getUser().getTimeZone());
-					c.set(  ((DateTime)mControl).getYear(), 
-							((DateTime)mControl).getMonth(), 
-							((DateTime)mControl).getDay());
+					Calendar c = Calendar.getInstance(getSession().getUser().getTimeZone());
+					c.set(  ((DateTime)control).getYear(), 
+							((DateTime)control).getMonth(), 
+							((DateTime)control).getDay());
 					if (EditorDTO.class.isAssignableFrom(getDTO().getClass())) {
-						getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, c.getTime());
+						getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, c.getTime());
 					}
 
 					if (getControllerListener() != null)
@@ -74,7 +74,7 @@ public class DateField extends CommonField {
 		if (date != null) {			
 			Calendar c = Calendar.getInstance();	// In server time
 			c.setTime(date);			
-			((DateTime)mControl).setDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+			((DateTime)control).setDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
 		}
 		if (getControllerListener() != null)
 			((CommonItemControllerListener)getControllerListener()).dataChanged(getSelf());
@@ -83,30 +83,30 @@ public class DateField extends CommonField {
 	public Date getDate() {
 		Calendar c = Calendar.getInstance();
 		c.set(getYear(), getMonth(), getDay(), 
-			((DateTime)mControl).getHours(), ((DateTime)mControl).getMinutes(), ((DateTime)mControl).getSeconds());
+			((DateTime)control).getHours(), ((DateTime)control).getMinutes(), ((DateTime)control).getSeconds());
 		return c.getTime();
 	}
 	
 	public Integer getMonth() {
-		return ((DateTime)mControl).getMonth();
+		return ((DateTime)control).getMonth();
 	}
 
 	public Integer getDay() {
-		return ((DateTime)mControl).getDay();
+		return ((DateTime)control).getDay();
 	}
 
 	public Integer getYear() {
-		return ((DateTime)mControl).getYear();
+		return ((DateTime)control).getYear();
 	}
 
 	@Override
 	public void refresh() throws DTOException {
 		if (getDTO() != null) {
-			Object f = getDTO().getDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter);
+			Object f = getDTO().getDataField(dataFieldName, dataFieldGetter, dataFieldSetter);
 			if (f != null) {
 				setDate((Date)f);
 			} else {
-				getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, getDate());
+				getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, getDate());
 			}
 		}
 	}

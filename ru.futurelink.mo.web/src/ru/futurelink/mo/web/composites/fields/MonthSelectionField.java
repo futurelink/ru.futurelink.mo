@@ -66,15 +66,15 @@ public class MonthSelectionField extends CommonField {
 	}	
 
 	private void createControls() {		
-		mControl = new CommonComposite(mParent.getSession(), mParent, SWT.NONE, null);
+		control = new CommonComposite(getSession(), parent, SWT.NONE, null);
 
 		GridLayout gl = new GridLayout(2, true);
-		((CommonComposite)mControl).setLayout(gl);
+		((CommonComposite)control).setLayout(gl);
 		
-		mMonthSelection = new Combo(((CommonComposite)mControl), SWT.BORDER | SWT.READ_ONLY);
+		mMonthSelection = new Combo(((CommonComposite)control), SWT.BORDER | SWT.READ_ONLY);
 		mMonthSelection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 		for (int i = 0; i < 12; i++) {
-			mMonthSelection.add(mParent.getLocaleString(mMonths[i]));
+			mMonthSelection.add(((CommonComposite)getParentComposite()).getLocaleString(mMonths[i]));
 		}
 		mMonthSelection.addSelectionListener(new SelectionListener() {		
 			private static final long serialVersionUID = 1L;
@@ -91,7 +91,7 @@ public class MonthSelectionField extends CommonField {
 			public void widgetDefaultSelected(SelectionEvent arg0) {}
 		});
 
-		mYearSelection = new Combo(((CommonComposite)mControl), SWT.BORDER | SWT.READ_ONLY);
+		mYearSelection = new Combo(((CommonComposite)control), SWT.BORDER | SWT.READ_ONLY);
 		mYearSelection.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 		mYearSelection.addSelectionListener(new SelectionListener() {		
 			private static final long serialVersionUID = 1L;
@@ -110,6 +110,7 @@ public class MonthSelectionField extends CommonField {
 
 		mYearSelection.add("2013");
 		mYearSelection.add("2014");
+		mYearSelection.add("2015");
 	}
 	
 	public void setUseDateRange(boolean useDateRange) {
@@ -122,13 +123,13 @@ public class MonthSelectionField extends CommonField {
 			// например, для быстрого фильтра на панели инструментов, нужно очищать
 			// поле фильтрации, чтобы использовать только одно условие.
 			if (getUseOnlyOneCondition())
-				getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, null);
+				getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, null);
 
 			if (mUseDateRange) {
-				getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, 
+				getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, 
 					formatDateRange());
 			} else {
-				getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, 
+				getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, 
 					formatDate());
 			}
 
@@ -170,17 +171,20 @@ public class MonthSelectionField extends CommonField {
 		
 		Calendar c = Calendar.getInstance();
 		c.set(getYear(), getMonth()-1, 1, 0, 0, 0);
+
+		// Get last day of month before time zone shifting
+		Integer lastDay = c.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+		// Shift time zone to user time
 		c.add(Calendar.MILLISECOND, 
 				TimeZone.getDefault().getRawOffset() - 
-				mParent.getSession().getUser().getTimeZone().getRawOffset());
+				getSession().getUser().getTimeZone().getRawOffset());
 		range.setBeginDate(c.getTime());
-
-		Integer lastDay = c.getActualMaximum(Calendar.DAY_OF_MONTH);
 
 		c.set(getYear(), getMonth()-1, lastDay, 23, 59, 59);
 		c.add(Calendar.MILLISECOND, 
 				TimeZone.getDefault().getRawOffset() - 
-				mParent.getSession().getUser().getTimeZone().getRawOffset());
+				getSession().getUser().getTimeZone().getRawOffset());
 		range.setEndDate(c.getTime());
 
 		System.out.println("DateRange set to "+range.getBeginDate().toString()+" to "+range.getEndDate().toString());
@@ -249,7 +253,7 @@ public class MonthSelectionField extends CommonField {
 
 	@Override
 	public void setEditable(boolean isEditable) {
-		mControl.setEnabled(isEditable);
+		control.setEnabled(isEditable);
 	}
 
 	@Override

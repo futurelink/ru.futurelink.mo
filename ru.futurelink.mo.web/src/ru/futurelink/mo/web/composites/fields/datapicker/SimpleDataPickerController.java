@@ -47,7 +47,7 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 	private Class<?>				mTableClass;
 
 	private Map<String, ArrayList<Object>> mQueryConditions;
-	private String					mOrderBy;
+	private String				mOrderBy;
 	private boolean				mPublic;
 
 	private EditorDTOList<EditorDTO> mList;

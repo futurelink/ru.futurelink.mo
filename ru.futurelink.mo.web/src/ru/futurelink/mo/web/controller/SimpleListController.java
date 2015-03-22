@@ -320,7 +320,7 @@ abstract public class SimpleListController
 
 		setToolEnabled("create", true);
 
-		((CommonListComposite)getComposite()).refresh();		
+		((CommonListComposite)getComposite()).refresh();
 	}
 
 	@Override

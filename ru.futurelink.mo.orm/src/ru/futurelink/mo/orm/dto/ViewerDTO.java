@@ -20,6 +20,7 @@ import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
+import ru.futurelink.mo.orm.iface.IModelObject;
 
 /**
  * Simple DTO for viewing data only.
@@ -30,7 +31,7 @@ public class ViewerDTO extends CommonDTO {
 
 	private static final long serialVersionUID = 1L;
 
-	public ViewerDTO(ModelObject data) {
+	public ViewerDTO(IModelObject data) {
 		super(data);
 	}
 	

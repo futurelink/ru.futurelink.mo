@@ -22,7 +22,7 @@ import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.table.CommonTable;
-import ru.futurelink.mo.web.composites.table.CommonTableContentProvider;
+import ru.futurelink.mo.web.composites.table.CommonContentProvider;
 import ru.futurelink.mo.web.controller.CompositeParams;
 
 public class HistoryListTable extends CommonTable {
@@ -44,7 +44,7 @@ public class HistoryListTable extends CommonTable {
 
 	@Override
 	protected IContentProvider createContentProvider() {
-		return new CommonTableContentProvider();
+		return new CommonContentProvider();
 	}
 
 	@Override

@@ -9,25 +9,16 @@
  *    Pavlov Denis - initial API and implementation
  ******************************************************************************/
 
-package ru.futurelink.mo.web.recycle;
+package ru.futurelink.mo.web.composites.fields.datapicker.as;
 
-import ru.futurelink.mo.orm.dto.CommonDTO;
+import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
-import ru.futurelink.mo.web.composites.table.CommonContentProvider;
+import ru.futurelink.mo.web.controller.CommonControllerListener;
 
 /**
- * Провайдер для корзины - показывает элементы с deleteFlag > 0, в отличие от
- * обычного провайдера.  
- * 
  * @author pavlov
  *
  */
-public class RecycleTableContentProvider extends CommonContentProvider {
-	private static final long serialVersionUID = 1L;
-
-	@Override
-	protected boolean getIsDisplayable(CommonDTO element) throws DTOException {
-		return true;
-	}
-	
+public interface AutosuggestControllerListener extends CommonControllerListener {
+	public void setSelectedDTO(IDTO data) throws DTOException;
 }

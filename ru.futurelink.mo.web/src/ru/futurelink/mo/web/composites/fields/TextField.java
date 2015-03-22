@@ -39,17 +39,16 @@ import ru.futurelink.mo.web.controller.CompositeParams;
  *
  */
 public class TextField extends CommonField {
-	//protected ModifyListener 	mModifyListener;
-	protected String			mInitialText;
-	protected String			mRealText;
-	private String				mHint;
-	private String				mTextBeforeFocus;
+	protected String		mInitialText;
+	protected String		mRealText;
+	private String			mHint;
+	private String			mTextBeforeFocus;
 	
-	private ClientListener 		mValidateListener;
+	private ClientListener 	mValidateListener;
 	private boolean			mUppercase;	
 	private boolean			mDisallowSpaces;
 
-	private List<String>		mSource;
+	private List<String>	mSource;
 
 	private boolean			mStopOnError;
 	
@@ -87,10 +86,10 @@ public class TextField extends CommonField {
 	
 	private final void setValidator() {
 		if (mValidateListener != null)
-			mControl.removeListener(SWT.Verify, mValidateListener);	
+			control.removeListener(SWT.Verify, mValidateListener);	
 
 		mValidateListener = new ClientListener(generateValidator());
-		mControl.addListener(SWT.Verify, mValidateListener);		
+		control.addListener(SWT.Verify, mValidateListener);		
 	}
 	
 	/**
@@ -128,23 +127,23 @@ public class TextField extends CommonField {
 		mStyle = style;
 
 		if ((style & TextField.COMBO) == TextField.COMBO) {
-			mControl = new Combo(mParent, SWT.BORDER);
+			control = new Combo(parent, SWT.BORDER);
 		} else {
-			mControl = new Text(mParent, SWT.BORDER | (style & SWT.READ_ONLY) | (style & SWT.MULTI));
+			control = new Text(parent, SWT.BORDER | (style & SWT.READ_ONLY) | (style & SWT.MULTI));
 
-			((Text)mControl).addModifyListener(new ModifyListener() {			
+			((Text)control).addModifyListener(new ModifyListener() {			
 				private static final long serialVersionUID = 1L;
 
 				@Override
 				public void modifyText(ModifyEvent arg0) {
-					if (mFieldModifyListener != null)
-						mFieldModifyListener.modifyText(arg0);				
+					if (fieldModifyListener != null)
+						fieldModifyListener.modifyText(arg0);				
 				}
 			});
 		}
 		setTextLimit(255);	// По-умолчанию ограничение 255 символов
 		
-		mControl.addFocusListener(new FocusListener() {
+		control.addFocusListener(new FocusListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -165,7 +164,7 @@ public class TextField extends CommonField {
 					// Если в данных пусто - покажем подсказку
 					if ((mStyle & TextField.COMBO) != TextField.COMBO) {
 						if ((getText() == null) || getText().equals("")) {
-							((Text)mControl).setText(getHint());
+							((Text)control).setText(getHint());
 						}
 					}
 
@@ -188,8 +187,8 @@ public class TextField extends CommonField {
 
 				// Сбросим подсказку, если получили фокус, и текст равер подсказке
 				if ((mStyle & TextField.COMBO) != TextField.COMBO) {
-					if (((Text)mControl).getText().equals(getHint())) {
-						((Text)mControl).setText(getText());
+					if (((Text)control).getText().equals(getHint())) {
+						((Text)control).setText(getText());
 					}
 				}
 			}
@@ -207,13 +206,13 @@ public class TextField extends CommonField {
 
 		// Если текст изменился на подсказку - то считаем что текст пустой
 		if ((mStyle & TextField.COMBO) != TextField.COMBO) {
-			if (((Text)mControl).getText().equals(getHint())) {
+			if (((Text)control).getText().equals(getHint())) {
 				mRealText = new String();
 			} else {
-				mRealText = String.copyValueOf(((Text)mControl).getText().toCharArray());
+				mRealText = String.copyValueOf(((Text)control).getText().toCharArray());
 			}
 		} else {
-			mRealText = String.copyValueOf(((Combo)mControl).getText().toCharArray());
+			mRealText = String.copyValueOf(((Combo)control).getText().toCharArray());
 		}
 
 		// Вызываем этот метод только для DTO предназначенных для редакитрования					
@@ -224,17 +223,17 @@ public class TextField extends CommonField {
 			
 			// Это касается фильтра
 			if (FilterDTO.class.isAssignableFrom(getDTO().getClass()) && getUseOnlyOneCondition())
-				getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, null);
+				getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, null);
 
 			// Если поле используется для DTO фильтра, то пустое значение = null, иначе,
 			// пустое значение - это пустая строка.
 			if ((getText() == null) || getText().equals(getHint())) {
 				if (FilterDTO.class.isAssignableFrom(getDTO().getClass()))
-					getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, null);
+					getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, null);
 				else
-					getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, getValue());
+					getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, getValue());
 			} else {
-				getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, getValue());
+				getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, getValue());
 			}
 			
 			isModified = true;
@@ -257,15 +256,15 @@ public class TextField extends CommonField {
 	public void setText(String text) throws DTOException {
 		if ((text == null) || text.equals("")) {
 			if ((mStyle & TextField.COMBO) != TextField.COMBO) {
-				((Text)mControl).setText(getHint());
+				((Text)control).setText(getHint());
 				mRealText = text;
 			}
 		} else {
 			if ((mStyle & TextField.COMBO) != TextField.COMBO) {
-				((Text)mControl).setText(text);
-				((Text)mControl).setSelection(text.length());	// Переместим курсор в конец
+				((Text)control).setText(text);
+				((Text)control).setSelection(text.length());	// Переместим курсор в конец
 			} else {
-				((Combo)mControl).setText(text);			
+				((Combo)control).setText(text);			
 			}
 			mRealText = String.copyValueOf(text.toCharArray());
 		}
@@ -289,9 +288,9 @@ public class TextField extends CommonField {
 	 */
 	public void setTextLimit(int limit) {
 		if ((mStyle & TextField.COMBO) == TextField.COMBO) {
-			((Combo)mControl).setTextLimit(limit);
+			((Combo)control).setTextLimit(limit);
 		} else {
-			((Text)mControl).setTextLimit(limit);
+			((Text)control).setTextLimit(limit);
 		}
 	}
 	
@@ -303,8 +302,8 @@ public class TextField extends CommonField {
 		if ((mStyle & TextField.COMBO) == TextField.COMBO) {
 			
 		} else {
-			if (((Text)mControl).getEditable() != isEditable) {
-				((Text)mControl).setEditable(isEditable);
+			if (((Text)control).getEditable() != isEditable) {
+				((Text)control).setEditable(isEditable);
 			}			
 		}
 	}
@@ -315,7 +314,7 @@ public class TextField extends CommonField {
 	 * @param color
 	 */
 	public void setForeground(Color color) {
-		mControl.setForeground(color);
+		control.setForeground(color);
 	}
 	
 	/**
@@ -324,14 +323,14 @@ public class TextField extends CommonField {
 	 * @param color
 	 */
 	public void setBackground(Color color) {
-		mControl.setBackground(color);
+		control.setBackground(color);
 	}
 
 	@Override
 	public void refresh() throws DTOException {
 		Object f = null;
 		if (getDTO() != null)
-			f = getDTO().getDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter);
+			f = getDTO().getDataField(dataFieldName, dataFieldGetter, dataFieldSetter);
 		setText(f != null ? f.toString() : "");
 	}
 
@@ -341,7 +340,7 @@ public class TextField extends CommonField {
 	 * @param character
 	 */
 	public void setEchoChar(char character) {
-		((Text)mControl).setEchoChar(character);
+		((Text)control).setEchoChar(character);
 	}
 	
 	/**
@@ -355,7 +354,7 @@ public class TextField extends CommonField {
 			
 		} else {
 			if ((getText() == null) || getText().equals(""))
-				((Text)mControl).setText(mHint);
+				((Text)control).setText(mHint);
 		}
 	}
 	
@@ -385,9 +384,9 @@ public class TextField extends CommonField {
 	@Override
 	public void handleMandatory() {
 		if (getMandatory()&&isEmpty()) {
-			mControl.setBackground(new Color(mControl.getDisplay(), 255, 169, 169));
+			control.setBackground(new Color(control.getDisplay(), 255, 169, 169));
 		} else {
-			mControl.setBackground(new Color(mControl.getDisplay(), 255, 255, 255));
+			control.setBackground(new Color(control.getDisplay(), 255, 255, 255));
 		}
 	}
 
@@ -400,7 +399,7 @@ public class TextField extends CommonField {
 		mSource = sourceList;
 		if ((mStyle & TextField.COMBO) == TextField.COMBO) {
 			for (String s : mSource) {
-				((Combo)mControl).add(s);
+				((Combo)control).add(s);
 			}
 		}
 	}

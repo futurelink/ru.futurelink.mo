@@ -43,8 +43,8 @@ public class CheckBoxField extends CommonField {
 	}
 
 	private void createField() {
-		mControl = new Button(mParent, SWT.CHECK);
-		((Button)mControl).addSelectionListener(new SelectionListener() {
+		control = new Button(parent, SWT.CHECK);
+		((Button)control).addSelectionListener(new SelectionListener() {
 			
 			private static final long serialVersionUID = 1L;
 			
@@ -52,7 +52,7 @@ public class CheckBoxField extends CommonField {
 			public void widgetSelected(SelectionEvent arg0) {
 				try {
 					if (EditorDTO.class.isAssignableFrom(getDTO().getClass())) {
-						getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, ((Button)mControl).getSelection());
+						getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, ((Button)control).getSelection());
 					}
 					
 					if (getControllerListener() != null) {
@@ -70,16 +70,16 @@ public class CheckBoxField extends CommonField {
 	}
 	
 	public void setText(String text) {
-		((Button)mControl).setText(text);
+		((Button)control).setText(text);
 	}
 
 	@Override
 	public void refresh() throws DTOException {
 		boolean selected = false;
-		if (getDTO().getDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter) != null) {
-			selected = (Boolean)getDTO().getDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter);
+		if (getDTO().getDataField(dataFieldName, dataFieldGetter, dataFieldSetter) != null) {
+			selected = (Boolean)getDTO().getDataField(dataFieldName, dataFieldGetter, dataFieldSetter);
 		}
-		((Button)mControl).setSelection(selected);
+		((Button)control).setSelection(selected);
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class CheckBoxField extends CommonField {
 
 	@Override
 	public Object getValue() {
-		return ((Button)mControl).getSelection();
+		return ((Button)control).getSelection();
 	}
 
 }

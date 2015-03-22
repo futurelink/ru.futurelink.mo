@@ -11,6 +11,9 @@
 
 package ru.futurelink.mo.web.controller.iface;
 
+import javax.xml.soap.SOAPException;
+
+import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
@@ -39,6 +42,7 @@ public interface IListController
 	
 	/**
 	 * Обработка запроса данных для списка.
+	 * @throws SOAPException 
 	 */
 	public void handleDataQuery() throws DTOException;
 
@@ -61,4 +65,11 @@ public interface IListController
 	 * @return
 	 */
 	public IDTO getActiveData();
+	
+	/**
+	 * Get controller list DTO.
+	 * 
+	 * @return
+	 */
+	public CommonDTOList<? extends IDTO> getDTO() throws DTOException;
 }

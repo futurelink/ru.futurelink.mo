@@ -13,7 +13,6 @@ package ru.futurelink.mo.orm.entities.security;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -24,7 +23,7 @@ import ru.futurelink.mo.orm.pm.PersistentManagerSession;
 @Entity(name = "Client")
 @Table(name = "CLIENTS")
 @NamedQueries({
-	@NamedQuery(name="Client.keyExists", query="SELECT c FROM Client c where c.mOwner = :owner and c.mSecret = :secret")
+	@NamedQuery(name="Client.keyExists", query="SELECT c FROM Client c where c.owner = :owner and c.secret = :secret and c.deleteFlag = 0")
 })
 public class Client extends CommonObject {
 	private static final long serialVersionUID = 1L;
@@ -34,14 +33,9 @@ public class Client extends CommonObject {
 	public Client(PersistentManagerSession manager) {
 		super(manager);
 	}
-
-	@JoinColumn(name = "owner", referencedColumnName="id")
-	private User mOwner;
-	public void setOwner(User user) { mOwner = user; }
-	public User getOwner() { return mOwner; }
 	
 	@Column(name = "secret")
-	private String mSecret;
-	public void setSecret(String secret) { mSecret = secret; }
-	public String getSecret() { return mSecret; }  
+	private String secret;
+	public void setSecret(String secret) { this.secret = secret; }
+	public String getSecret() { return secret; }  
 }

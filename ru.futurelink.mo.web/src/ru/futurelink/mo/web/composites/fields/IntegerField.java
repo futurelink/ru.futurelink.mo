@@ -56,10 +56,10 @@ public class IntegerField extends TextField {
 	protected void createControls(int style) {
 		super.createControls(style);
 		
-		((Text)mControl).setText("");
+		((Text)control).setText("");
 	
 		ClientListener clientListener = new ClientListener(digitsOnlyJS);
-		mControl.addListener(SWT.Verify, clientListener);
+		control.addListener(SWT.Verify, clientListener);
 	}
 	
 	@Override
@@ -70,7 +70,7 @@ public class IntegerField extends TextField {
 	
 	@Override
 	public boolean isEmpty() {
-		return (((Text)mControl).getText() == null) || ((Text)mControl).getText().isEmpty() || 
-				(Integer.valueOf(((Text)mControl).getText()) == 0);
+		return (((Text)control).getText() == null) || ((Text)control).getText().isEmpty() || 
+				(Integer.valueOf(((Text)control).getText()) == 0);
 	}
 }

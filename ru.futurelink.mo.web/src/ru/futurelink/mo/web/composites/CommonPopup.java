@@ -16,6 +16,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Shell;
@@ -32,9 +33,9 @@ import ru.futurelink.mo.web.app.ApplicationSession;
 public class CommonPopup extends Dialog {
 
 	private static final long serialVersionUID = 1L;
-	private CommonComposite 	attachedComposite;
-	private Object				result;
-	private Control			lastFocusedControl;
+	private Composite 	attachedComposite;
+	private Object		result;
+	private Control		lastFocusedControl;
 	
 	public CommonPopup(ApplicationSession session, Shell parent, int style) {
 		super(parent, style);
@@ -74,7 +75,7 @@ public class CommonPopup extends Dialog {
 	 *  
 	 * @param composite
 	 */
-	public void attachComposite(CommonComposite composite) {
+	public void attachComposite(Composite composite) {
 		attachedComposite = composite;
 
 		attachedComposite.setParent(shell);
@@ -94,15 +95,16 @@ public class CommonPopup extends Dialog {
 	}
 
 	public void close() {
-		shell.close();
+		if (shell != null)
+			shell.close();
 	}
 	
 	public Integer open() {
 		// В режиме диалога нужно проверить создался ли композит, если произошла
 		// какая-то ошибка, по причине которой окно должно быть закрыто или не должно быть
 		// открыто, то мы не открываем диалог вообще.		
-		shell = new UnfocusableShell(getParent(), SWT.RESIZE);
-		
+		shell = new UnfocusableShell(getParent(), SWT.RESIZE | SWT.APPLICATION_MODAL);
+
 		// Этот костыль нужен на случай если шелл будет принимать фокус
 		lastFocusedControl = getShell().getDisplay().getFocusControl();
 		

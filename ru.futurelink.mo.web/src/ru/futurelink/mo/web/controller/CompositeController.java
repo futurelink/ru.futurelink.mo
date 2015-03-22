@@ -157,12 +157,12 @@ public abstract class CompositeController
 					methParams.add(meth.invoke(this));
 				} catch (NoSuchMethodException | SecurityException ex) {
 					methParams.add(null);
-					logger().error("No such method method {} on {}, so NULL will be used", 
+					logger().error("No such method method '{}' in {} on createAccessChecker so NULL will be used", 
 							method, getClass().getSimpleName());
 				} catch (IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException ex) {
 					methParams.add(null);
-					logger().error("Could not execute method {} on {}, so NULL will be used", 
+					logger().error("Could not execute method '{}' in {} on createAccessChecker so NULL will be used", 
 							method, getClass().getSimpleName());
 				}
 			}

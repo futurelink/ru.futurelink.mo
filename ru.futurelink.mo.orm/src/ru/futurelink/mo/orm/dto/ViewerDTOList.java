@@ -15,9 +15,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
+import ru.futurelink.mo.orm.iface.IModelObject;
 
 /**
  * @author pavlov
@@ -40,19 +40,23 @@ public class ViewerDTOList<T extends CommonDTO> extends CommonDTOList<T> {
 	 * @param sourceList
 	 * @throws DTOException
 	 */
-	public void addObjectList(List<? extends ModelObject> sourceList)
+	public void addObjectList(List<? extends IModelObject> sourceList)
 			throws DTOException {
 		if ((sourceList == null) || (sourceList.size() == 0)) {
 			clear();
 			return;
 		} else {
-			for (ModelObject object : sourceList) {
+			for (IModelObject object : sourceList) {
 				try {
-					Constructor<T> ctr = getDTOClass().getConstructor(ModelObject.class);
+					Constructor<T> ctr = getDTOClass().getConstructor(IModelObject.class);
 					T dto = ctr.newInstance(object);
 					if (dto != null) {
+						// Execute data adding handler
+						onAddDTOItem(dto, object);
+						
+						// Add data model to DTO
 						if (dto.getAccessChecker() == null) dto.addAccessChecker(getAccessChecker());
-						addDTOItem(dto);						
+						addDTOItem(dto);
 					} else {
 						throw new DTOException("Ошибка, созданный DTO = null", null);
 					}
@@ -68,5 +72,6 @@ public class ViewerDTOList<T extends CommonDTO> extends CommonDTOList<T> {
 			}		
 		}			
 	}
-
+	
+	public void onAddDTOItem(IDTO dto, IModelObject data) {}
 }

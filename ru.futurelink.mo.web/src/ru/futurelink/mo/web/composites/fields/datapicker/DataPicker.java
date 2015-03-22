@@ -41,7 +41,6 @@ import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonComposite;
 import ru.futurelink.mo.web.composites.CommonItemComposite;
 import ru.futurelink.mo.web.composites.fields.CommonField;
-import ru.futurelink.mo.web.composites.fields.IField;
 import ru.futurelink.mo.web.controller.CommonItemController;
 import ru.futurelink.mo.web.controller.CommonItemControllerListener;
 import ru.futurelink.mo.web.controller.CompositeParams;
@@ -52,11 +51,13 @@ import ru.futurelink.mo.web.controller.CompositeParams;
  * @author Futurelink
  *
  */
-public class DataPicker extends CommonField implements IField {
+public class DataPicker extends CommonField {
 
-	private Text	mEdit;
+	public static String	HINTSTRING = "- не выбрано -";
+
+	protected Text	mEdit;
 	private Label	mSelectButton;
-	private Label  mClearButton;
+	private Label	mClearButton;
 	
 	private ModifyListener 			mModifyListener;
 	private SelectionListener		mDataPickListener;
@@ -64,7 +65,7 @@ public class DataPicker extends CommonField implements IField {
 	private Class<? extends ICommonObject> 		mDataClass;
 	private Class<?>								mTableClass;
 	private Class<? extends CommonItemController> mItemControllerClass;
-	private CompositeParams							mItemDialogParams;
+	private CompositeParams						mItemDialogParams;
 	
 	private Class<? extends CommonDataPickerController> mPickerController;
 	
@@ -79,11 +80,11 @@ public class DataPicker extends CommonField implements IField {
 	
 	// Свойства используемые для определения 
 	// создания элемента из списка выбора
-	private boolean		mAllowCreate;
+	private boolean		allowCreate;
 
 	// Не учитывать создателя-владельца элемента при
 	// построении списка (публичный список-справочник)
-	private boolean		mPublic;
+	private boolean		publicData;
 	
 	protected CommonItemControllerListener mParentControllerListener;
 	
@@ -96,8 +97,7 @@ public class DataPicker extends CommonField implements IField {
 			) {
 		super(session, parent, style, params, dataComposite);
 		
-		mPickerController = pickerController;
-		
+		mPickerController = pickerController;		
 		createControls(style);
 	}
 
@@ -109,14 +109,13 @@ public class DataPicker extends CommonField implements IField {
 			Class<? extends CommonDataPickerController> pickerController
 			) {
 		super(session, parent, style, params, dto);
-		
-		mPickerController = pickerController;
 
+		mPickerController = pickerController;
 		createControls(style);
 	}
-
-	private void createControls(int style) {
-		mControl = new CommonComposite(mParent.getSession(), mParent, SWT.BORDER, null);
+	
+	protected void createControls(int style) {
+		control = new CommonComposite(getSession(), parent, SWT.BORDER, null);
 
 		GridLayout gl = new GridLayout(3, false);
 		gl.marginWidth = 0;
@@ -124,9 +123,9 @@ public class DataPicker extends CommonField implements IField {
 		gl.horizontalSpacing = 0;
 		gl.verticalSpacing = 0;
 
-		((CommonComposite)mControl).setLayout(gl);
+		((CommonComposite)control).setLayout(gl);
 
-		mEdit = new Text((Composite) mControl, SWT.READ_ONLY);
+		mEdit = new Text((Composite) control, SWT.NONE | SWT.READ_ONLY | style);
 		mEdit.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 		mEdit.pack();
 
@@ -135,10 +134,11 @@ public class DataPicker extends CommonField implements IField {
 		gd.heightHint = 24;
 		gd.widthHint = 24;
 
-		mClearButton = new Label((Composite) mControl, SWT.NONE);
+		// Create clear button
+		mClearButton = new Label((Composite) control, SWT.NONE);
 		mClearButton.setLayoutData(gd);
 		mClearButton.setData(RWT.CUSTOM_VARIANT, "dataPickerButton");
-		mClearButton.setImage(new Image(mControl.getDisplay(), getClass().getResourceAsStream("/images/24/delete.png")));
+		mClearButton.setImage(new Image(control.getDisplay(), getClass().getResourceAsStream("/images/24/delete.png")));
 		mClearButton.pack();
 		if ((style & SWT.READ_ONLY) > 0) mClearButton.setEnabled(true);
 		mClearButton.addMouseListener(new MouseListener() {
@@ -155,7 +155,7 @@ public class DataPicker extends CommonField implements IField {
 					setSelectedDTO(null);
 					refresh();
 				} catch (DTOException ex) {
-					// TODO hand;e this error!
+					// TODO handle this error!
 				}
 			}
 			
@@ -168,10 +168,11 @@ public class DataPicker extends CommonField implements IField {
 		gd2.heightHint = 24;
 		gd2.widthHint = 24;
 
-		mSelectButton = new Label((Composite) mControl, SWT.NONE);
+		// Create selection button
+		mSelectButton = new Label((Composite) control, SWT.NONE);
 		mSelectButton.setLayoutData(gd2);
 		mSelectButton.setData(RWT.CUSTOM_VARIANT, "dataPickerButton");
-		mSelectButton.setImage(new Image(mControl.getDisplay(), getClass().getResourceAsStream("/images/24/find.png")));
+		mSelectButton.setImage(new Image(control.getDisplay(), getClass().getResourceAsStream("/images/24/find.png")));
 		mSelectButton.pack();
 		if ((style & SWT.READ_ONLY) > 0) mSelectButton.setEnabled(true);
 		mSelectButton.addMouseListener(new MouseListener() {
@@ -210,7 +211,7 @@ public class DataPicker extends CommonField implements IField {
 	 */
 	public IDTO getSelectedDTO() throws DTOException {
 		if (getDTO() != null)
-			return (IDTO) getDTO().getDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter);
+			return (IDTO) getDTO().getDataField(dataFieldName, dataFieldGetter, dataFieldSetter);
 		else
 			return null;
 	}
@@ -229,30 +230,30 @@ public class DataPicker extends CommonField implements IField {
 			// Set current selected item with value got from getDTO() method
 			if (getDTO() != null) {
 				Object dataToSet = null;
-				// Это касается фильтра
+
+				// This is for filter DTO only
 				if (FilterDTO.class.isAssignableFrom(getDTO().getClass()) && getUseOnlyOneCondition())
-					getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, null);
+					getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, null);
 
 				// If we need to set data from DTO field, get it an set.
 				if ((data != null) && (mSelectedFieldName != null) && (mSelectedFieldGetterName != null))
 					dataToSet = data.getDataField(mSelectedFieldName, mSelectedFieldGetterName, null);
 				else
 					dataToSet = data;			
-				getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, dataToSet);
+				getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, dataToSet);
 			}
 
 			if (mModifyListener != null) {
 				Event e = new Event();
-				e.widget = mControl;
-				e.display = mControl.getDisplay();
+				e.widget = control;
+				e.display = control.getDisplay();
 				mModifyListener.modifyText(new ModifyEvent(e)); // Отправляем событие
-			}
+			}		
 		//}
 	}
 
 	@Override
 	public void refresh() throws DTOException {
-		// Display selected item display field value
 		if (!mDisplayFieldName.isEmpty() && !mDisplayFieldGetterName.isEmpty()) {
 			if (getSelectedDTO() != null)
 				mEdit.setText(
@@ -260,9 +261,10 @@ public class DataPicker extends CommonField implements IField {
 				);
 			else
 				//mEdit.setText(getLocaleString("noValue"));
-				mEdit.setText("- не выбрано -");
+				if (!mEdit.isFocusControl())
+					mEdit.setText(HINTSTRING);
 		}
-
+		
 		handleMandatory();
 	}
 	
@@ -322,14 +324,14 @@ public class DataPicker extends CommonField implements IField {
 	}
 	
 	/**
-	 * Отвязать обработчик кнопки выбора данных.
+	 * Remove data pick listener.
 	 */
 	final public void removeDataPickListener() {
 		mDataPickListener = null;
 	}
 	
 	/**
-	 * Задать класс данных для списка выбора.
+	 * Set data item class to use in selection.
 	 * 
 	 * @param classType
 	 */
@@ -338,7 +340,7 @@ public class DataPicker extends CommonField implements IField {
 	}
 
 	/**
-	 * Задать класс таблицы для отображения списка.
+	 * Set table implementation class to display.
 	 * 
 	 * @param classType
 	 */
@@ -416,7 +418,7 @@ public class DataPicker extends CommonField implements IField {
 			c = new Color(mEdit.getDisplay(), 255, 255, 255);
 		}
 		mEdit.setBackground(c);
-		mControl.setBackground(c);
+		control.setBackground(c);
 	}
 
 	/**
@@ -425,7 +427,7 @@ public class DataPicker extends CommonField implements IField {
 	 * @param allowCreate
 	 */
 	public void setAllowCreate(boolean allowCreate) {
-		mAllowCreate = allowCreate;
+		this.allowCreate = allowCreate;
 	}
 
 	/**
@@ -434,7 +436,7 @@ public class DataPicker extends CommonField implements IField {
 	 * @return
 	 */
 	public boolean getAllowCreate() {
-		return mAllowCreate;
+		return allowCreate;
 	}
 
 	/**
@@ -443,7 +445,7 @@ public class DataPicker extends CommonField implements IField {
 	 * @return
 	 */
 	public boolean getPublic() {
-		return mPublic;
+		return publicData;
 	}
 
 	/**
@@ -453,7 +455,7 @@ public class DataPicker extends CommonField implements IField {
 	 * @param pub
 	 */
 	public void setPublic(boolean pub) {
-		mPublic = pub;
+		publicData = pub;
 	}
 
 	/**

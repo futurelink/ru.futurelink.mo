@@ -34,7 +34,7 @@ abstract public class CommonListController
 	implements IListController 
 {
 	private FilterDTO						filterDTO;
-	private CommonDTOList<? extends IDTO> dto;
+	private CommonDTOList<? extends IDTO>	dto;
 	private IDTOAccessChecker				accessChecker;
 	
 	public CommonListController(ICompositeController parentController,
@@ -119,7 +119,8 @@ abstract public class CommonListController
 	 * @param dto
 	 * @throws DTOException 
 	 */
-	protected synchronized void setDTO(CommonDTOList<? extends IDTO> dto) throws DTOException {
+	protected synchronized void setDTO(CommonDTOList<? extends IDTO> dto) 
+			throws DTOException {
 		removeDTO();	// Очищаем старый объект DTO
 		
 		this.dto = dto;
@@ -135,7 +136,8 @@ abstract public class CommonListController
 	 * @return
 	 * @throws DTOException 
 	 */
-	protected CommonDTOList<? extends IDTO> getDTO() throws DTOException {
+	@Override
+	public CommonDTOList<? extends IDTO> getDTO() throws DTOException {
 		return dto;
 	}
 	
@@ -277,7 +279,7 @@ abstract public class CommonListController
 			throw new DTOException("Ошибка обноелния данных", e);
 		}
 	}
-	
+
 	@Override
 	public void processUsecaseParams() {}
 }

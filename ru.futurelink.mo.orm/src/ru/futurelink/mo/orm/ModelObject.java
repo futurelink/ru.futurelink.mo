@@ -35,7 +35,7 @@ public abstract class ModelObject
 	public static final int SAVE_DELETE = 3;
 
 	public Accessors getAccessors(String fieldName) throws NoSuchFieldException {
-		return getField(fieldName).getAnnotation(Accessors.class);		
+		return getField(fieldName).getAnnotation(Accessors.class);
 	}
 
 	private Field getField(String fieldName) throws NoSuchFieldException {

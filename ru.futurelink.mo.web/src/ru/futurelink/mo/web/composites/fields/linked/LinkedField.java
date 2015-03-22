@@ -80,12 +80,12 @@ public class LinkedField extends TextField {
 			CommonItemComposite dataComposite) {
 		super(session, parent, style, params, dataComposite);
 
-		mPopup = new CommonPopup(mParent.getSession(), mParent.getShell(), SWT.BORDER);
+		mPopup = new CommonPopup(parent.getSession(), parent.getShell(), SWT.BORDER);
 		mSelectionParams = new HashMap<String, Object>();
 
 		// Убираем старый обработчик, который создал конструктор
 		if (mModifyListener != null)
-			((Text)mControl).removeModifyListener(mModifyListener);
+			((Text)control).removeModifyListener(mModifyListener);
 
 		// Задаем новый обработчик
 		mModifyListener = new ModifyListener() {
@@ -95,19 +95,19 @@ public class LinkedField extends TextField {
 				try {
 					
 					// Если текст изменился на подсказку - то считаем что текст пустой
-					if (((Text)mControl).getText().equals(getHint())) {
+					if (((Text)control).getText().equals(getHint())) {
 						mRealText = new String();
 					} else {
-						mRealText = String.copyValueOf(((Text)mControl).getText().toCharArray());
+						mRealText = String.copyValueOf(((Text)control).getText().toCharArray());
 					}
 
 					// Вызываем этот метод только для DTO предназначенных для редакитрования,
 					// если текст изменен на hint надо его занулить.
 					if ((getDTO() != null) && EditorDTO.class.isAssignableFrom(getDTO().getClass())) {
 						if ((getText() == null) || getText().equals(getHint())) {
-							getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, "");
+							getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, "");
 						} else {
-							getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, getText());
+							getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, getText());
 						}
 					}
 
@@ -130,9 +130,9 @@ public class LinkedField extends TextField {
 			}
 		};
 
-		((Text)mControl).addModifyListener(mModifyListener);
+		((Text)control).addModifyListener(mModifyListener);
 
-		((Text)mControl).addKeyListener(new KeyListener() {		
+		((Text)control).addKeyListener(new KeyListener() {		
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -174,7 +174,7 @@ public class LinkedField extends TextField {
 			}
 		});
 
-		mControl.addFocusListener(new FocusListener() {
+		control.addFocusListener(new FocusListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -186,8 +186,8 @@ public class LinkedField extends TextField {
 					Display.getCurrent().setData( RWT.CANCEL_KEYS, new String[] {} );
 					
 					// Если в данных пусто - покажем подсказку
-					if (((Text)mControl).getText().equals("")) {
-						((Text)mControl).setText(getHint());
+					if (((Text)control).getText().equals("")) {
+						((Text)control).setText(getHint());
 					}
 
 					dataChangeFinished();
@@ -209,8 +209,8 @@ public class LinkedField extends TextField {
 					mPopupShowingState = false;
 				
 				// Сбросим подсказку, если получили фокус, и текст равер подсказке
-				if (((Text)mControl).getText().equals(getHint())) {
-					((Text)mControl).setText("");
+				if (((Text)control).getText().equals(getHint())) {
+					((Text)control).setText("");
 				}
 				if (mFocusListener != null)
 					mFocusListener.focusGained(arg0);
@@ -227,15 +227,15 @@ public class LinkedField extends TextField {
 	 * @throws InitException 
 	 */
 	private void handlePopup() throws InitException {
-		if (((Text)mControl).getText().length() > 3) {
-			if (!((Text)mControl).getText().equals(getHint()) && mControl.isFocusControl()) {
+		if (((Text)control).getText().length() > 3) {
+			if (!((Text)control).getText().equals(getHint()) && control.isFocusControl()) {
 				if (!justShown) {
 					if (mLinkedListController != null) {
 
 						mPopupShowingState = true;
 						
-						Point coords = ((Text)mControl).toDisplay(0, 2);
-						Rectangle bounds = ((Text)mControl).getBounds();
+						Point coords = ((Text)control).toDisplay(0, 2);
+						Rectangle bounds = ((Text)control).getBounds();
 						mPopup.open();
 						
 						// Внедряем во всплывающее окно композит контроллера
@@ -245,7 +245,7 @@ public class LinkedField extends TextField {
 							mLinkedListController.handleDataQuery(8, mSelectionParams);
 							mPopup.attachComposite(mLinkedListController.getComposite());
 						} else {
-							mParent.getSession().logger().error("No composite for LinkedList created!");							
+							getSession().logger().error("No composite for LinkedList created!");							
 						}
 						
 						mPopup.moveTo(new Point(coords.x-1, coords.y+bounds.height-1));
@@ -274,10 +274,10 @@ public class LinkedField extends TextField {
 		// Но выборка должна происходить только если вводится слово целиком,
 		// или несколько слов, но не буква или набор букв.
 		String completedText = "Банк Приморье";
-		String text = ((Text)mControl).getText(); 
+		String text = ((Text)control).getText(); 
 		if (text.equals("Банк")) {
-			((Text)mControl).setText(completedText);
-			((Text)mControl).setSelection(text.length(), completedText.length());
+			((Text)control).setText(completedText);
+			((Text)control).setSelection(text.length(), completedText.length());
 		}
 	}
 

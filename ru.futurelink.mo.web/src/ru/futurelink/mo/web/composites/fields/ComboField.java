@@ -50,7 +50,7 @@ public class ComboField extends CommonField {
 			CommonItemComposite dataComposite) {
 		super(session, parent, style, params, dataComposite);
 
-		mControl = new Combo(mParent, SWT.BORDER | SWT.READ_ONLY);
+		control = new Combo(parent, SWT.BORDER | SWT.READ_ONLY);
 		mSelectionListener = new SelectionListener() {			
 			private static final long serialVersionUID = 1L;
 			@Override
@@ -61,10 +61,10 @@ public class ComboField extends CommonField {
 				try {
 					storeSelection();
 					
-					if (mFieldModifyListener != null) {
+					if (fieldModifyListener != null) {
 						Event event = new Event();
 						ModifyEvent e = new ModifyEvent(event);
-						mFieldModifyListener.modifyText(e);
+						fieldModifyListener.modifyText(e);
 					}			
 					
 					if (getControllerListener() != null)
@@ -74,7 +74,7 @@ public class ComboField extends CommonField {
 				}				
 			}
 		};
-		((Combo)mControl).addSelectionListener(mSelectionListener);
+		((Combo)control).addSelectionListener(mSelectionListener);
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class ComboField extends CommonField {
 	 */
 	private void storeSelection() throws DTOException {
 		if ((getDTO() != null) && (EditorDTO.class.isAssignableFrom(getDTO().getClass()))) {
-			getDTO().setDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter, 
+			getDTO().setDataField(dataFieldName, dataFieldGetter, dataFieldSetter, 
 					getSelection());
 
 			if (getControllerListener() != null)
@@ -95,7 +95,7 @@ public class ComboField extends CommonField {
 	}
 	
 	public void select(Integer index) {
-		((Combo)mControl).select(index);
+		((Combo)control).select(index);
 
 		try {
 			storeSelection();
@@ -116,7 +116,7 @@ public class ComboField extends CommonField {
 	@Override
 	public void refresh() throws DTOException {
 		if (getDTO() != null) {
-			Object f = getDTO().getDataField(mDataFieldName, mDataFieldGetter, mDataFieldSetter);
+			Object f = getDTO().getDataField(dataFieldName, dataFieldGetter, dataFieldSetter);
 			if (f != null) {
 				int index = 0;
 				// Пробежимся по набору ключей источника и вытащим индекс,
@@ -143,15 +143,15 @@ public class ComboField extends CommonField {
 	private void fillList() {
 		for (String s : mSource.keySet()) {
 			if (mSource.get(s) != null)
-				((Combo)mControl).add(mSource.get(s));
+				((Combo)control).add(mSource.get(s));
 		}		
 	}
 	
 	private String getSelection() {
-		int index = ((Combo)mControl).getSelectionIndex();
+		int index = ((Combo)control).getSelectionIndex();
 		if (index < 0) return null;
 
-		String value = ((Combo)mControl).getItem(index);
+		String value = ((Combo)control).getItem(index);
 
 		// найдем значение в источнике
 		for (String key : mSource.keySet()) {
@@ -163,15 +163,15 @@ public class ComboField extends CommonField {
 
 	@Override
 	public boolean isEmpty() {
-		return (((Combo)mControl).getSelectionIndex() < 0);
+		return (((Combo)control).getSelectionIndex() < 0);
 	}
 
 	@Override
 	public void handleMandatory() {
 		if (getMandatory()&&isEmpty()) {
-			mControl.setBackground(new Color(mControl.getDisplay(), 255, 169, 169));
+			control.setBackground(new Color(control.getDisplay(), 255, 169, 169));
 		} else {
-			mControl.setBackground(new Color(mControl.getDisplay(), 255, 255, 255));
+			control.setBackground(new Color(control.getDisplay(), 255, 255, 255));
 		}
 	}
 

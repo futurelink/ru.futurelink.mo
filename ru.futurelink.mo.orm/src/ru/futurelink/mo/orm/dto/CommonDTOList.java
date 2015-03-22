@@ -87,9 +87,17 @@ public abstract class CommonDTOList<T extends IDTO> {
 	 */
 	@SuppressWarnings("unchecked")
 	public void addDTOItem(IDTO dtoItem) throws DTOException {
+		
+		if (dtoItem == null) return;
+		
 		// Добавляем только новые элементы, если элемент уже есть,
 		// его дублировать не надо.
 		if (!mDTOList.containsValue(dtoItem)) {
+			
+			// Set access checker if it's not set
+			if (dtoItem.getAccessChecker() == null)
+				dtoItem.addAccessChecker(getAccessChecker());
+			
 			String id = dtoItem.getId();
 			// Если ID есть, то добавляем элемент с его ID, иначе,
 			// добавляем элемент с временной ID, которая создается на базе
@@ -108,6 +116,8 @@ public abstract class CommonDTOList<T extends IDTO> {
 	 * @throws DTOException
 	 */
 	public void removeDTOItem(IDTO dtoItem) throws DTOException {
+		if (dtoItem == null) return;
+
 		for (Integer index : mOrderList.keySet()) {
 			if (mOrderList.get(index).equals(dtoItem.getId())) {
 				mOrderList.remove(index);
@@ -121,8 +131,8 @@ public abstract class CommonDTOList<T extends IDTO> {
 	 * Clear the list.
 	 */
 	public void clear() {
-		mOrderList.clear();
-		mDTOList.clear();
+		if (mOrderList != null) mOrderList.clear();
+		if (mDTOList != null) mDTOList.clear();		
 		mIndex = 0;
 	}
 	
