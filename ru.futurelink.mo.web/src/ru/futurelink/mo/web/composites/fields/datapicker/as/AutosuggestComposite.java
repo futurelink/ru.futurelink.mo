@@ -153,7 +153,7 @@ public class AutosuggestComposite extends CommonListComposite {
 		/*
 		 * Search list composite
 		 */
-		autoSuggestListView = new ListViewer(c, SWT.PUSH);
+		autoSuggestListView = new ListViewer(c, SWT.V_SCROLL);
 		autoSuggestListView.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
 		autoSuggestListView.setContentProvider(new CommonContentProvider());
 		autoSuggestListView.setLabelProvider(labelProvider);

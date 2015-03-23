@@ -17,7 +17,6 @@ import org.eclipse.rap.rwt.client.service.JavaScriptExecutor;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.exceptions.SaveException;
 import ru.futurelink.mo.web.composites.fields.IField;
-import ru.futurelink.mo.web.composites.fields.datapicker.DataPicker;
 import ru.futurelink.mo.web.controller.CommonItemController;
 import ru.futurelink.mo.web.controller.CommonItemController.EditMode;
 import ru.futurelink.mo.web.controller.CommonItemEditControllerListener;
