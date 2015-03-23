@@ -182,9 +182,10 @@ public abstract class CommonItemController
 	}
 
 	@Override
-	public void create() throws DTOException {
-		setDTO(PersistentObjectFactory.getInstance().createEditorDTO(
-				mDataClass, EditorDTO.class, mPersistentSession, accessChecker));
+	public void create() throws DTOException {		
+		setDTO(createDTO(PersistentObjectFactory.getInstance()
+				.createPersistentObject(mDataClass, mPersistentSession))
+			);
 		doAfterCreate();
 	}
 

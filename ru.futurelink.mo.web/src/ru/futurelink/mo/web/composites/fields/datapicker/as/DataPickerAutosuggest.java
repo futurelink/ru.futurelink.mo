@@ -112,6 +112,11 @@ public class DataPickerAutosuggest extends DataPicker {
 					// Close popup after selection
 					autoSuggestPopup.close();
 				}
+
+				@Override
+				public void cancelAutosuggest() {
+					autoSuggestPopup.close();					
+				}
 			};
 	}
 	
@@ -178,6 +183,10 @@ public class DataPickerAutosuggest extends DataPicker {
 					}
 				});
 
+				// Prepare data for list selection
+				if (getPrepareListener() != null)
+					getPrepareListener().prepare();
+				
 				// Create autosuggest controller with composite packed into
 				// popup shell.
 				autoSuggestController = createAutoSuggestController();
@@ -246,8 +255,11 @@ public class DataPickerAutosuggest extends DataPicker {
 					ICompositeController.class, Class.class, 
 					Composite.class, CompositeParams.class);
 			
-			return autoSuggestCons.newInstance(getParentController(), getDataClass(), 
-					autoSuggestPopup.getShell(), new CompositeParams());
+			return autoSuggestCons.newInstance(
+					getParentController(), 
+					getDataClass(), 
+					autoSuggestPopup.getShell(), 
+					getParams());
 
 		} catch (NoSuchMethodException | SecurityException | InstantiationException | 
 				IllegalAccessException | IllegalArgumentException | 

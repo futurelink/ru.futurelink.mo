@@ -21,4 +21,5 @@ import ru.futurelink.mo.web.controller.CommonControllerListener;
  */
 public interface AutosuggestControllerListener extends CommonControllerListener {
 	public void setSelectedDTO(IDTO data) throws DTOException;
+	public void cancelAutosuggest();
 }

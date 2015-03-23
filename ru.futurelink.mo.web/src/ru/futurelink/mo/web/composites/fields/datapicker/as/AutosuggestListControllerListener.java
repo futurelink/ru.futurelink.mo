@@ -20,4 +20,5 @@ import ru.futurelink.mo.web.controller.CommonListControllerListener;
 public interface AutosuggestListControllerListener extends
 		CommonListControllerListener {
 	public void searchTextModified(String text);
+	public void cancelAutosuggest();
 }

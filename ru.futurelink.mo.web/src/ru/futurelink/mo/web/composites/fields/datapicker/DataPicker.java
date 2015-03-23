@@ -23,8 +23,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -256,10 +254,10 @@ public class DataPicker extends CommonField {
 				);
 			else
 				//mEdit.setText(getLocaleString("noValue"));
-				if (!mEdit.isFocusControl())
+				if (!mEdit.isDisposed() && !mEdit.isFocusControl())
 					mEdit.setText(HINTSTRING);
 		}
-		
+
 		handleMandatory();
 	}
 	
@@ -504,12 +502,35 @@ public class DataPicker extends CommonField {
 	}
 	
 	/**
+	 * Get params passed to data picker on preparing
+	 * into CompositeParams collection.
+	 * 
+	 * @return
+	 */
+	protected CompositeParams getParams() {
+		return (new CompositeParams()).
+			// Параметры выборки пикера
+			add("tableClass", getTableClass()).
+			add("queryConditions", getQueryConditions()).
+			add("orderBy", getOrderBy()).
+
+			// Параметры, которые касаются возможностей пикера
+			add("itemControllerClass", getItemControllerClass()).
+			add("itemDialogParams", getItemDialogParams()).
+			add("allowCreate", getAllowCreate()).
+			add("public", getPublic());		
+	}
+	
+	/**
 	 * Обработка открытия окна выбора из базы данных посредством
 	 * поля DataPicker.
 	 * 
 	 * @param picker
 	 */
 	public void openSelectionDialog() {
+		// Can not open selection until parent controller is set
+		if (getParentController() == null) return;
+		
 		CommonDialog d = new CommonDialog(getSession(), getParentController().getComposite().getShell(), SWT.NONE);		
 		Class<? extends CommonDataPickerController> pickerControllerClass = getPickerController();
 		if (pickerControllerClass == null) {
@@ -540,19 +561,7 @@ public class DataPicker extends CommonField {
 					(CompositeController)getParentController(),
 					getDataClass(),
 					d.getShell(),
-					(new CompositeParams()).
-
-						// Параметры выборки пикера
-						add("tableClass", getTableClass()).
-						add("queryConditions", getQueryConditions()).
-						add("orderBy", getOrderBy()).
-
-						// Параметры, которые касаются возможностей пикера
-						add("itemControllerClass", getItemControllerClass()).
-						add("itemDialogParams", getItemDialogParams()).
-						add("allowCreate", getAllowCreate()).
-						add("public", getPublic())
-						);
+					getParams());
 			c.init();
 			// If there was an error in composite creation it must do nothing
 			if (c.getComposite() != null && !c.getComposite().isDisposed()) {

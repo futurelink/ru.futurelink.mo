@@ -126,6 +126,12 @@ public abstract class AutosuggestController extends CommonListController {
 			}
 
 			@Override
+			public void cancelAutosuggest() {
+				if (getControllerListener() != null)
+					((AutosuggestControllerListener)getControllerListener()).cancelAutosuggest();
+			}
+
+			@Override
 			public void itemDoubleClicked(IDTO data) {}
 			
 			@Override
