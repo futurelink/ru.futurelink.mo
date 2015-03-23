@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings
+    xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm
+          http://java.sun.com/xml/ns/persistence/orm_2_0.xsd" version="2.0">
+
+  	<sequence-generator name="system-uuid" sequence-name="system-uuid"></sequence-generator>
+
+	<entity class = "ru.futurelink.mo.orm.entities.CommonObject"></entity>
+	<entity class = "ru.futurelink.mo.orm.entities.CodeSupport"></entity>
+	<entity class = "ru.futurelink.mo.orm.entities.WorkLogSupport"></entity>
+	<entity class = "ru.futurelink.mo.orm.entities.HistoryObject"></entity>
+	<entity class = "ru.futurelink.mo.orm.entities.CommonRegister"></entity>
+	<entity class = "ru.futurelink.mo.orm.entities.security.UserLock"></entity>
+	<entity class = "ru.futurelink.mo.orm.entities.security.User"></entity>
+	<entity class = "ru.futurelink.mo.orm.entities.security.Client"></entity>
+	<entity class = "ru.futurelink.mo.orm.entities.security.Access"></entity>
+	<entity class = "ru.futurelink.mo.orm.entities.mailer.MailServer"></entity>
+	<entity class = "ru.futurelink.mo.orm.entities.mailer.MailQueue"></entity>
+	<entity class = "ru.futurelink.mo.orm.entities.mailer.MailTemplate"></entity>
+	<entity class = "ru.futurelink.mo.orm.entities.migration.MigrationVersion"></entity>
+
+</entity-mappings>

@@ -42,15 +42,14 @@ import ru.futurelink.mo.web.controller.CompositeParams;
  * @author pavlov
  *
  */
-public class SimpleDataPickerController extends CommonDataPickerController {
+public class SimpleDataPickerController extends DataPickerController {
 
 	private Class<?>				mTableClass;
-
-	private Map<String, ArrayList<Object>> mQueryConditions;
 	private String				mOrderBy;
 	private boolean				mPublic;
 
-	private EditorDTOList<EditorDTO> mList;
+	private Map<String, List<Object>>	mQueryConditions;
+	private EditorDTOList<EditorDTO>	mList;
 
 	/**
 	 * @param parentController
@@ -65,7 +64,7 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 		super(parentController, dataClass, container, compositeParams);
 		
 		if (compositeParams.get("queryConditions") != null) {
-			mQueryConditions = (Map<String, ArrayList<Object>>) compositeParams.get("queryConditions"); 
+			mQueryConditions = (Map<String, List<Object>>) compositeParams.get("queryConditions"); 
 		}
 		
 		if (compositeParams.get("orderBy") != null) {
@@ -90,62 +89,8 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void handleDataQuery() throws DTOException {		
-		// Выполняем именованый запрос всех затратных документов нашего пользователя
-		logger().debug("Запрос данных списка для просмотра...");
-		TypedQuery<?> q2;
-		String queryString = "";
-		if (IHistoryObject.class.isAssignableFrom(mDataClass)) {
-			queryString = 
-				"select d from "+mDataClass.getName()+" d where d.deleteFlag = 0 and d.outdated = 0";
-		} else {
-			queryString = 
-				"select d from "+mDataClass.getName()+" d where d.deleteFlag = 0";
-		}
 		
-		// If data picker is not public select records filtered by owner only 
-		if (!mPublic) {
-			 queryString += " and d.owner = :owner";
-		}
-		
-		// Перелопатим допусловия первый раз...
-		HashMap<String, Object> additionalValues = new HashMap<>();
-		if (mQueryConditions != null) {
-			int k = 0;
-			ArrayList<String> additionalConditions = new ArrayList<String>();
-			for (String fieldName : mQueryConditions.keySet()) {
-				k++;
-				String cond = ""; 
-				for (int n = 0; n < mQueryConditions.get(fieldName).size(); n++) {
-					if (mQueryConditions.get(fieldName).get(n) != null) {
-						cond = cond + "d." + fieldName + " = :fieldData" + k + n;
-						additionalValues.put("fieldData" + k + n, mQueryConditions.get(fieldName).get(n));
-					} else {
-						cond = cond + "d." + fieldName + " is null";
-					}
-					if (n < mQueryConditions.get(fieldName).size()-1)
-						cond = cond + " or ";
-				}
-				cond = "("+ cond +")";
-				additionalConditions.add(cond);
-			}
-			if (additionalConditions.size() > 0)
-				queryString = queryString + " and " + CommonDataPickerController.join(additionalConditions, " and ");
-		}
-		logger().info("Additional query conditions: {}", queryString);
-
-		// Add ordering after query is created
-		if ((mOrderBy != null) && (!mOrderBy.isEmpty())) {
-			queryString += " order by d."+mOrderBy;
-		}
-
-		q2 = mSession.persistent().getEm().createQuery(queryString, mDataClass);
-		if (!mPublic) q2.setParameter("owner", getSession().getDatabaseUser());
-		if (additionalValues.size() > 0) {
-			for (String key : additionalValues.keySet()) {
-				q2.setParameter(key, additionalValues.get(key));
-			}
-		}
-		
+		TypedQuery<?> q2 = buildQuery(getDataClass(), mQueryConditions, mOrderBy, mPublic);
 		if (q2.getResultList().size() > 0) {
 			logger().debug("Records quantity: {}", q2.getResultList().size());
 		}
@@ -154,6 +99,69 @@ public class SimpleDataPickerController extends CommonDataPickerController {
 		mList.addObjectList((List<? extends ModelObject>) q2.getResultList());
 		
 		handleDataQueryExecuted();
+	}
+	
+	private TypedQuery<?> buildQuery(
+			Class<?> dataClass,
+			Map<String, List<Object>> queryConditions,
+			String orderBy,
+			boolean publicData) {
+
+		String queryString = "";
+		if (IHistoryObject.class.isAssignableFrom(mDataClass)) {
+			queryString = 
+				"select d from "+dataClass.getName()+" d where d.deleteFlag = 0 and d.outdated = 0";
+		} else {
+			queryString = 
+				"select d from "+dataClass.getName()+" d where d.deleteFlag = 0";
+		}
+
+		// If data picker is not public select records filtered by owner only 
+		if (!publicData) {
+			 queryString += " and d.owner = :owner";
+		}
+		
+		// Iterate on additional condition values...
+		HashMap<String, Object> additionalValues = new HashMap<>();
+		if (queryConditions != null) {
+			int k = 0;
+			ArrayList<String> additionalConditions = new ArrayList<String>();
+			for (String fieldName : queryConditions.keySet()) {
+				k++;
+				String cond = ""; 
+				for (int n = 0; n < queryConditions.get(fieldName).size(); n++) {
+					if (queryConditions.get(fieldName).get(n) != null) {
+						cond = cond + "d." + fieldName + " = :fieldData" + k + n;
+						additionalValues.put("fieldData" + k + n, queryConditions.get(fieldName).get(n));
+					} else {
+						cond = cond + "d." + fieldName + " is null";
+					}
+					if (n < queryConditions.get(fieldName).size()-1)
+						cond = cond + " or ";
+				}
+				cond = "("+ cond +")";
+				additionalConditions.add(cond);
+			}
+			if (additionalConditions.size() > 0)
+				queryString = queryString + " and " + DataPickerController.join(additionalConditions, " and ");
+		}
+		logger().info("Additional query conditions: {}", queryString);
+
+		// Add ordering after query is created
+		if ((orderBy != null) && (!orderBy.isEmpty())) {
+			queryString += " order by d." + orderBy;
+		}
+
+		TypedQuery<?> q = mSession.persistent().getEm().createQuery(queryString, dataClass);
+		if (!publicData) q.setParameter("owner", getSession().getDatabaseUser());
+
+		if (additionalValues.size() > 0) {
+			for (String key : additionalValues.keySet()) {
+				q.setParameter(key, additionalValues.get(key));
+			}
+		}
+
+		return q;
 	}
 	
 	@Override

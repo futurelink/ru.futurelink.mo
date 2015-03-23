@@ -32,7 +32,7 @@ import ru.futurelink.mo.web.app.ApplicationSession;
 import ru.futurelink.mo.web.composites.CommonComposite;
 import ru.futurelink.mo.web.composites.CommonItemComposite;
 import ru.futurelink.mo.web.composites.CommonPopup;
-import ru.futurelink.mo.web.composites.fields.datapicker.CommonDataPickerController;
+import ru.futurelink.mo.web.composites.fields.datapicker.DataPickerController;
 import ru.futurelink.mo.web.composites.fields.datapicker.DataPicker;
 import ru.futurelink.mo.web.controller.CompositeParams;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
@@ -76,7 +76,7 @@ public class DataPickerAutosuggest extends DataPicker {
 			int style, 
 			CompositeParams params, 
 			CommonItemComposite dataComposite,
-			Class<? extends CommonDataPickerController> pickerController,
+			Class<? extends DataPickerController> pickerController,
 			Class<? extends AutosuggestController> autoSuggestControllerClass) {
 		super(session, parent, style, params, dataComposite, pickerController);
 		
@@ -89,7 +89,7 @@ public class DataPickerAutosuggest extends DataPicker {
 			int style, 
 			CompositeParams params,
 			CommonDTO dto,
-			Class<? extends CommonDataPickerController> pickerController,
+			Class<? extends DataPickerController> pickerController,
 			Class<? extends AutosuggestController> autoSuggestControllerClass) {
 		super(session, parent, style, params, dto, pickerController);
 		
@@ -142,7 +142,7 @@ public class DataPickerAutosuggest extends DataPicker {
 				}
 			}
 		});
-		
+
 		mEdit.addFocusListener(new FocusListener() {
 			private static final long serialVersionUID = 1L;
 

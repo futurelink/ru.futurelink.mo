@@ -23,10 +23,13 @@ import ru.futurelink.mo.web.composites.toolbar.JournalToolbar;
 import ru.futurelink.mo.web.controller.CompositeParams;
 
 /**
+ * The most basic data picker selection window toolbar.
+ * It only contains two buttons: "Select" and "Close".
+ * 
  * @author pavlov
  *
  */
-public class CommonDataPickerToolbar extends ItemToolbar {
+public class DataPickerToolbar extends ItemToolbar {
 	private static final long serialVersionUID = 1L;
 
 	private Button createButton;
@@ -37,7 +40,7 @@ public class CommonDataPickerToolbar extends ItemToolbar {
 	 * @param parent
 	 * @param style
 	 */
-	public CommonDataPickerToolbar(ApplicationSession session,
+	public DataPickerToolbar(ApplicationSession session,
 			Composite parent, int style, CompositeParams params) {
 		super(session, parent, style);
 		

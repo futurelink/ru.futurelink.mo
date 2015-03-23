@@ -178,7 +178,7 @@ public class AutosuggestComposite extends CommonListComposite {
 		autoSuggestEdit.setText(text);
 		autoSuggestEdit.setSelection(caretPosition);
 	}
-	
+
 	@Override
 	protected void finalize() throws Throwable {
 		displayColumnName = null;

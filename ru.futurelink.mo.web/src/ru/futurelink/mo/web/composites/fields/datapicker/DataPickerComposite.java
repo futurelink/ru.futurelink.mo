@@ -25,10 +25,10 @@ import ru.futurelink.mo.web.composites.toolbar.ToolbarListener;
 import ru.futurelink.mo.web.controller.CompositeParams;
 import ru.futurelink.mo.web.exceptions.InitException;
 
-abstract public class CommonDataPickerComposite extends CommonListComposite {
+abstract public class DataPickerComposite extends CommonListComposite {
 	private static final long serialVersionUID = 1L;
 
-	public CommonDataPickerComposite(ApplicationSession session, Composite parent, int style,
+	public DataPickerComposite(ApplicationSession session, Composite parent, int style,
 			Class<?> tableClass, CompositeParams params) {
 		super(session, parent, style, params);
 	}
@@ -37,16 +37,16 @@ abstract public class CommonDataPickerComposite extends CommonListComposite {
 	protected CommonToolbar createToolbar() {
 		
 		/*
-		 * Переносим нужные параметры на тулбар
+		 * Set params passing to toolbar.
 		 */
 		CompositeParams params = new CompositeParams();
 		params.add("allowCreate", getParam("allowCreate"));
 		params.add("itemControllerClass", getParam("itemControllerClass"));
-		
+
 		/*
-		 * Создаем недостаюзщие кнопочки в зависимости от параметров тулбара.
+		 * Create parameter specified buttons on toolbar.
 		 */
-		ItemToolbar toolbar = new CommonDataPickerToolbar(getSession(), this, SWT.NONE, params);
+		ItemToolbar toolbar = new DataPickerToolbar(getSession(), this, SWT.NONE, params);
 		toolbar.addToolBarListener(new ToolbarListener() {			
 			@Override
 			public void toolBarButtonPressed(Button button) {

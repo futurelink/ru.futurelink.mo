@@ -35,7 +35,7 @@ import ru.futurelink.mo.web.controller.CommonTableControllerListener;
  *
  */
 public class SimpleDataPickerComposite 
-	extends CommonDataPickerComposite {
+	extends DataPickerComposite {
 	private static final long serialVersionUID = 1L;
 
 	private Class<? extends ICommonTable>	mTableClass;

@@ -40,13 +40,13 @@ import ru.futurelink.mo.web.exceptions.InitException;
  * @author Futurelink
  *
  */
-abstract public class CommonDataPickerController 
+abstract public class DataPickerController 
 	extends CommonListController
 	implements IListEditController {
 
 	private IDTO mActiveData;
 
-	public CommonDataPickerController(CompositeController parentController,
+	public DataPickerController(CompositeController parentController,
 			Class<? extends ICommonObject> dataClass, Composite container,
 			CompositeParams compositeParams) {
 		super(parentController, dataClass, container, compositeParams);

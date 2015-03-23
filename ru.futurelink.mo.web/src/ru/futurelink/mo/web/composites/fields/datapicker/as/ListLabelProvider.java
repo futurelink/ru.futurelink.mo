@@ -17,6 +17,9 @@ import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 
 /**
+ * List label provider for DTO. Displays one column of
+ * DTO as text.
+ * 
  * @author pavlov
  *
  */

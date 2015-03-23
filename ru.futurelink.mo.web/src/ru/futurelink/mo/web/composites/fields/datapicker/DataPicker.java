@@ -49,7 +49,9 @@ import ru.futurelink.mo.web.controller.CompositeParams;
 import ru.futurelink.mo.web.exceptions.InitException;
 
 /**
- * Простейший контрол выбора элемента из списка.
+ * Data picker control.
+ * 
+ * This control is used to select referenced data from the list.
  * 
  * @author Futurelink
  *
@@ -70,24 +72,19 @@ public class DataPicker extends CommonField {
 	private Class<? extends CommonItemController> mItemControllerClass;
 	private CompositeParams						mItemDialogParams;
 	
-	private Class<? extends CommonDataPickerController> mPickerController;
+	private Class<? extends DataPickerController> mPickerController;
 	
-	private String			mDisplayFieldName;
-	private String			mDisplayFieldGetterName;
-
-	private String			mSelectedFieldName;
-	private String			mSelectedFieldGetterName;
+	private String		mDisplayFieldName;
+	private String		mDisplayFieldGetterName;
+	
+	private String		mSelectedFieldName;
+	private String		mSelectedFieldGetterName;
 
 	private Map<String, ArrayList<Object>> mQueryConditions;
-	private String			mOrderBy;	
+	private String		mOrderBy;	
 	
-	// Свойства используемые для определения 
-	// создания элемента из списка выбора
-	private boolean		allowCreate;
-
-	// Не учитывать создателя-владельца элемента при
-	// построении списка (публичный список-справочник)
-	private boolean		publicData;
+	private boolean		allowCreate;	// Allow creation from selection list
+	private boolean		publicData;		// Don't care about owner-creator of data 
 	
 	protected CommonItemControllerListener mParentControllerListener;
 	
@@ -96,7 +93,7 @@ public class DataPicker extends CommonField {
 			int style, 
 			CompositeParams params, 
 			CommonItemComposite dataComposite,
-			Class<? extends CommonDataPickerController> pickerController
+			Class<? extends DataPickerController> pickerController
 			) {
 		super(session, parent, style, params, dataComposite);
 		
@@ -109,7 +106,7 @@ public class DataPicker extends CommonField {
 			int style, 
 			CompositeParams params,
 			CommonDTO dto,
-			Class<? extends CommonDataPickerController> pickerController
+			Class<? extends DataPickerController> pickerController
 			) {
 		super(session, parent, style, params, dto);
 
@@ -215,7 +212,6 @@ public class DataPicker extends CommonField {
 	 * @param data
 	 */
 	public void setSelectedDTO(IDTO data) throws DTOException {
-		// Только если реально данные изменились на уровне объекта
 		/*if (((data != null) && !data.equals(mSelectedData)) || 
 			((data == null) && (mSelectedData != null))) {
 			mSelectedData = data;*/
@@ -262,11 +258,11 @@ public class DataPicker extends CommonField {
 	}
 	
 	/**
-	 * Получить класс контроллера списка выбора для этого элмента.
+	 * Get data picker selection controller class.
 	 * 
 	 * @return
 	 */
-	final public Class<? extends CommonDataPickerController> getPickerController() {
+	final public Class<? extends DataPickerController> getPickerController() {
 		return mPickerController;
 	}
 	
@@ -294,23 +290,31 @@ public class DataPicker extends CommonField {
 	}
 	
 	/**
-	 * Привязать обработчик изменения выбора.
+	 * Set data modify listener.
 	 */
 	final public void addModifyListener(ModifyListener listener) {
 		mModifyListener = listener;
 	}
 
 	/**
-	 * Отвязать обработчик изменения выбора.
+	 * Remove data modify listener.
 	 */
 	final public void removeModifyListener() {
 		mModifyListener = null;
 	}
 
+	/**
+	 * Set data selection preparation procedure listener.
+	 * 
+	 * @param listener
+	 */
 	final public void addPrepareListener(PrepareListener listener) {
 		mPrepareListener = listener;
 	}
 	
+	/**
+	 * Remove data selection preparetion procedure listener.
+	 */
 	final public void removePrepareListener() {
 		mPrepareListener = null;
 	}
@@ -337,10 +341,20 @@ public class DataPicker extends CommonField {
 		mTableClass = classType;
 	}
 
+	/**
+	 * Get referenced (picked) data entity class.
+	 * 
+	 * @return
+	 */
 	final public Class<? extends ICommonObject> getDataClass() {
 		return mDataClass;
 	}
 	
+	/**
+	 * Get display table class.
+	 * 
+	 * @return
+	 */
 	final public Class<?> getTableClass() {
 		return mTableClass;
 	}
@@ -411,7 +425,7 @@ public class DataPicker extends CommonField {
 	}
 
 	/**
-	 * Можно создавать элементы из списка выбора?
+	 * Set permission to create referenced data from selection list.
 	 * 
 	 * @param allowCreate
 	 */
@@ -420,7 +434,7 @@ public class DataPicker extends CommonField {
 	}
 
 	/**
-	 * Получить можно ли создавать элементы из списка выбора.
+	 * Get ability to create referenced data from selection list.
 	 * 
 	 * @return
 	 */
@@ -429,7 +443,7 @@ public class DataPicker extends CommonField {
 	}
 
 	/**
-	 * Is the data picker public or not.
+	 * Is the data picker operates on all data or only on own referenced data.
 	 * 
 	 * @return
 	 */
@@ -522,17 +536,16 @@ public class DataPicker extends CommonField {
 	}
 	
 	/**
-	 * Обработка открытия окна выбора из базы данных посредством
-	 * поля DataPicker.
+	 * Open referenced data selection window.
 	 * 
 	 * @param picker
 	 */
-	public void openSelectionDialog() {
+	protected void openSelectionDialog() {
 		// Can not open selection until parent controller is set
 		if (getParentController() == null) return;
 		
 		CommonDialog d = new CommonDialog(getSession(), getParentController().getComposite().getShell(), SWT.NONE);		
-		Class<? extends CommonDataPickerController> pickerControllerClass = getPickerController();
+		Class<? extends DataPickerController> pickerControllerClass = getPickerController();
 		if (pickerControllerClass == null) {
 			pickerControllerClass = SimpleDataPickerController.class;
 		}
@@ -554,10 +567,10 @@ public class DataPicker extends CommonField {
 		if (getPrepareListener() != null)
 			getPrepareListener().prepare();
 		
-		CommonDataPickerController c = null;
+		DataPickerController c = null;
 		d.setText(((CommonComposite)getParentController().getComposite()).getLocaleString("selection"));				
 		try {		
-			c = (CommonDataPickerController) constr.newInstance(
+			c = (DataPickerController) constr.newInstance(
 					(CompositeController)getParentController(),
 					getDataClass(),
 					d.getShell(),
