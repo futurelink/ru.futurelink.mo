@@ -12,9 +12,19 @@
 package ru.futurelink.mo.web.controller;
 
 import java.lang.reflect.Constructor;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.eclipse.swt.widgets.Composite;
 
+import ru.futurelink.mo.orm.ModelObject;
 import ru.futurelink.mo.orm.dto.CommonDTO;
 import ru.futurelink.mo.orm.dto.CommonDTOList;
 import ru.futurelink.mo.orm.dto.EditorDTOList;
@@ -23,6 +33,7 @@ import ru.futurelink.mo.orm.dto.IDTO;
 import ru.futurelink.mo.orm.dto.access.IDTOAccessChecker;
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.iface.ICommonObject;
+import ru.futurelink.mo.orm.types.DateRange;
 import ru.futurelink.mo.web.composites.CommonDataComposite;
 import ru.futurelink.mo.web.composites.CommonListComposite;
 import ru.futurelink.mo.web.controller.iface.ICompositeController;
@@ -36,7 +47,7 @@ abstract public class CommonListController
 	private FilterDTO						filterDTO;
 	private CommonDTOList<? extends IDTO>	dto;
 	private IDTOAccessChecker				accessChecker;
-	
+
 	public CommonListController(ICompositeController parentController,
 			Class<? extends ICommonObject> dataClass, CompositeParams compositeParams) {
 		super(parentController, dataClass, compositeParams);
@@ -168,6 +179,7 @@ abstract public class CommonListController
 	/**
 	 * Очистка DTO списка. Удаляем все данные из DTO и обновляем
 	 * отображения списка.
+	 * 
 	 * @throws DTOException 
 	 */
 	public synchronized void clearDTO() throws DTOException {
@@ -227,6 +239,98 @@ abstract public class CommonListController
 		filterDTO = filter;
 	}
 	
+	public final Predicate getFilterConditions(
+			CriteriaQuery<? extends ModelObject> cq,			
+			Root<? extends ModelObject> root,
+			Map<String, Object> parametres) {
+
+		Predicate pre = null;
+		CriteriaBuilder cb = getSession().persistent().getEm().getCriteriaBuilder();
+		Map<String, List<Object>> conditions = filterDTO.getConditions();
+
+		if (!conditions.isEmpty()) {
+			int k = 0;
+			for (String fieldName : conditions.keySet()) {
+				k++;
+				for (int n = 0; n < conditions.get(fieldName).size(); n++) {
+					Predicate newPre = null;
+					// Empty conditions are skipped
+					if (conditions.get(fieldName).get(n) != null) {
+
+						// If condition is a CommonDTO object - use data item specific value processing
+						if (CommonDTO.class.isAssignableFrom(conditions.get(fieldName).get(n).getClass())) {
+							try {
+								String id = ((CommonDTO)conditions.get(fieldName).get(n)).getId();
+								newPre = cb.equal(
+										root.get(fieldName).get("id"), 
+										cb.parameter(ModelObject.class, "fieldData" + k + n));
+
+								// Put return parameter
+								parametres.put("fieldData" + k + n, id);
+							} catch (DTOException ex) {
+								// TODO handle this error
+								ex.printStackTrace();
+							}
+						} else {
+							// If condition is a string or any other value - use simple string processing
+							if (!conditions.get(fieldName).get(n).equals("")) {
+								// Обработка диапазона дат "от" и "до" 
+								if (DateRange.class.isAssignableFrom(conditions.get(fieldName).get(n).getClass())) {
+									newPre = cb.and(
+										cb.greaterThanOrEqualTo(
+											root.<Date>get(fieldName), 
+											cb.parameter(Date.class, "fieldData" + k + n + "min")),
+										cb.lessThanOrEqualTo(
+											root.<Date>get(fieldName), 
+											cb.parameter(Date.class, "fieldData" + k + n + "max"))
+									);
+
+									// Put return parameter
+									parametres.put("fieldData" + k + n + "min", 
+										((DateRange)conditions.get(fieldName).get(n)).getBeginDate());						
+									parametres.put("fieldData" + k + n + "max", 
+										((DateRange)conditions.get(fieldName).get(n)).getEndDate());						
+								} else {					
+									newPre = cb.equal(
+											root.get(fieldName), 
+											cb.parameter(Object.class, "fieldData" + k + n));
+
+									// Put return parameter
+									parametres.put("fieldData" + k + n, conditions.get(fieldName).get(n));
+								}
+							}
+						}
+
+						// Add filter predicate as 'AND'/'OR' clause
+						if (newPre != null)
+							if (pre == null)
+								pre = newPre;
+							else {
+								// If there is more than one condition on the same field, use "or"
+								if (n < conditions.get(fieldName).size()-1)
+									pre = cb.or(pre, newPre);
+								else
+									pre = cb.and(pre, newPre);
+							}
+
+					}
+				}
+			}
+		}
+
+		cb = null;
+		
+		return pre;
+	}
+
+	public final void applyFilterConditionsParameters(Query query, Map<String, Object> parametres) {
+		if ((query != null) && (parametres != null)) {
+			for (String key : parametres.keySet()) {
+				query.setParameter(key, parametres.get(key));
+			}
+		}
+	}
+
 	/**
 	 * Создание контроллера элемента.
 	 * 

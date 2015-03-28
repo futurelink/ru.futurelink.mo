@@ -15,10 +15,10 @@ import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Query;
-
 import ru.futurelink.mo.orm.exceptions.DTOException;
 import ru.futurelink.mo.orm.types.DateRange;
 
@@ -31,14 +31,14 @@ import ru.futurelink.mo.orm.types.DateRange;
 public class FilterDTO extends CommonDTO {
 	private static final long serialVersionUID = 1L;
 
-	private Map<String, ArrayList<Object>> mQueryConditions;
+	private Map<String, List<Object>>		mQueryConditions;
 	private HashMap<String, Object>			mAdditionalValues;
 	private String							mConditionsQueryString = "";
 
 	public FilterDTO() {
 		super(null);
 		
-		mQueryConditions = new HashMap<String, ArrayList<Object>>() ;
+		mQueryConditions = new HashMap<String, List<Object>>() ;
 		mAdditionalValues = new HashMap<String, Object>();		
 	}
 
@@ -61,6 +61,10 @@ public class FilterDTO extends CommonDTO {
 		}
 	}
 
+	public Map<String, List<Object>> getConditions() {
+		return mQueryConditions;
+	}
+	
 	private Object getCondition(String fieldName) {
 		if (mQueryConditions.get(fieldName) != null) {
 			return mQueryConditions.get(fieldName).get(0);

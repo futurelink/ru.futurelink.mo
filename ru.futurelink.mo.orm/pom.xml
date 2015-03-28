@@ -92,7 +92,7 @@
 							ru.futurelink.mo.orm.annotations,
 							ru.futurelink.mo.orm.aspects,
 							ru.futurelink.mo.orm.dto.*,
-							ru.futurelink.mo.orm.exceptions,							
+							ru.futurelink.mo.orm.exceptions,
 							ru.futurelink.mo.orm.migration,
 							ru.futurelink.mo.orm.security,
 							ru.futurelink.mo.orm.types
@@ -161,12 +161,6 @@
 			<version>2.6.0.v20150309-bf26070</version>
 			<type>bundle</type>
 		</dependency>
-<!--		<dependency>
-			<groupId>eclipselink</groupId>
-			<artifactId>org.eclipse.persistence.jpa.modelgen</artifactId>
-			<version>2.6.0.v20150309-bf26070</version>
-			<type>bundle</type>
-		</dependency>-->
 		<dependency>
 			<groupId>equinox</groupId>
 			<artifactId>org.eclipse.osgi.services</artifactId>
